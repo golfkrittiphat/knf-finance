@@ -5,6 +5,7 @@ stack = "BEST_EFFORT_FALLBACK"
 
 [nix]
 channel = "stable-25_05"
+packages = ["nano"]
 
 [workflows]
 runButton = "Project"
@@ -36,6 +37,10 @@ externalPort = 80
 
 [[ports]]
 localPort = 5001
+
+[[ports]]
+localPort = 5002
+externalPort = 3000
 
 [userenv]
 

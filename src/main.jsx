@@ -71,7 +71,8 @@ function App() {
         fetchRecords();
       })
       .subscribe();
-    return () => supabase.removeChannel(channel);
+    const interval = setInterval(fetchRecords, 5000);
+return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, []);
 
   async function fetchRecords() {
