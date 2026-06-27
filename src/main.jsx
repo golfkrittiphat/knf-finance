@@ -256,6 +256,29 @@ function App() {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showSummaryPicker, setShowSummaryPicker] = useState(false);
 
+  // ตั้งพื้นหลังของหน้าเว็บ (html/body) ให้เป็นสีเดียวกับแอป
+  // กันไม่ให้เห็นขอบ/แถบสีขาวตอนเนื้อหาสั้นกว่าจอ หรือตอนเลื่อนหน้าจอเด้ง (overscroll)
+  useEffect(() => {
+    const prevHtmlBg = document.documentElement.style.background;
+    const prevBodyBg = document.body.style.background;
+    document.documentElement.style.background = "#0f172a";
+    document.body.style.background = "#0f172a";
+    document.body.style.margin = "0";
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    const prevMeta = meta.content;
+    meta.content = "#0f172a";
+    return () => {
+      document.documentElement.style.background = prevHtmlBg;
+      document.body.style.background = prevBodyBg;
+      meta.content = prevMeta;
+    };
+  }, []);
+
   // โหลดข้อมูลจาก Supabase
   useEffect(() => {
     fetchRecords();
