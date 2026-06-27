@@ -37,7 +37,8 @@ externalPort = 80
 [userenv]
 
 [userenv.shared]
-VITE_SUPABASE_URL = ""
+VITE_SUPABASE_URL = "https://sbpmkmuxtslmxwsdaral.supabase.co"
+VITE_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicG1rbXV4dHNsbXh3c2RhcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTczNjAsImV4cCI6MjA5ODEzMzM2MH0.9xWYG8SG5CmP5pVvnyxS79JrEL0g-pku0334GiOEOTs"
 
 [deployment]
 deploymentTarget = "static"
