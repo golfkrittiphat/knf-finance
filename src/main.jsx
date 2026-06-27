@@ -13,9 +13,9 @@ const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่ง�
 // รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
 // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
 const STAFF_PINS = {
-  "1203": "กอล์ฟ",
-  "121": "น้ำ",
-  "313": "กิ๊บ",
+  "1111": "เจ้าของร้าน",
+  "1234": "พนักงาน A",
+  "5678": "พนักงาน B",
 };
 
 const formatMoney = (n) =>
@@ -191,6 +191,51 @@ function SummaryImageModal({ image, onClose }) {
   );
 }
 
+// โมดัลเลือกแบบสรุป (วันเดียว/ทั้งเดือน) ก่อนสร้างภาพ
+function SummaryPickerModal({ summaryMode, setSummaryMode, summaryDate, setSummaryDate, filterMonth, onGenerate, generating, onClose }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 340, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>📷 สร้างภาพสรุป</div>
+        <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 12, border: "1px solid #334155" }}>
+          {[{ key: "day", label: "วันเดียว" }, { key: "month", label: `ทั้งเดือน (${filterMonth})` }].map((m) => (
+            <button key={m.key} onClick={() => setSummaryMode(m.key)} style={{
+              flex: 1, padding: "9px 0", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
+              background: summaryMode === m.key ? "#0f4c2a" : "#0f172a",
+              color: summaryMode === m.key ? "#fff" : "#64748b", transition: "all 0.2s",
+            }}>{m.label}</button>
+          ))}
+        </div>
+        {summaryMode === "day" && (
+          <input type="date" value={summaryDate} onChange={(e) => setSummaryDate(e.target.value)}
+            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "8px 12px", borderRadius: 8, fontSize: 14, marginBottom: 12, width: "100%", boxSizing: "border-box" }} />
+        )}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onGenerate} disabled={generating} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none", cursor: generating ? "not-allowed" : "pointer",
+            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff", fontWeight: 700, fontSize: 14,
+            opacity: generating ? 0.7 : 1,
+          }}>
+            {generating ? "⏳ กำลังสร้าง..." : "🖼️ สร้างภาพ"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -209,6 +254,7 @@ function App() {
   const [summaryDate, setSummaryDate] = useState(todayStr());
   const [summaryImage, setSummaryImage] = useState(null); // { dataUrl, label }
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [showSummaryPicker, setShowSummaryPicker] = useState(false);
 
   // โหลดข้อมูลจาก Supabase
   useEffect(() => {
@@ -496,6 +542,7 @@ function App() {
 
       const dataUrl = canvas.toDataURL("image/png");
       setSummaryImage({ dataUrl, label: isDay ? `สรุปวันที่ ${summaryDate}` : `สรุปเดือน ${filterMonth}` });
+      setShowSummaryPicker(false);
     } finally {
       setGeneratingImage(false);
     }
@@ -549,6 +596,19 @@ function App() {
           msg={`ต้องการลบ${confirmDelete.label} ใช่หรือไม่?`}
           onConfirm={doDelete}
           onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {showSummaryPicker && (
+        <SummaryPickerModal
+          summaryMode={summaryMode}
+          setSummaryMode={setSummaryMode}
+          summaryDate={summaryDate}
+          setSummaryDate={setSummaryDate}
+          filterMonth={filterMonth}
+          onGenerate={generateSummaryImage}
+          generating={generatingImage}
+          onClose={() => setShowSummaryPicker(false)}
         />
       )}
 
@@ -607,31 +667,11 @@ function App() {
               <label style={{ color: "#94a3b8", fontSize: 13 }}>เดือน:</label>
               <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
                 style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 12px", borderRadius: 8, fontSize: 14 }} />
-            </div>
-
-            {/* สร้างภาพสรุป */}
-            <div style={{ background: "#1e293b", borderRadius: 14, padding: 14, marginBottom: 18, border: "1px solid #334155" }}>
-              <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 13, color: "#f1f5f9" }}>📷 สร้างภาพสรุป</div>
-              <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 10, border: "1px solid #334155" }}>
-                {[{ key: "day", label: "วันเดียว" }, { key: "month", label: `ทั้งเดือน (${filterMonth})` }].map((m) => (
-                  <button key={m.key} onClick={() => setSummaryMode(m.key)} style={{
-                    flex: 1, padding: "9px 0", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
-                    background: summaryMode === m.key ? "#0f4c2a" : "#0f172a",
-                    color: summaryMode === m.key ? "#fff" : "#64748b", transition: "all 0.2s",
-                  }}>{m.label}</button>
-                ))}
-              </div>
-              {summaryMode === "day" && (
-                <input type="date" value={summaryDate} onChange={(e) => setSummaryDate(e.target.value)}
-                  style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "8px 12px", borderRadius: 8, fontSize: 14, marginBottom: 10, width: "100%", boxSizing: "border-box" }} />
-              )}
-              <button onClick={generateSummaryImage} disabled={generatingImage} style={{
-                width: "100%", padding: "11px 0", borderRadius: 10, border: "none", cursor: generatingImage ? "not-allowed" : "pointer",
-                background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff", fontWeight: 700, fontSize: 14,
-                opacity: generatingImage ? 0.7 : 1,
-              }}>
-                {generatingImage ? "⏳ กำลังสร้างภาพ..." : "🖼️ สร้างภาพสรุป"}
-              </button>
+              <button onClick={() => setShowSummaryPicker(true)} title="สร้างภาพสรุป" style={{
+                width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                cursor: "pointer", fontSize: 16, flexShrink: 0,
+              }}>📷</button>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
