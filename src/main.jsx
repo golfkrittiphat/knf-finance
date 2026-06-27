@@ -10,6 +10,14 @@ const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "�
 const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "อื่นๆ"];
 const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่งท่าเรือ";
 
+// รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
+// แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
+const STAFF_PINS = {
+  "1111": "เจ้าของร้าน",
+  "1234": "พนักงาน A",
+  "5678": "พนักงาน B",
+};
+
 const formatMoney = (n) =>
   Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -49,6 +57,63 @@ function ConfirmModal({ msg, onConfirm, onCancel }) {
   );
 }
 
+// โมดัลขอรหัสประจำตัวก่อนทำรายการ (บันทึก/ลบ)
+function PinModal({ title, onSubmit, onCancel }) {
+  const [pin, setPin] = useState("");
+  const [err, setErr] = useState("");
+
+  const handleConfirm = () => {
+    const name = STAFF_PINS[pin.trim()];
+    if (!name) {
+      setErr("รหัสไม่ถูกต้อง กรุณาลองใหม่");
+      return;
+    }
+    onSubmit({ pin: pin.trim(), name });
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: "28px 24px",
+        maxWidth: 320, width: "90%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🔐</div>
+        <div style={{ textAlign: "center", color: "#f1f5f9", fontWeight: 700, fontSize: 16, marginBottom: 16 }}>{title}</div>
+        <input
+          type="password"
+          inputMode="numeric"
+          autoFocus
+          placeholder="กรอกรหัสประจำตัว"
+          value={pin}
+          onChange={(e) => { setPin(e.target.value); setErr(""); }}
+          onKeyDown={(e) => { if (e.key === "Enter") handleConfirm(); }}
+          style={{
+            width: "100%", background: "#0f172a", border: `1px solid ${err ? "#ef4444" : "#334155"}`,
+            color: "#f1f5f9", padding: "12px 14px", borderRadius: 10, fontSize: 18,
+            textAlign: "center", letterSpacing: 4, boxSizing: "border-box", marginBottom: 8,
+          }}
+        />
+        {err && <div style={{ color: "#ef4444", fontSize: 12, textAlign: "center", marginBottom: 10 }}>{err}</div>}
+        <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={handleConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยืนยัน</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -60,6 +125,8 @@ function App() {
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  // pinRequest: { purpose: "save" | "delete", payload }
+  const [pinRequest, setPinRequest] = useState(null);
 
   // โหลดข้อมูลจาก Supabase
   useEffect(() => {
@@ -71,8 +138,7 @@ function App() {
         fetchRecords();
       })
       .subscribe();
-    const interval = setInterval(fetchRecords, 5000);
-return () => { supabase.removeChannel(channel); clearInterval(interval); };
+    return () => supabase.removeChannel(channel);
   }, []);
 
   async function fetchRecords() {
@@ -99,11 +165,18 @@ return () => { supabase.removeChannel(channel); clearInterval(interval); };
     });
   };
 
-  const handleSubmit = async () => {
+  // ขั้นแรก: กดบันทึก -> ตรวจสอบฟอร์มแล้วขอรหัสประจำตัว
+  const handleSubmit = () => {
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
       showToast("กรุณากรอกจำนวนเงินที่ถูกต้อง", "#ef4444");
       return;
     }
+    setPinRequest({ purpose: "save" });
+  };
+
+  // ขั้นที่สอง: ได้รหัสแล้ว -> บันทึกลง Supabase พร้อมชื่อผู้บันทึก
+  const doSave = async ({ name }) => {
+    setPinRequest(null);
     setSaving(true);
     const rec = {
       id: genId(),
@@ -113,6 +186,10 @@ return () => { supabase.removeChannel(channel); clearInterval(interval); };
       category: form.category,
       note: form.note,
       created_at: Date.now(),
+      created_by: name,
+      deleted: false,
+      deleted_by: null,
+      deleted_at: null,
     };
     const { error } = await supabase.from("records").insert([rec]);
     setSaving(false);
@@ -124,20 +201,38 @@ return () => { supabase.removeChannel(channel); clearInterval(interval); };
     }
   };
 
+  // ขั้นแรกของการลบ: เลือกรายการที่จะลบ -> ขอรหัสประจำตัว
   const askDelete = (rec) => {
-    const label = `${rec.type === "income" ? "รายรับ" : "รายจ่าย"} ฿${formatMoney(rec.amount)} (${rec.category}) วันที่ ${rec.date}`;
-    setConfirmDelete({ id: rec.id, label });
+    setPinRequest({ purpose: "delete", payload: rec });
   };
 
+  // ขั้นที่สอง: ได้รหัสแล้ว -> เปิดโมดัลยืนยันการลบ พร้อมชื่อผู้ลบ
+  const onPinForDelete = ({ name }) => {
+    const rec = pinRequest.payload;
+    setPinRequest(null);
+    const label = `${rec.type === "income" ? "รายรับ" : "รายจ่าย"} ฿${formatMoney(rec.amount)} (${rec.category}) วันที่ ${rec.date}`;
+    setConfirmDelete({ id: rec.id, label, deletedBy: name });
+  };
+
+  // ลบแบบ soft delete: ไม่ลบออกจากฐานข้อมูลจริง แต่ทำเครื่องหมายว่าลบแล้ว พร้อมบันทึกว่าใครลบ
   const doDelete = async () => {
-    const { error } = await supabase.from("records").delete().eq("id", confirmDelete.id);
+    const { error } = await supabase
+      .from("records")
+      .update({ deleted: true, deleted_by: confirmDelete.deletedBy, deleted_at: Date.now() })
+      .eq("id", confirmDelete.id);
     setConfirmDelete(null);
     if (!error) showToast("ลบรายการแล้ว", "#f59e0b");
     else showToast("ลบไม่สำเร็จ", "#ef4444");
   };
 
-  // Stats
-  const monthRecords = records.filter((r) => r.date.startsWith(filterMonth));
+  const handlePinSubmit = (result) => {
+    if (pinRequest.purpose === "save") doSave(result);
+    else if (pinRequest.purpose === "delete") onPinForDelete(result);
+  };
+
+  // Stats: ไม่นับรายการที่ถูกลบแล้ว
+  const activeRecords = records.filter((r) => !r.deleted);
+  const monthRecords = activeRecords.filter((r) => r.date.startsWith(filterMonth));
   const totalIncome = monthRecords.filter((r) => r.type === "income").reduce((s, r) => s + r.amount, 0);
   const totalExpense = monthRecords.filter((r) => r.type === "expense").reduce((s, r) => s + r.amount, 0);
   const profit = totalIncome - totalExpense;
@@ -170,6 +265,14 @@ return () => { supabase.removeChannel(channel); clearInterval(interval); };
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0", fontFamily: "'Sarabun','Noto Sans Thai',sans-serif" }}>
+      {pinRequest && (
+        <PinModal
+          title={pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" : "กรอกรหัสประจำตัวเพื่อลบรายการ"}
+          onSubmit={handlePinSubmit}
+          onCancel={() => setPinRequest(null)}
+        />
+      )}
+
       {confirmDelete && (
         <ConfirmModal
           msg={`ต้องการลบ${confirmDelete.label} ใช่หรือไม่?`}
@@ -388,31 +491,45 @@ return () => { supabase.removeChannel(channel); clearInterval(interval); };
                 <div>ยังไม่มีรายการ</div>
               </div>
             )}
-            {records.map((r) => (
-              <div key={r.id} style={{
-                background: "#1e293b", borderRadius: 12, padding: "13px 14px", marginBottom: 8,
-                border: `1px solid ${r.type === "income" ? "#166534" : "#7f1d1d"}`,
-                display: "flex", alignItems: "center", gap: 12,
-              }}>
-                <div style={{ fontSize: 22 }}>{r.type === "income" ? "💚" : "❤️"}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 700, color: r.type === "income" ? "#22c55e" : "#ef4444", fontSize: 16 }}>
-                      {r.type === "income" ? "+" : "-"}{formatMoney(r.amount)} ฿
-                    </span>
-                    <span style={{ fontSize: 11, color: "#64748b" }}>{r.date}</span>
+            {records.map((r) => {
+              const isDeleted = !!r.deleted;
+              return (
+                <div key={r.id} style={{
+                  background: "#1e293b", borderRadius: 12, padding: "13px 14px", marginBottom: 8,
+                  border: `1px solid ${isDeleted ? "#334155" : (r.type === "income" ? "#166534" : "#7f1d1d")}`,
+                  display: "flex", alignItems: "center", gap: 12,
+                  opacity: isDeleted ? 0.6 : 1,
+                }}>
+                  <div style={{ fontSize: 22 }}>{isDeleted ? "🗑️" : (r.type === "income" ? "💚" : "❤️")}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{
+                        fontWeight: 700, fontSize: 16,
+                        color: isDeleted ? "#64748b" : (r.type === "income" ? "#22c55e" : "#ef4444"),
+                        textDecoration: isDeleted ? "line-through" : "none",
+                      }}>
+                        {r.type === "income" ? "+" : "-"}{formatMoney(r.amount)} ฿
+                      </span>
+                      <span style={{ fontSize: 11, color: "#64748b" }}>{r.date}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+                      {r.category}{r.note ? ` · ${r.note}` : ""}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}>
+                      {r.created_by ? `บันทึกโดย ${r.created_by}` : ""}
+                      {isDeleted ? ` · ลบไปแล้ว${r.deleted_by ? ` โดย ${r.deleted_by}` : ""}` : ""}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
-                    {r.category}{r.note ? ` · ${r.note}` : ""}
-                  </div>
+                  {!isDeleted && (
+                    <button onClick={() => askDelete(r)} style={{
+                      background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
+                      cursor: "pointer", color: "#ef4444", fontSize: 16,
+                      padding: "6px 10px", borderRadius: 8,
+                    }} title="ลบรายการ">🗑️</button>
+                  )}
                 </div>
-                <button onClick={() => askDelete(r)} style={{
-                  background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
-                  cursor: "pointer", color: "#ef4444", fontSize: 16,
-                  padding: "6px 10px", borderRadius: 8,
-                }} title="ลบรายการ">🗑️</button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
