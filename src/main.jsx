@@ -13,9 +13,9 @@ const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่ง�
 // รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
 // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
 const STAFF_PINS = {
-  "1203": "กอล์ฟ",
-  "121": "น้ำ",
-  "313": "กิ๊บ",
+  "1111": "เจ้าของร้าน",
+  "1234": "พนักงาน A",
+  "5678": "พนักงาน B",
 };
 
 const formatMoney = (n) =>
@@ -164,8 +164,8 @@ function SummaryImageModal({ image, onClose }) {
         display: "flex", flexDirection: "column", gap: 14,
       }}>
         <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", textAlign: "center" }}>{image.label}</div>
-        <div style={{ overflowY: "auto", borderRadius: 10, border: "1px solid #334155" }}>
-          <img src={image.dataUrl} alt={image.label} style={{ width: "100%", display: "block" }} />
+        <div style={{ overflowY: "auto", overflowX: "hidden", borderRadius: 10, border: "1px solid #334155" }}>
+          <img src={image.dataUrl} alt={image.label} style={{ width: "100%", maxWidth: "100%", display: "block" }} />
         </div>
         <div style={{ fontSize: 11, color: "#64748b", textAlign: "center" }}>
           มือถือ: กดค้างที่ภาพเพื่อบันทึก หรือกดปุ่มดาวน์โหลดด้านล่าง
@@ -387,6 +387,7 @@ function App() {
       // คำนวณความสูงของภาพล่วงหน้าตามจำนวนเนื้อหา
       const W = 640;
       const PAD = 28;
+      const RIGHT_MARGIN = 36; // เผื่อขอบขวาเพิ่ม กันตัวเลขชิดขอบเกินไป
       const lineH = 26;
       let h = 0;
       h += 100; // header (shop name + label)
@@ -476,7 +477,7 @@ function App() {
           ctx.fillText("รายรับ", PAD, y + 12);
           y += 22;
           incomeCats.forEach(([cat, amt]) => {
-            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - PAD, "#cbd5e1", "#22c55e", FONT);
+            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - RIGHT_MARGIN, "#cbd5e1", "#22c55e", FONT);
             y += lineH;
           });
           y += 8;
@@ -487,7 +488,7 @@ function App() {
           ctx.fillText("รายจ่าย", PAD, y + 12);
           y += 22;
           expenseCats.forEach(([cat, amt]) => {
-            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - PAD, "#cbd5e1", "#ef4444", FONT);
+            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - RIGHT_MARGIN, "#cbd5e1", "#ef4444", FONT);
             y += lineH;
           });
         }
@@ -520,7 +521,7 @@ function App() {
           const color = r.type === "income" ? "#22c55e" : "#ef4444";
           const dateTag = isDay ? "" : `${r.date.slice(5)} · `;
           const leftText = `${dateTag}${r.category}${r.note ? " · " + r.note : ""}`;
-          drawRow(ctx, leftText, `${sign}${formatMoney(r.amount)} ฿`, PAD, y, W - PAD, "#cbd5e1", color, FONT, 12);
+          drawRow(ctx, leftText, `${sign}${formatMoney(r.amount)} ฿`, PAD, y, W - RIGHT_MARGIN, "#cbd5e1", color, FONT, 12);
           y += lineH;
         });
       }
