@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/main.jsx << 'ENDOFFILE'
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import ReactDOM from "react-dom/client";
@@ -430,4 +429,3 @@ const labelStyle = {
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-ENDOFFILE
