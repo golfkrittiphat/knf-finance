@@ -7,7 +7,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "ผลไม้", "อื่นๆ"];
-const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าเช่า", "ค่าน้ำ/ไฟ", "ค่าแก๊ส", "แพ็กเกจจิ้ง", "ค่าขนส่ง", "ค่าการตลาด", "อื่นๆ"];
+const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "อื่นๆ"];
 const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่งท่าเรือ";
 
 const formatMoney = (n) =>
