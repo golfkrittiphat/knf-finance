@@ -236,6 +236,86 @@ function SummaryPickerModal({ summaryMode, setSummaryMode, summaryDate, setSumma
   );
 }
 
+// โมดัลเพิ่มสินค้าใหม่ในสต็อก
+function NewItemModal({ name, setName, unit, setUnit, onConfirm, onCancel }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 340, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>📦 เพิ่มสินค้าในสต็อก</div>
+        <label style={labelStyle}>ชื่อสินค้า</label>
+        <input type="text" autoFocus placeholder="เช่น ไอติม, น้ำอัดลม" value={name}
+          onChange={(e) => setName(e.target.value)} style={{ ...inputStyle, marginBottom: 12 }} />
+        <label style={labelStyle}>หน่วยนับ (ไม่บังคับ)</label>
+        <input type="text" placeholder="เช่น แท่ง, ขวด, ชิ้น" value={unit}
+          onChange={(e) => setUnit(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>เพิ่มสินค้า</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// โมดัลกรอกจำนวนตอนเพิ่ม/ลบสต็อก
+function StockQtyModal({ request, value, setValue, onConfirm, onCancel }) {
+  const isAdd = request.action === "add";
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 320, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>{isAdd ? "📥" : "📤"}</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>
+          {isAdd ? "เพิ่มจำนวน" : "ตัดสต็อก (ขายแล้ว)"}
+        </div>
+        <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 16, textAlign: "center" }}>{request.itemName}</div>
+        <input
+          type="number"
+          autoFocus
+          placeholder={`จำนวน (${request.unit})`}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") onConfirm(); }}
+          style={{ ...inputStyle, fontSize: 20, fontWeight: 700, textAlign: "center", marginBottom: 16 }}
+        />
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: isAdd ? "linear-gradient(135deg,#15803d,#22c55e)" : "linear-gradient(135deg,#b91c1c,#ef4444)",
+            color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยืนยัน</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -255,6 +335,20 @@ function App() {
   const [summaryImage, setSummaryImage] = useState(null); // { dataUrl, label }
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showSummaryPicker, setShowSummaryPicker] = useState(false);
+
+  // ระบบสต็อกของ
+  const [stockItems, setStockItems] = useState([]);
+  const [stockMovements, setStockMovements] = useState([]);
+  const [stockView, setStockView] = useState("list"); // "list" | "graph"
+  const [selectedStockItemId, setSelectedStockItemId] = useState(null);
+  const [stockGraphMonth, setStockGraphMonth] = useState(todayStr().slice(0, 7));
+  const [showNewItemModal, setShowNewItemModal] = useState(false);
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemUnit, setNewItemUnit] = useState("");
+  // stockQtyRequest: { itemId, itemName, action: "add" | "remove" }
+  const [stockQtyRequest, setStockQtyRequest] = useState(null);
+  const [stockQtyValue, setStockQtyValue] = useState("");
+  const [savingStock, setSavingStock] = useState(false);
 
   // ตั้งพื้นหลังของหน้าเว็บ (html/body) ให้เป็นสีเดียวกับแอป
   // กันไม่ให้เห็นขอบ/แถบสีขาวตอนเนื้อหาสั้นกว่าจอ หรือตอนเลื่อนหน้าจอเด้ง (overscroll)
@@ -291,6 +385,38 @@ function App() {
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
+
+  // โหลดข้อมูลสต็อกจาก Supabase
+  useEffect(() => {
+    fetchStockItems();
+    fetchStockMovements();
+    const channel = supabase
+      .channel("stock-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, () => {
+        fetchStockItems();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_movements" }, () => {
+        fetchStockMovements();
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  async function fetchStockItems() {
+    const { data, error } = await supabase
+      .from("stock_items")
+      .select("*")
+      .order("created_at", { ascending: true });
+    if (!error) setStockItems(data || []);
+  }
+
+  async function fetchStockMovements() {
+    const { data, error } = await supabase
+      .from("stock_movements")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error) setStockMovements(data || []);
+  }
 
   async function fetchRecords() {
     const { data, error } = await supabase
@@ -379,6 +505,81 @@ function App() {
   const handlePinSubmit = (result) => {
     if (pinRequest.purpose === "save") doSave(result);
     else if (pinRequest.purpose === "delete") onPinForDelete(result);
+    else if (pinRequest.purpose === "stock") doStockMovement(result);
+  };
+
+  // คำนวณจำนวนสต็อกล่าสุดของแต่ละสินค้า จากผลรวมการเพิ่ม/ลบ
+  const getStockCount = (itemId) => {
+    return stockMovements
+      .filter((m) => m.item_id === itemId)
+      .reduce((sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity), 0);
+  };
+
+  // สร้างสินค้าใหม่ในสต็อก (ไม่ต้องกรอกรหัส แค่ตั้งชื่อ/หน่วย)
+  const handleAddItem = async () => {
+    if (!newItemName.trim()) {
+      showToast("กรุณากรอกชื่อสินค้า", "#ef4444");
+      return;
+    }
+    const item = {
+      id: genId(),
+      name: newItemName.trim(),
+      unit: newItemUnit.trim() || "ชิ้น",
+      created_at: Date.now(),
+    };
+    const { error } = await supabase.from("stock_items").insert([item]);
+    if (error) {
+      showToast("เพิ่มสินค้าไม่สำเร็จ", "#ef4444");
+    } else {
+      setShowNewItemModal(false);
+      setNewItemName("");
+      setNewItemUnit("");
+      showToast("✓ เพิ่มสินค้าแล้ว");
+    }
+  };
+
+  // ขั้นแรก: เลือกเพิ่ม/ลบสต็อก -> เปิดช่องกรอกจำนวน
+  const askStockQty = (item, action) => {
+    setStockQtyValue("");
+    setStockQtyRequest({ itemId: item.id, itemName: item.name, unit: item.unit, action });
+  };
+
+  // ขั้นที่สอง: กรอกจำนวนแล้ว -> ขอรหัสประจำตัว
+  const confirmStockQty = () => {
+    const qty = Number(stockQtyValue);
+    if (!stockQtyValue || isNaN(qty) || qty <= 0) {
+      showToast("กรุณากรอกจำนวนที่ถูกต้อง", "#ef4444");
+      return;
+    }
+    setPinRequest({ purpose: "stock", payload: { ...stockQtyRequest, quantity: qty } });
+  };
+
+  // ขั้นที่สาม: ได้รหัสแล้ว -> บันทึกการเคลื่อนไหวสต็อกพร้อมชื่อผู้ทำรายการ
+  const doStockMovement = async ({ name }) => {
+    const payload = pinRequest.payload;
+    setPinRequest(null);
+    setStockQtyRequest(null);
+    setSavingStock(true);
+    const movement = {
+      id: genId(),
+      item_id: payload.itemId,
+      type: payload.action, // "add" | "remove"
+      quantity: payload.quantity,
+      date: todayStr(),
+      created_by: name,
+      created_at: Date.now(),
+    };
+    const { error } = await supabase.from("stock_movements").insert([movement]);
+    setSavingStock(false);
+    if (error) {
+      showToast("บันทึกสต็อกไม่สำเร็จ", "#ef4444");
+    } else {
+      showToast(
+        payload.action === "add"
+          ? `✓ เพิ่ม ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`
+          : `✓ ตัดสต็อก ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`
+      );
+    }
   };
 
   // สร้างภาพสรุป (เหมือนใบเสร็จ) ด้วย Canvas API ไม่ต้องพึ่งไลบรารีเสริม
@@ -609,7 +810,11 @@ function App() {
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0", fontFamily: "'Sarabun','Noto Sans Thai',sans-serif" }}>
       {pinRequest && (
         <PinModal
-          title={pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" : "กรอกรหัสประจำตัวเพื่อลบรายการ"}
+          title={
+            pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" :
+            pinRequest.purpose === "delete" ? "กรอกรหัสประจำตัวเพื่อลบรายการ" :
+            "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
+          }
           onSubmit={handlePinSubmit}
           onCancel={() => setPinRequest(null)}
         />
@@ -638,6 +843,27 @@ function App() {
 
       {summaryImage && (
         <SummaryImageModal image={summaryImage} onClose={() => setSummaryImage(null)} />
+      )}
+
+      {showNewItemModal && (
+        <NewItemModal
+          name={newItemName}
+          setName={setNewItemName}
+          unit={newItemUnit}
+          setUnit={setNewItemUnit}
+          onConfirm={handleAddItem}
+          onCancel={() => { setShowNewItemModal(false); setNewItemName(""); setNewItemUnit(""); }}
+        />
+      )}
+
+      {stockQtyRequest && (
+        <StockQtyModal
+          request={stockQtyRequest}
+          value={stockQtyValue}
+          setValue={setStockQtyValue}
+          onConfirm={confirmStockQty}
+          onCancel={() => setStockQtyRequest(null)}
+        />
       )}
 
       {toast && (
@@ -669,6 +895,7 @@ function App() {
         {[
           { key: "dashboard", label: "📊 สรุป" },
           { key: "add", label: "➕ บันทึก" },
+          { key: "stock", label: "📦 สต็อก" },
           { key: "history", label: "📋 ประวัติ" },
         ].map((t) => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
@@ -842,6 +1069,165 @@ function App() {
                 {saving ? "⏳ กำลังบันทึก..." : (form.type === "income" ? "💚 บันทึกรายรับ" : "❤️ บันทึกรายจ่าย")}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* STOCK */}
+        {tab === "stock" && (
+          <div>
+            {stockView === "list" && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>📦 สต็อกสินค้า</div>
+                  <button onClick={() => setShowNewItemModal(true)} style={{
+                    padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                    background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+                    fontWeight: 700, fontSize: 13,
+                  }}>➕ เพิ่มสินค้า</button>
+                </div>
+
+                {stockItems.length === 0 && (
+                  <div style={{ textAlign: "center", padding: "50px 0", color: "#475569" }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+                    <div>ยังไม่มีสินค้าในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น</div>
+                  </div>
+                )}
+
+                {stockItems.map((item) => {
+                  const count = getStockCount(item.id);
+                  return (
+                    <div key={item.id} style={{
+                      background: "#1e293b", borderRadius: 12, padding: "14px", marginBottom: 10,
+                      border: "1px solid #334155",
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <button
+                          onClick={() => { setSelectedStockItemId(item.id); setStockView("graph"); }}
+                          style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0 }}
+                        >
+                          <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>{item.name}</div>
+                          <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>📈 ดูกราฟรายวัน</div>
+                        </button>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: count > 0 ? "#22c55e" : "#ef4444" }}>{count}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{item.unit}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => askStockQty(item, "add")} style={{
+                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                          background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 700, fontSize: 13,
+                        }}>📥 เพิ่มจำนวน</button>
+                        <button onClick={() => askStockQty(item, "remove")} style={{
+                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                          background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 700, fontSize: 13,
+                        }}>📤 ขายแล้ว</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {stockView === "graph" && (() => {
+              const item = stockItems.find((i) => i.id === selectedStockItemId);
+              if (!item) {
+                return (
+                  <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                    <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                    <div style={{ marginBottom: 14 }}>ไม่พบสินค้านี้</div>
+                    <button onClick={() => setStockView("list")} style={{
+                      padding: "9px 18px", borderRadius: 8, border: "1px solid #334155",
+                      background: "#1e293b", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 13,
+                    }}>← กลับไปหน้ารายการสินค้า</button>
+                  </div>
+                );
+              }
+              const itemMovements = stockMovements
+                .filter((m) => m.item_id === item.id && m.date.startsWith(stockGraphMonth))
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+              const dayMap = {};
+              itemMovements.forEach((m) => {
+                if (!dayMap[m.date]) dayMap[m.date] = { add: 0, remove: 0 };
+                dayMap[m.date][m.type] += m.quantity;
+              });
+              const dayRows = Object.entries(dayMap).map(([date, v]) => ({ date, add: v.add, remove: v.remove }));
+              const maxQty = Math.max(...dayRows.map((d) => Math.max(d.add, d.remove, 1)), 1);
+              const currentCount = getStockCount(item.id);
+
+              return (
+                <div>
+                  <button onClick={() => setStockView("list")} style={{
+                    background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
+                    fontSize: 13, marginBottom: 14, padding: 0,
+                  }}>← กลับไปหน้ารายการสินค้า</button>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 17, color: "#f1f5f9" }}>{item.name}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>สต็อกล่าสุด: <span style={{ color: currentCount > 0 ? "#22c55e" : "#ef4444", fontWeight: 700 }}>{currentCount} {item.unit}</span></div>
+                    </div>
+                    <input type="month" value={stockGraphMonth} onChange={(e) => setStockGraphMonth(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                  </div>
+
+                  {dayRows.length > 0 ? (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 การเคลื่อนไหวรายวัน</div>
+                      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
+                        {dayRows.map((d) => (
+                          <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, flex: 1 }}>
+                            <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: 80, marginBottom: 4 }}>
+                              <div style={{ width: 10, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.add / maxQty) * 76)}px` }} />
+                              <div style={{ width: 10, background: "#ef4444", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.remove / maxQty) * 76)}px` }} />
+                            </div>
+                            <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: "flex", gap: 16, marginTop: 10, justifyContent: "center" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#22c55e", borderRadius: 2 }} /> เพิ่มเข้า
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#ef4444", borderRadius: 2 }} /> ตัดออก (ขาย)
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                      <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                      <div>ไม่มีการเคลื่อนไหวในเดือนนี้</div>
+                    </div>
+                  )}
+
+                  {dayRows.length > 0 && (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                        <thead>
+                          <tr style={{ color: "#64748b" }}>
+                            <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>เพิ่ม</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>ขาย</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...dayRows].reverse().map((d) => (
+                            <tr key={d.date} style={{ borderTop: "1px solid #0f172a" }}>
+                              <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>+{d.add}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#ef4444" }}>-{d.remove}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
 
