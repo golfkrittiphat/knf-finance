@@ -10,6 +10,139 @@ const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "�
 const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "อื่นๆ"];
 const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่งท่าเรือ";
 
+// รายการเมนูอาหาร + ราคา ของหมวด "ร้านอาหาร"
+// *** แก้ไขรายชื่อเมนูและราคาจริงได้ที่นี่ ***
+// พิมพ์ชื่อเมนูใหม่ที่ไม่อยู่ในลิสต์นี้ได้เหมือนกัน (ระบบจะให้กรอกราคาเองตอนนั้น)
+const MENU_ITEMS = [
+  // เมนูตำ
+  { name: "ตำไทย", price: 50 },
+  { name: "ตำไทยปู", price: 55 },
+  { name: "ตำไทยปูไข่เค็ม", price: 60 },
+  { name: "ตำปลาร้า", price: 50 },
+  { name: "ตำปูปลาร้า", price: 55 },
+  { name: "ตำปูปลาร้ากุ้ง (สด/ลวก)", price: 70 },
+  { name: "ตำปูปลาร้าหอยดอง", price: 70 },
+  { name: "ตำปูปลาร้าหอยแครง", price: 80 },
+  { name: "ตำไหลบัวปูปลาร้า", price: 60 },
+  { name: "ตำไหลบัวปลาร้ากุ้ง (สด/ลวก)", price: 70 },
+  { name: "ตำไหลบัวหมูยอ", price: 60 },
+  { name: "ตำหมูยอ", price: 60 },
+  { name: "ตำหมูกรอบ", price: 70 },
+  { name: "ตำแดง (ปลาร้า/ไม่ปลาร้า)", price: 50 },
+  { name: "ตำแดงปู (ปลาร้า/ไม่ปลาร้า)", price: 55 },
+  { name: "ตำแดงไทยไข่เค็ม", price: 60 },
+  { name: "ตำแดงไทยปูไข่เค็ม", price: 65 },
+  { name: "ตำข้าวโพด", price: 50 },
+  { name: "ตำข้าวโพดไข่เค็ม", price: 60 },
+  { name: "ตำกระท้อนไทยปู", price: 60 },
+  { name: "ตำกระท้อนปูปลาร้า", price: 70 },
+  { name: "ตำกระท้อนปลาร้าหมูยอ", price: 70 },
+  { name: "ตำกระท้อนปูปลาร้ากุ้งสด", price: 80 },
+
+  // เมนูลาบ
+  { name: "ลาบหมู", price: 60 },
+  { name: "ลาบไก่", price: 60 },
+  { name: "ลาบกุ้ง", price: 80 },
+  { name: "ลาบปลาทอด", price: 100 },
+  { name: "ตับหวาน", price: 70 },
+
+  // เมนูยำ
+  { name: "ยำวุ้นเส้นหมูสับ", price: 60 },
+  { name: "ยำวุ้นเส้นทะเล/รวมมิตร", price: 70 },
+  { name: "ยำรวมมิตร", price: 70 },
+  { name: "ยำหมูยอ", price: 60 },
+  { name: "ยำหมึกสด", price: 80 },
+  { name: "ยำสามกรอบ", price: 70 },
+  { name: "ยำไข่เค็ม", price: 50 },
+  { name: "ยำหมูกรอบ", price: 70 },
+  { name: "ยำไส้ต้น", price: 70 },
+  { name: "หมูมะนาว", price: 70 },
+  { name: "พล่ากุ้ง (สด/ลวก)", price: 70 },
+
+  // เมนูต้ม
+  { name: "ต้มยำรวมมิตร (น้ำข้น/น้ำใส)", price: 100 },
+  { name: "ต้มยำทะเล (น้ำข้น/น้ำใส)", price: 100 },
+  { name: "ต้มยำกุ้ง (น้ำข้น/น้ำใส)", price: 100 },
+  { name: "ต้มยำปลากะพง (น้ำข้น/น้ำใส)", price: 100 },
+  { name: "แกงเห็ด (ปลาร้า/ไม่ปลาร้า)", price: 60 },
+  { name: "แกงอ่อม (หมู/ไก่)", price: 70 },
+  { name: "ต้มจืดเต้าหู้หมูสับ", price: 60 },
+
+  // เมนูอาหารจานเดียว
+  { name: "ข้าวผัดหมู, ไก่ (เล็ก)", price: 50 },
+  { name: "ข้าวผัดหมู, ไก่ (กลาง)", price: 100 },
+  { name: "ข้าวผัดหมู, ไก่ (ใหญ่)", price: 150 },
+  { name: "ข้าวผัดทะเล, รวม (เล็ก)", price: 60 },
+  { name: "ข้าวผัดทะเล, รวม (กลาง)", price: 120 },
+  { name: "ข้าวผัดทะเล, รวม (ใหญ่)", price: 180 },
+  { name: "ผัดเครื่องแกงหมู, ไก่", price: 50 },
+  { name: "ผัดเครื่องแกงทะเล, รวม", price: 60 },
+  { name: "ผัดเครื่องแกงหมูกรอบ", price: 60 },
+  { name: "ผัดกะเพราหมู, ไก่", price: 50 },
+  { name: "ผัดกะเพราทะเล, รวม", price: 60 },
+  { name: "ผัดกะเพราหมูกรอบ", price: 60 },
+  { name: "ผัดพริกหมู, ไก่", price: 50 },
+  { name: "ผัดพริกทะเล, รวม", price: 60 },
+  { name: "ผัดพริกหมูกรอบ", price: 60 },
+  { name: "ผัดพริกไทยดำหมู, ไก่", price: 50 },
+  { name: "ผัดพริกไทยดำทะเล, รวม", price: 60 },
+  { name: "ผัดคะน้าหมูกรอบ", price: 60 },
+  { name: "ผัดคื่นฉ่ายปลากะพง", price: 70 },
+  { name: "ผัดกะปิสะตอหมู, ไก่", price: 60 },
+  { name: "ผัดกะปิสะตอทะเล, รวม", price: 70 },
+  { name: "ผัดฉ่า (กุ้ง/หมึก/ทะเล/ปลา)", price: 70 },
+  { name: "คั่วกลิ้งหมู, ไก่", price: 50 },
+  { name: "ราดหน้าหมู, ไก่", price: 50 },
+  { name: "ราดหน้าทะเล, รวม", price: 60 },
+  { name: "ผัดซีอิ๊วหมู, ไก่", price: 50 },
+  { name: "ผัดซีอิ๊วทะเล, รวม", price: 60 },
+  { name: "สุกี้หมู, ไก่ (น้ำ/แห้ง)", price: 50 },
+  { name: "สุกี้ทะเล, รวม (น้ำ/แห้ง)", price: 60 },
+
+  // เมนูทอด
+  { name: "ไก่ทอด", price: 60 },
+  { name: "เอ็นไก่ทอด", price: 80 },
+  { name: "กุ้งชุบแป้งทอด", price: 80 },
+  { name: "ทอดมันกุ้ง", price: 70 },
+  { name: "ไก่ทอดกระเทียม", price: 60 },
+  { name: "หมูทอดกระเทียม", price: 60 },
+  { name: "ปลาหมึกทอดกระเทียม", price: 70 },
+  { name: "ไส้ต้นทอดกระเทียม", price: 70 },
+  { name: "ซี่โครงหมูทอดกระเทียม", price: 70 },
+  { name: "ปลากะพงทอดกระเทียม", price: 100 },
+  { name: "ปลากะพงทอดสามรส", price: 100 },
+  { name: "ปลากะพงทอดราดพริก", price: 100 },
+  { name: "ปลากะพงทอดลุยสวน", price: 100 },
+
+  // เมนูเครื่องดื่ม
+  { name: "น้ำดื่ม (เล็ก)", price: 10 },
+  { name: "น้ำดื่ม (ใหญ่)", price: 20 },
+  { name: "น้ำอัดลม (เล็ก)", price: 15 },
+  { name: "น้ำอัดลม (ใหญ่)", price: 30 },
+  { name: "น้ำแข็ง (เล็ก)", price: 10 },
+  { name: "น้ำแข็ง (ใหญ่)", price: 20 },
+
+  // อื่นๆ
+  { name: "ข้าวเหนียว", price: 10 },
+  { name: "ขนมจีน", price: 10 },
+  { name: "ข้าว (จาน)", price: 10 },
+  { name: "ข้าว (หม้อ)", price: 60 },
+  { name: "ไข่ดาว", price: 10 },
+  { name: "ไข่เจียว", price: 10 },
+
+  { name: "ไอซ์ สตรอเบอร์รี่ ซันเด", price: 20 },
+  { name: "ไอซ์ ช็อกโกแลต คริสปี้", price: 20 },
+  { name: "ไอซ์ บิงโกคุกกี้", price: 20 },
+  { name: "ไอซ์ สตรอเบอร์รี่", price: 20 },
+  { name: "ไอซ์ ฟรุซซี่ เกรป", price: 10 },
+  { name: "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต", price: 10 },
+  { name: "ไอซ์ โมจิ ช็อกโกแลต", price: 10 },
+  { name: "ไอซ์ โมจิ วานิลลา", price: 10 },
+  { name: "ไอซ์ ซามังก้า", price: 10 },
+  { name: "ไอซ์ ช็อกโก มอลต์", price: 10 },
+  
+];
+
 // รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
 // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
 const STAFF_PINS = {
@@ -372,6 +505,9 @@ function App() {
   const [form, setForm] = useState({
     type: "income", date: todayStr(), amount: "", category: CATEGORIES_INCOME[0], note: "",
   });
+  // รายการเมนูที่กำลังเพิ่มในออเดอร์ (ใช้เมื่อหมวด = ร้านอาหาร)
+  // แต่ละแถว: { id, name, price, qty }
+  const [orderItems, setOrderItems] = useState([]);
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -383,6 +519,9 @@ function App() {
   const [summaryImage, setSummaryImage] = useState(null); // { dataUrl, label }
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showSummaryPicker, setShowSummaryPicker] = useState(false);
+  // สรุปยอดขายตามเมนู (ในหน้าแดชบอร์ด): เลือกดูแบบวันเดียวหรือทั้งเดือน
+  const [menuStatsMode, setMenuStatsMode] = useState("month"); // "day" | "month"
+  const [menuStatsDate, setMenuStatsDate] = useState(todayStr());
 
   // ระบบสต็อกของ
   const [stockItems, setStockItems] = useState([]);
@@ -492,15 +631,52 @@ function App() {
       if (field === "type") {
         updated.category = value === "income" ? CATEGORIES_INCOME[0] : CATEGORIES_EXPENSE[0];
       }
+      if (field === "type" || field === "category") {
+        setOrderItems([]); // ล้างรายการเมนูเมื่อเปลี่ยนประเภท/หมวดหมู่
+      }
       return updated;
     });
   };
 
+  const isFoodOrder = form.type === "income" && form.category === "ร้านอาหาร";
+  const orderTotal = orderItems.reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 0), 0);
+
+  // เพิ่มแถวเมนูใหม่ในออเดอร์
+  const addOrderItem = () => {
+    setOrderItems((items) => [...items, { id: genId(), name: "", price: "", qty: 1 }]);
+  };
+  const updateOrderItem = (id, field, value) => {
+    setOrderItems((items) => items.map((it) => {
+      if (it.id !== id) return it;
+      const updated = { ...it, [field]: value };
+      if (field === "name") {
+        const match = MENU_ITEMS.find((m) => m.name === value);
+        if (match) updated.price = match.price;
+      }
+      return updated;
+    }));
+  };
+  const removeOrderItem = (id) => {
+    setOrderItems((items) => items.filter((it) => it.id !== id));
+  };
+
   // ขั้นแรก: กดบันทึก -> ตรวจสอบฟอร์มแล้วขอรหัสประจำตัว
   const handleSubmit = () => {
-    if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
-      showToast("กรุณากรอกจำนวนเงินที่ถูกต้อง", "#ef4444");
-      return;
+    if (isFoodOrder) {
+      if (orderItems.length === 0) {
+        showToast("กรุณาเพิ่มเมนูอย่างน้อย 1 รายการ", "#ef4444");
+        return;
+      }
+      const invalid = orderItems.some((it) => !it.name.trim() || !it.price || Number(it.price) <= 0 || !it.qty || Number(it.qty) <= 0);
+      if (invalid) {
+        showToast("กรุณากรอกชื่อเมนู ราคา และจำนวนให้ครบทุกแถว", "#ef4444");
+        return;
+      }
+    } else {
+      if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
+        showToast("กรุณากรอกจำนวนเงินที่ถูกต้อง", "#ef4444");
+        return;
+      }
     }
     setPinRequest({ purpose: "save" });
   };
@@ -509,13 +685,26 @@ function App() {
   const doSave = async ({ name }) => {
     setPinRequest(null);
     setSaving(true);
+
+    let amount, note, items;
+    if (isFoodOrder) {
+      amount = orderTotal;
+      note = orderItems.map((it) => `${it.name.trim()} x${it.qty}`).join(" · ");
+      items = JSON.stringify(orderItems.map((it) => ({ name: it.name.trim(), price: Number(it.price), qty: Number(it.qty) })));
+    } else {
+      amount = Number(form.amount);
+      note = form.note;
+      items = null;
+    }
+
     const rec = {
       id: genId(),
       type: form.type,
       date: form.date,
-      amount: Number(form.amount),
+      amount,
       category: form.category,
-      note: form.note,
+      note,
+      items,
       created_at: Date.now(),
       created_by: name,
       deleted: false,
@@ -528,6 +717,7 @@ function App() {
       showToast("เกิดข้อผิดพลาด กรุณาลองใหม่", "#ef4444");
     } else {
       setForm((f) => ({ ...f, amount: "", note: "" }));
+      setOrderItems([]);
       showToast(form.type === "income" ? "✓ บันทึกรายรับแล้ว" : "✓ บันทึกรายจ่ายแล้ว");
     }
   };
@@ -854,6 +1044,25 @@ function App() {
   });
   const maxBar = Math.max(...dailyRows.map((d) => Math.max(d.income, d.expense, 1)), 1);
 
+  // สรุปยอดขายตามเมนู: รวบรวมจากออเดอร์ "ร้านอาหาร" ที่มีรายการ items บันทึกไว้
+  const menuStatsRecords = activeRecords.filter((r) =>
+    r.type === "income" && r.category === "ร้านอาหาร" && r.items &&
+    (menuStatsMode === "day" ? r.date === menuStatsDate : r.date.startsWith(menuStatsDate.slice(0, 7)))
+  );
+  const menuStatsMap = {};
+  menuStatsRecords.forEach((r) => {
+    let parsed = [];
+    try { parsed = JSON.parse(r.items); } catch (e) { parsed = []; }
+    parsed.forEach((it) => {
+      if (!menuStatsMap[it.name]) menuStatsMap[it.name] = { qty: 0, total: 0 };
+      menuStatsMap[it.name].qty += Number(it.qty) || 0;
+      menuStatsMap[it.name].total += (Number(it.qty) || 0) * (Number(it.price) || 0);
+    });
+  });
+  const menuStatsRows = Object.entries(menuStatsMap)
+    .map(([name, v]) => ({ name, qty: v.qty, total: v.total }))
+    .sort((a, b) => b.qty - a.qty);
+
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
@@ -1080,6 +1289,58 @@ function App() {
                 <div>ยังไม่มีข้อมูลในเดือนนี้<br />กดแท็บ "บันทึก" เพื่อเพิ่มรายการ</div>
               </div>
             )}
+
+            {/* เส้นแบ่ง + สรุปยอดขายตามเมนู */}
+            <div style={{ borderTop: "1px solid #334155", marginTop: 28, paddingTop: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>🍽️ ยอดขายตามเมนู</div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid #334155" }}>
+                    {[{ key: "day", label: "วันเดียว" }, { key: "month", label: "ทั้งเดือน" }].map((m) => (
+                      <button key={m.key} onClick={() => setMenuStatsMode(m.key)} style={{
+                        padding: "6px 12px", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
+                        background: menuStatsMode === m.key ? "#0f4c2a" : "#0f172a",
+                        color: menuStatsMode === m.key ? "#fff" : "#64748b",
+                      }}>{m.label}</button>
+                    ))}
+                  </div>
+                  {menuStatsMode === "day" ? (
+                    <input type="date" value={menuStatsDate} onChange={(e) => setMenuStatsDate(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                  ) : (
+                    <input type="month" value={menuStatsDate.slice(0, 7)} onChange={(e) => setMenuStatsDate(e.target.value + "-01")}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                  )}
+                </div>
+              </div>
+
+              {menuStatsRows.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "30px 0", color: "#475569", fontSize: 13 }}>
+                  ไม่มีรายการขายเมนูอาหารใน{menuStatsMode === "day" ? "วันนี้" : "เดือนนี้"}
+                </div>
+              ) : (
+                <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ color: "#64748b" }}>
+                        <th style={{ textAlign: "left", paddingBottom: 8 }}>เมนู</th>
+                        <th style={{ textAlign: "right", paddingBottom: 8 }}>จำนวนสั่ง</th>
+                        <th style={{ textAlign: "right", paddingBottom: 8 }}>ยอดขาย</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {menuStatsRows.map((m) => (
+                        <tr key={m.name} style={{ borderTop: "1px solid #0f172a" }}>
+                          <td style={{ padding: "8px 0", color: "#cbd5e1" }}>{m.name}</td>
+                          <td style={{ padding: "8px 0", textAlign: "right", color: "#f1f5f9", fontWeight: 700 }}>{m.qty}</td>
+                          <td style={{ padding: "8px 0", textAlign: "right", color: "#22c55e", fontWeight: 700 }}>{formatMoney(m.total)} ฿</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -1102,12 +1363,6 @@ function App() {
                 <input type="date" value={form.date} onChange={(e) => handleFormChange("date", e.target.value)} style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>💵 จำนวนเงิน (บาท)</label>
-                <input type="number" placeholder="0.00" value={form.amount}
-                  onChange={(e) => handleFormChange("amount", e.target.value)}
-                  style={{ ...inputStyle, fontSize: 20, fontWeight: 700, color: form.type === "income" ? "#22c55e" : "#ef4444" }} />
-              </div>
-              <div>
                 <label style={labelStyle}>🏷️ ประเภท</label>
                 <select value={form.category} onChange={(e) => handleFormChange("category", e.target.value)} style={inputStyle}>
                   {(form.type === "income" ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map((c) => (
@@ -1115,11 +1370,77 @@ function App() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label style={labelStyle}>📝 หมายเหตุ (ไม่บังคับ)</label>
-                <input type="text" placeholder="เช่น ค่าหมู ค่าผัก..." value={form.note}
-                  onChange={(e) => handleFormChange("note", e.target.value)} style={inputStyle} />
-              </div>
+
+              {isFoodOrder ? (
+                <div>
+                  <label style={labelStyle}>🍽️ รายการเมนู</label>
+                  <datalist id="menu-options">
+                    {MENU_ITEMS.map((m) => <option key={m.name} value={m.name} />)}
+                  </datalist>
+                  {orderItems.map((it) => (
+                    <div key={it.id} style={{
+                      display: "flex", gap: 6, marginBottom: 8, alignItems: "center",
+                      background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: 8,
+                    }}>
+                      <input
+                        type="text"
+                        list="menu-options"
+                        placeholder="พิมพ์หรือเลือกเมนู"
+                        value={it.name}
+                        onChange={(e) => updateOrderItem(it.id, "name", e.target.value)}
+                        style={{ ...inputStyle, flex: 2, padding: "8px 10px", fontSize: 13 }}
+                      />
+                      <input
+                        type="number"
+                        placeholder="ราคา"
+                        value={it.price}
+                        onChange={(e) => updateOrderItem(it.id, "price", e.target.value)}
+                        style={{ ...inputStyle, flex: 1, padding: "8px 10px", fontSize: 13, minWidth: 0 }}
+                      />
+                      <input
+                        type="number"
+                        placeholder="จำนวน"
+                        value={it.qty}
+                        onChange={(e) => updateOrderItem(it.id, "qty", e.target.value)}
+                        style={{ ...inputStyle, flex: 1, padding: "8px 10px", fontSize: 13, minWidth: 0 }}
+                      />
+                      <button onClick={() => removeOrderItem(it.id)} style={{
+                        background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)",
+                        color: "#ef4444", borderRadius: 8, padding: "8px 10px", cursor: "pointer", fontSize: 13, flexShrink: 0,
+                      }}>✕</button>
+                    </div>
+                  ))}
+                  <button onClick={addOrderItem} style={{
+                    width: "100%", padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
+                    background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
+                    marginBottom: 14,
+                  }}>➕ เพิ่มเมนู</button>
+
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "12px 14px", background: "#0f172a", borderRadius: 10, border: "1px solid #334155",
+                  }}>
+                    <span style={{ color: "#94a3b8", fontSize: 14, fontWeight: 600 }}>ยอดรวม</span>
+                    <span style={{ color: "#22c55e", fontSize: 20, fontWeight: 800 }}>{formatMoney(orderTotal)} ฿</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label style={labelStyle}>💵 จำนวนเงิน (บาท)</label>
+                  <input type="number" placeholder="0.00" value={form.amount}
+                    onChange={(e) => handleFormChange("amount", e.target.value)}
+                    style={{ ...inputStyle, fontSize: 20, fontWeight: 700, color: form.type === "income" ? "#22c55e" : "#ef4444" }} />
+                </div>
+              )}
+
+              {!isFoodOrder && (
+                <div>
+                  <label style={labelStyle}>📝 หมายเหตุ (ไม่บังคับ)</label>
+                  <input type="text" placeholder="เช่น ค่าหมู ค่าผัก..." value={form.note}
+                    onChange={(e) => handleFormChange("note", e.target.value)} style={inputStyle} />
+                </div>
+              )}
+
               <button onClick={handleSubmit} disabled={saving} style={{
                 marginTop: 6, padding: "14px 0", borderRadius: 12, border: "none", cursor: saving ? "not-allowed" : "pointer",
                 background: form.type === "income" ? "linear-gradient(135deg,#15803d,#22c55e)" : "linear-gradient(135deg,#b91c1c,#ef4444)",
