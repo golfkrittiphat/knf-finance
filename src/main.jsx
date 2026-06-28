@@ -88,6 +88,8 @@ function drawRow(ctx, leftText, rightText, x1, y, x2, leftColor, rightColor, fon
   ctx.fillStyle = rightColor;
   ctx.font = `700 ${size}px ${font}`;
   ctx.fillText(rightText, x2, y + 14);
+  // รีเซ็ตกลับเป็นชิดซ้ายเสมอ กันไม่ให้ค่าที่ตั้งไว้ตอนวาดตัวเลขฝั่งขวาไปกระทบ fillText ตัวถัดไปที่เรียกนอกฟังก์ชันนี้
+  ctx.textAlign = "left";
 }
 
 function ConfirmModal({ msg, onConfirm, onCancel }) {
