@@ -14,142 +14,143 @@ const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่ง�
 // *** แก้ไขรายชื่อเมนูและราคาจริงได้ที่นี่ ***
 // พิมพ์ชื่อเมนูใหม่ที่ไม่อยู่ในลิสต์นี้ได้เหมือนกัน (ระบบจะให้กรอกราคาเองตอนนั้น)
 const MENU_ITEMS = [
-  // เมนูตำ
-  { name: "ตำไทย", price: 50 },
-  { name: "ตำไทยปู", price: 55 },
-  { name: "ตำไทยปูไข่เค็ม", price: 60 },
-  { name: "ตำปลาร้า", price: 50 },
-  { name: "ตำปูปลาร้า", price: 55 },
-  { name: "ตำปูปลาร้ากุ้ง (สด/ลวก)", price: 70 },
-  { name: "ตำปูปลาร้าหอยดอง", price: 70 },
-  { name: "ตำปูปลาร้าหอยแครง", price: 80 },
-  { name: "ตำไหลบัวปูปลาร้า", price: 60 },
-  { name: "ตำไหลบัวปลาร้ากุ้ง (สด/ลวก)", price: 70 },
-  { name: "ตำไหลบัวหมูยอ", price: 60 },
-  { name: "ตำหมูยอ", price: 60 },
-  { name: "ตำหมูกรอบ", price: 70 },
-  { name: "ตำแดง (ปลาร้า/ไม่ปลาร้า)", price: 50 },
-  { name: "ตำแดงปู (ปลาร้า/ไม่ปลาร้า)", price: 55 },
-  { name: "ตำแดงไทยไข่เค็ม", price: 60 },
-  { name: "ตำแดงไทยปูไข่เค็ม", price: 65 },
-  { name: "ตำข้าวโพด", price: 50 },
-  { name: "ตำข้าวโพดไข่เค็ม", price: 60 },
-  { name: "ตำกระท้อนไทยปู", price: 60 },
-  { name: "ตำกระท้อนปูปลาร้า", price: 70 },
-  { name: "ตำกระท้อนปลาร้าหมูยอ", price: 70 },
-  { name: "ตำกระท้อนปูปลาร้ากุ้งสด", price: 80 },
+    // เมนูตำ
+    { name: "ตำไทย", price: 50 },
+    { name: "ตำไทยปู", price: 55 },
+    { name: "ตำไทยปูไข่เค็ม", price: 60 },
+    { name: "ตำปลาร้า", price: 50 },
+    { name: "ตำปูปลาร้า", price: 55 },
+    { name: "ตำปูปลาร้ากุ้ง (สด/ลวก)", price: 70 },
+    { name: "ตำปูปลาร้าหอยดอง", price: 70 },
+    { name: "ตำปูปลาร้าหอยแครง", price: 80 },
+    { name: "ตำไหลบัวปูปลาร้า", price: 60 },
+    { name: "ตำไหลบัวปลาร้ากุ้ง (สด/ลวก)", price: 70 },
+    { name: "ตำไหลบัวหมูยอ", price: 60 },
+    { name: "ตำหมูยอ", price: 60 },
+    { name: "ตำหมูกรอบ", price: 70 },
+    { name: "ตำแดง (ปลาร้า/ไม่ปลาร้า)", price: 50 },
+    { name: "ตำแดงปู (ปลาร้า/ไม่ปลาร้า)", price: 55 },
+    { name: "ตำแดงไทยไข่เค็ม", price: 60 },
+    { name: "ตำแดงไทยปูไข่เค็ม", price: 65 },
+    { name: "ตำข้าวโพด", price: 50 },
+    { name: "ตำข้าวโพดไข่เค็ม", price: 60 },
+    { name: "ตำกระท้อนไทยปู", price: 60 },
+    { name: "ตำกระท้อนปูปลาร้า", price: 70 },
+    { name: "ตำกระท้อนปลาร้าหมูยอ", price: 70 },
+    { name: "ตำกระท้อนปูปลาร้ากุ้งสด", price: 80 },
 
-  // เมนูลาบ
-  { name: "ลาบหมู", price: 60 },
-  { name: "ลาบไก่", price: 60 },
-  { name: "ลาบกุ้ง", price: 80 },
-  { name: "ลาบปลาทอด", price: 100 },
-  { name: "ตับหวาน", price: 70 },
+    // เมนูลาบ
+    { name: "ลาบหมู", price: 60 },
+    { name: "ลาบไก่", price: 60 },
+    { name: "ลาบกุ้ง", price: 80 },
+    { name: "ลาบปลาทอด", price: 100 },
+    { name: "ตับหวาน", price: 70 },
 
-  // เมนูยำ
-  { name: "ยำวุ้นเส้นหมูสับ", price: 60 },
-  { name: "ยำวุ้นเส้นทะเล/รวมมิตร", price: 70 },
-  { name: "ยำรวมมิตร", price: 70 },
-  { name: "ยำหมูยอ", price: 60 },
-  { name: "ยำหมึกสด", price: 80 },
-  { name: "ยำสามกรอบ", price: 70 },
-  { name: "ยำไข่เค็ม", price: 50 },
-  { name: "ยำหมูกรอบ", price: 70 },
-  { name: "ยำไส้ต้น", price: 70 },
-  { name: "หมูมะนาว", price: 70 },
-  { name: "พล่ากุ้ง (สด/ลวก)", price: 70 },
+    // เมนูยำ
+    { name: "ยำวุ้นเส้นหมูสับ", price: 60 },
+    { name: "ยำวุ้นเส้นทะเล/รวมมิตร", price: 70 },
+    { name: "ยำรวมมิตร", price: 70 },
+    { name: "ยำหมูยอ", price: 60 },
+    { name: "ยำหมึกสด", price: 80 },
+    { name: "ยำสามกรอบ", price: 70 },
+    { name: "ยำไข่เค็ม", price: 50 },
+    { name: "ยำหมูกรอบ", price: 70 },
+    { name: "ยำไส้ต้น", price: 70 },
+    { name: "หมูมะนาว", price: 70 },
+    { name: "พล่ากุ้ง (สด/ลวก)", price: 70 },
 
-  // เมนูต้ม
-  { name: "ต้มยำรวมมิตร (น้ำข้น/น้ำใส)", price: 100 },
-  { name: "ต้มยำทะเล (น้ำข้น/น้ำใส)", price: 100 },
-  { name: "ต้มยำกุ้ง (น้ำข้น/น้ำใส)", price: 100 },
-  { name: "ต้มยำปลากะพง (น้ำข้น/น้ำใส)", price: 100 },
-  { name: "แกงเห็ด (ปลาร้า/ไม่ปลาร้า)", price: 60 },
-  { name: "แกงอ่อม (หมู/ไก่)", price: 70 },
-  { name: "ต้มจืดเต้าหู้หมูสับ", price: 60 },
+    // เมนูต้ม
+    { name: "ต้มยำรวมมิตร (น้ำข้น/น้ำใส)", price: 100 },
+    { name: "ต้มยำทะเล (น้ำข้น/น้ำใส)", price: 100 },
+    { name: "ต้มยำกุ้ง (น้ำข้น/น้ำใส)", price: 100 },
+    { name: "ต้มยำปลากะพง (น้ำข้น/น้ำใส)", price: 100 },
+    { name: "แกงเห็ด (ปลาร้า/ไม่ปลาร้า)", price: 60 },
+    { name: "แกงอ่อม (หมู/ไก่)", price: 70 },
+    { name: "ต้มจืดเต้าหู้หมูสับ", price: 60 },
 
-  // เมนูอาหารจานเดียว
-  { name: "ข้าวผัดหมู, ไก่ (เล็ก)", price: 50 },
-  { name: "ข้าวผัดหมู, ไก่ (กลาง)", price: 100 },
-  { name: "ข้าวผัดหมู, ไก่ (ใหญ่)", price: 150 },
-  { name: "ข้าวผัดทะเล, รวม (เล็ก)", price: 60 },
-  { name: "ข้าวผัดทะเล, รวม (กลาง)", price: 120 },
-  { name: "ข้าวผัดทะเล, รวม (ใหญ่)", price: 180 },
-  { name: "ผัดเครื่องแกงหมู, ไก่", price: 50 },
-  { name: "ผัดเครื่องแกงทะเล, รวม", price: 60 },
-  { name: "ผัดเครื่องแกงหมูกรอบ", price: 60 },
-  { name: "ผัดกะเพราหมู, ไก่", price: 50 },
-  { name: "ผัดกะเพราทะเล, รวม", price: 60 },
-  { name: "ผัดกะเพราหมูกรอบ", price: 60 },
-  { name: "ผัดพริกหมู, ไก่", price: 50 },
-  { name: "ผัดพริกทะเล, รวม", price: 60 },
-  { name: "ผัดพริกหมูกรอบ", price: 60 },
-  { name: "ผัดพริกไทยดำหมู, ไก่", price: 50 },
-  { name: "ผัดพริกไทยดำทะเล, รวม", price: 60 },
-  { name: "ผัดคะน้าหมูกรอบ", price: 60 },
-  { name: "ผัดคื่นฉ่ายปลากะพง", price: 70 },
-  { name: "ผัดกะปิสะตอหมู, ไก่", price: 60 },
-  { name: "ผัดกะปิสะตอทะเล, รวม", price: 70 },
-  { name: "ผัดฉ่า (กุ้ง/หมึก/ทะเล/ปลา)", price: 70 },
-  { name: "คั่วกลิ้งหมู, ไก่", price: 50 },
-  { name: "ราดหน้าหมู, ไก่", price: 50 },
-  { name: "ราดหน้าทะเล, รวม", price: 60 },
-  { name: "ผัดซีอิ๊วหมู, ไก่", price: 50 },
-  { name: "ผัดซีอิ๊วทะเล, รวม", price: 60 },
-  { name: "สุกี้หมู, ไก่ (น้ำ/แห้ง)", price: 50 },
-  { name: "สุกี้ทะเล, รวม (น้ำ/แห้ง)", price: 60 },
+    // เมนูอาหารจานเดียว
+    { name: "ข้าวผัดหมู, ไก่ (เล็ก)", price: 50 },
+    { name: "ข้าวผัดหมู, ไก่ (กลาง)", price: 100 },
+    { name: "ข้าวผัดหมู, ไก่ (ใหญ่)", price: 150 },
+    { name: "ข้าวผัดทะเล, รวม (เล็ก)", price: 60 },
+    { name: "ข้าวผัดทะเล, รวม (กลาง)", price: 120 },
+    { name: "ข้าวผัดทะเล, รวม (ใหญ่)", price: 180 },
+    { name: "ผัดเครื่องแกงหมู, ไก่", price: 50 },
+    { name: "ผัดเครื่องแกงทะเล, รวม", price: 60 },
+    { name: "ผัดเครื่องแกงหมูกรอบ", price: 60 },
+    { name: "ผัดกะเพราหมู, ไก่", price: 50 },
+    { name: "ผัดกะเพราทะเล, รวม", price: 60 },
+    { name: "ผัดกะเพราหมูกรอบ", price: 60 },
+    { name: "ผัดพริกหมู, ไก่", price: 50 },
+    { name: "ผัดพริกทะเล, รวม", price: 60 },
+    { name: "ผัดพริกหมูกรอบ", price: 60 },
+    { name: "ผัดพริกไทยดำหมู, ไก่", price: 50 },
+    { name: "ผัดพริกไทยดำทะเล, รวม", price: 60 },
+    { name: "ผัดคะน้าหมูกรอบ", price: 60 },
+    { name: "ผัดคื่นฉ่ายปลากะพง", price: 70 },
+    { name: "ผัดกะปิสะตอหมู, ไก่", price: 60 },
+    { name: "ผัดกะปิสะตอทะเล, รวม", price: 70 },
+    { name: "ผัดฉ่า (กุ้ง/หมึก/ทะเล/ปลา)", price: 70 },
+    { name: "คั่วกลิ้งหมู, ไก่", price: 50 },
+    { name: "ราดหน้าหมู, ไก่", price: 50 },
+    { name: "ราดหน้าทะเล, รวม", price: 60 },
+    { name: "ผัดซีอิ๊วหมู, ไก่", price: 50 },
+    { name: "ผัดซีอิ๊วทะเล, รวม", price: 60 },
+    { name: "สุกี้หมู, ไก่ (น้ำ/แห้ง)", price: 50 },
+    { name: "สุกี้ทะเล, รวม (น้ำ/แห้ง)", price: 60 },
 
-  // เมนูทอด
-  { name: "ไก่ทอด", price: 60 },
-  { name: "เอ็นไก่ทอด", price: 80 },
-  { name: "กุ้งชุบแป้งทอด", price: 80 },
-  { name: "ทอดมันกุ้ง", price: 80 },
-  { name: "ไก่ทอดกระเทียม", price: 60 },
-  { name: "หมูทอดกระเทียม", price: 60 },
-  { name: "ปลาหมึกทอดกระเทียม", price: 70 },
-  { name: "ไส้ต้นทอดกระเทียม", price: 70 },
-  { name: "ซี่โครงหมูทอดกระเทียม", price: 70 },
-  { name: "ปลากะพงทอดกระเทียม", price: 100 },
-  { name: "ปลากะพงทอดสามรส", price: 100 },
-  { name: "ปลากะพงทอดราดพริก", price: 100 },
-  { name: "ปลากะพงทอดลุยสวน", price: 100 },
+    // เมนูทอด
+    { name: "ไก่ทอด", price: 60 },
+    { name: "เอ็นไก่ทอด", price: 80 },
+    { name: "กุ้งชุบแป้งทอด", price: 80 },
+    { name: "ทอดมันกุ้ง", price: 80 },
+    { name: "ไก่ทอดกระเทียม", price: 60 },
+    { name: "หมูทอดกระเทียม", price: 60 },
+    { name: "ปลาหมึกทอดกระเทียม", price: 70 },
+    { name: "ไส้ต้นทอดกระเทียม", price: 70 },
+    { name: "ซี่โครงหมูทอดกระเทียม", price: 70 },
+    { name: "ปลากะพงทอดกระเทียม", price: 100 },
+    { name: "ปลากะพงทอดสามรส", price: 100 },
+    { name: "ปลากะพงทอดราดพริก", price: 100 },
+    { name: "ปลากะพงทอดลุยสวน", price: 100 },
 
-  // เมนูเครื่องดื่ม
-  { name: "น้ำดื่ม (เล็ก)", price: 10 },
-  { name: "น้ำดื่ม (ใหญ่)", price: 20 },
-  { name: "น้ำอัดลม (เล็ก)", price: 12 },
-  { name: "น้ำอัดลม (ใหญ่)", price: 30 },
-  { name: "น้ำแข็ง (เล็ก)", price: 10 },
-  { name: "น้ำแข็ง (ใหญ่)", price: 20 },
+    // เมนูเครื่องดื่ม
+    { name: "น้ำดื่ม (เล็ก)", price: 10 },
+    { name: "น้ำดื่ม (ใหญ่)", price: 20 },
+    { name: "น้ำอัดลม (เล็ก)", price: 12 },
+    { name: "น้ำอัดลม (ใหญ่)", price: 30 },
+    { name: "น้ำแข็ง (เล็ก)", price: 10 },
+    { name: "น้ำแข็ง (ใหญ่)", price: 20 },
 
-  // อื่นๆ
-  { name: "ข้าวเหนียว", price: 10 },
-  { name: "ขนมจีน", price: 10 },
-  { name: "ข้าว (จาน)", price: 10 },
-  { name: "ข้าว (หม้อ)", price: 60 },
-  { name: "ไข่ดาว", price: 10 },
-  { name: "ไข่เจียว", price: 10 },
+    // อื่นๆ
+    { name: "ข้าวเหนียว", price: 10 },
+    { name: "ขนมจีน", price: 10 },
+    { name: "ข้าว (จาน)", price: 10 },
+    { name: "ข้าว (หม้อ)", price: 60 },
+    { name: "ไข่ดาว", price: 10 },
+    { name: "ไข่เจียว", price: 10 },
 
-  { name: "ไอซ์ สตรอเบอร์รี่ ซันเด", price: 20 },
-  { name: "ไอซ์ ช็อกโกแลต คริสปี้", price: 20 },
-  { name: "ไอซ์ บิงโกคุกกี้", price: 20 },
-  { name: "ไอซ์ สตรอเบอร์รี่", price: 20 },
-  { name: "ไอซ์ ฟรุซซี่ เกรป", price: 10 },
-  { name: "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต", price: 10 },
-  { name: "ไอซ์ โมจิ ช็อกโกแลต", price: 10 },
-  { name: "ไอซ์ โมจิ วานิลลา", price: 10 },
-  { name: "ไอซ์ ซามังก้า", price: 10 },
-  { name: "ไอซ์ ช็อกโก มอลต์", price: 10 },
-  
-];
+    { name: "ไอซ์ สตรอเบอร์รี่ ซันเด", price: 20 },
+    { name: "ไอซ์ ช็อกโกแลต คริสปี้", price: 20 },
+    { name: "ไอซ์ บิงโกคุกกี้", price: 20 },
+    { name: "ไอซ์ สตรอเบอร์รี่", price: 20 },
+    { name: "ไอซ์ ฟรุซซี่ เกรป", price: 10 },
+    { name: "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต", price: 10 },
+    { name: "ไอซ์ โมจิ ช็อกโกแลต", price: 10 },
+    { name: "ไอซ์ โมจิ วานิลลา", price: 10 },
+    { name: "ไอซ์ ซามังก้า", price: 10 },
+    { name: "ไอซ์ ช็อกโก มอลต์", price: 10 },
 
-// รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
-// แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
-const STAFF_PINS = {
-  "1203": "กอล์ฟ",
-  "121": "น้ำ",
-  "313": "กิ๊บ",
-};
+  ];
+
+  // รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
+  // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
+  const STAFF_PINS = {
+    "1203": "กอล์ฟ",
+    "121": "น้ำ",
+    "313": "กิ๊บ",
+  };
+
 
 // โหลดฟอนต์ Sarabun จาก Google Fonts จริงๆ (ครั้งเดียว) เพื่อให้ภาพสรุปหน้าตาเหมือนกันทุกอุปกรณ์
 // ถ้าไม่โหลดฟอนต์เอง เบราว์เซอร์แต่ละเครื่อง/แต่ละ OS จะใช้ฟอนต์สำรองคนละตัว
@@ -508,6 +509,8 @@ function App() {
   // รายการเมนูที่กำลังเพิ่มในออเดอร์ (ใช้เมื่อหมวด = ร้านอาหาร)
   // แต่ละแถว: { id, name, price, qty }
   const [orderItems, setOrderItems] = useState([]);
+  // วิธีรับเงิน (บังคับเลือกตอนบันทึกรายรับหมวดร้านอาหาร): "" | "cash" | "transfer"
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -633,6 +636,7 @@ function App() {
       }
       if (field === "type" || field === "category") {
         setOrderItems([]); // ล้างรายการเมนูเมื่อเปลี่ยนประเภท/หมวดหมู่
+        setPaymentMethod(""); // ล้างวิธีรับเงินด้วย ต้องเลือกใหม่ทุกครั้ง
       }
       return updated;
     });
@@ -672,6 +676,10 @@ function App() {
         showToast("กรุณากรอกชื่อเมนู ราคา และจำนวนให้ครบทุกแถว", "#ef4444");
         return;
       }
+      if (!paymentMethod) {
+        showToast("กรุณาเลือกวิธีรับเงิน (เงินสด/โอน)", "#ef4444");
+        return;
+      }
     } else {
       if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
         showToast("กรุณากรอกจำนวนเงินที่ถูกต้อง", "#ef4444");
@@ -686,15 +694,18 @@ function App() {
     setPinRequest(null);
     setSaving(true);
 
-    let amount, note, items;
+    let amount, note, items, payment;
     if (isFoodOrder) {
       amount = orderTotal;
-      note = orderItems.map((it) => `${it.name.trim()} x${it.qty}`).join(" · ");
+      const paymentLabel = paymentMethod === "cash" ? "เงินสด" : "โอน";
+      note = orderItems.map((it) => `${it.name.trim()} x${it.qty}`).join(" · ") + ` (${paymentLabel})`;
       items = JSON.stringify(orderItems.map((it) => ({ name: it.name.trim(), price: Number(it.price), qty: Number(it.qty) })));
+      payment = paymentMethod;
     } else {
       amount = Number(form.amount);
       note = form.note;
       items = null;
+      payment = null;
     }
 
     const rec = {
@@ -705,6 +716,7 @@ function App() {
       category: form.category,
       note,
       items,
+      payment_method: payment,
       created_at: Date.now(),
       created_by: name,
       deleted: false,
@@ -718,6 +730,7 @@ function App() {
     } else {
       setForm((f) => ({ ...f, amount: "", note: "" }));
       setOrderItems([]);
+      setPaymentMethod("");
       showToast(form.type === "income" ? "✓ บันทึกรายรับแล้ว" : "✓ บันทึกรายจ่ายแล้ว");
     }
   };
@@ -1419,9 +1432,22 @@ function App() {
                   <div style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "12px 14px", background: "#0f172a", borderRadius: 10, border: "1px solid #334155",
+                    marginBottom: 14,
                   }}>
                     <span style={{ color: "#94a3b8", fontSize: 14, fontWeight: 600 }}>ยอดรวม</span>
                     <span style={{ color: "#22c55e", fontSize: 20, fontWeight: 800 }}>{formatMoney(orderTotal)} ฿</span>
+                  </div>
+
+                  <label style={labelStyle}>💳 วิธีรับเงิน <span style={{ color: "#ef4444" }}>*</span></label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[{ key: "cash", label: "💵 เงินสด" }, { key: "transfer", label: "🏦 โอน" }].map((p) => (
+                      <button key={p.key} onClick={() => setPaymentMethod(p.key)} style={{
+                        flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer", fontSize: 14, fontWeight: 700,
+                        border: paymentMethod === p.key ? "2px solid #3b82f6" : "1px solid #334155",
+                        background: paymentMethod === p.key ? "rgba(59,130,246,0.15)" : "#0f172a",
+                        color: paymentMethod === p.key ? "#60a5fa" : "#64748b",
+                      }}>{p.label}</button>
+                    ))}
                   </div>
                 </div>
               ) : (
