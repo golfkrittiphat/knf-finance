@@ -18,6 +18,34 @@ const STAFF_PINS = {
   "313": "กิ๊บ",
 };
 
+// โหลดฟอนต์ Sarabun จาก Google Fonts จริงๆ (ครั้งเดียว) เพื่อให้ภาพสรุปหน้าตาเหมือนกันทุกอุปกรณ์
+// ถ้าไม่โหลดฟอนต์เอง เบราว์เซอร์แต่ละเครื่อง/แต่ละ OS จะใช้ฟอนต์สำรองคนละตัว
+// ทำให้ความกว้างตัวอักษรไทยต่างกัน และอาจทำให้ตัวเลขชนขอบภาพไม่เท่ากันในแต่ละเครื่อง
+let _fontLoadPromise = null;
+function ensureSarabunLoaded() {
+  if (_fontLoadPromise) return _fontLoadPromise;
+  _fontLoadPromise = (async () => {
+    if (!document.querySelector('link[data-sarabun-font]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap";
+      link.setAttribute("data-sarabun-font", "1");
+      document.head.appendChild(link);
+    }
+    try {
+      await Promise.all([
+        document.fonts.load("400 16px Sarabun"),
+        document.fonts.load("700 16px Sarabun"),
+        document.fonts.load("800 16px Sarabun"),
+      ]);
+      await document.fonts.ready;
+    } catch (e) {
+      // ถ้าโหลดไม่สำเร็จ (เช่น ไม่มีอินเทอร์เน็ต) ก็วาดต่อด้วยฟอนต์สำรอง
+    }
+  })();
+  return _fontLoadPromise;
+}
+
 const formatMoney = (n) =>
   Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -272,9 +300,17 @@ function NewItemModal({ name, setName, unit, setUnit, onConfirm, onCancel }) {
   );
 }
 
-// โมดัลกรอกจำนวนตอนเพิ่ม/ลบสต็อก
-function StockQtyModal({ request, value, setValue, onConfirm, onCancel }) {
+// โมดัลกรอกจำนวนตอนเพิ่ม/ลบ/แจกฟรีสต็อก
+function StockQtyModal({ request, value, setValue, note, setNote, onConfirm, onCancel }) {
   const isAdd = request.action === "add";
+  const isFree = request.action === "free";
+  const icon = isAdd ? "📥" : isFree ? "🎁" : "📤";
+  const title = isAdd ? "เพิ่มจำนวน" : isFree ? "แจกฟรี" : "ตัดสต็อก (ขายแล้ว)";
+  const btnColor = isAdd
+    ? "linear-gradient(135deg,#15803d,#22c55e)"
+    : isFree
+    ? "linear-gradient(135deg,#c2410c,#f97316)"
+    : "linear-gradient(135deg,#b91c1c,#ef4444)";
   return (
     <div style={{
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
@@ -286,9 +322,9 @@ function StockQtyModal({ request, value, setValue, onConfirm, onCancel }) {
         maxWidth: 320, width: "100%", border: "1px solid #334155",
         boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
       }}>
-        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>{isAdd ? "📥" : "📤"}</div>
+        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>{icon}</div>
         <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>
-          {isAdd ? "เพิ่มจำนวน" : "ตัดสต็อก (ขายแล้ว)"}
+          {title}
         </div>
         <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 16, textAlign: "center" }}>{request.itemName}</div>
         <input
@@ -297,9 +333,19 @@ function StockQtyModal({ request, value, setValue, onConfirm, onCancel }) {
           placeholder={`จำนวน (${request.unit})`}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") onConfirm(); }}
-          style={{ ...inputStyle, fontSize: 20, fontWeight: 700, textAlign: "center", marginBottom: 16 }}
+          onKeyDown={(e) => { if (e.key === "Enter" && !isFree) onConfirm(); }}
+          style={{ ...inputStyle, fontSize: 20, fontWeight: 700, textAlign: "center", marginBottom: isFree ? 10 : 16 }}
         />
+        {isFree && (
+          <input
+            type="text"
+            placeholder="หมายเหตุ เช่น แจกในงานเปิดร้าน"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") onConfirm(); }}
+            style={{ ...inputStyle, marginBottom: 16 }}
+          />
+        )}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{
             flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
@@ -307,7 +353,7 @@ function StockQtyModal({ request, value, setValue, onConfirm, onCancel }) {
           }}>ยกเลิก</button>
           <button onClick={onConfirm} style={{
             flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
-            background: isAdd ? "linear-gradient(135deg,#15803d,#22c55e)" : "linear-gradient(135deg,#b91c1c,#ef4444)",
+            background: btnColor,
             color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 15,
           }}>ยืนยัน</button>
         </div>
@@ -345,9 +391,10 @@ function App() {
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemName, setNewItemName] = useState("");
   const [newItemUnit, setNewItemUnit] = useState("");
-  // stockQtyRequest: { itemId, itemName, action: "add" | "remove" }
+  // stockQtyRequest: { itemId, itemName, action: "add" | "remove" | "free" }
   const [stockQtyRequest, setStockQtyRequest] = useState(null);
   const [stockQtyValue, setStockQtyValue] = useState("");
+  const [stockNote, setStockNote] = useState("");
   const [savingStock, setSavingStock] = useState(false);
 
   // ตั้งพื้นหลังของหน้าเว็บ (html/body) ให้เป็นสีเดียวกับแอป
@@ -371,6 +418,11 @@ function App() {
       document.body.style.background = prevBodyBg;
       meta.content = prevMeta;
     };
+  }, []);
+
+  // โหลดฟอนต์ล่วงหน้าตั้งแต่เปิดแอป เพื่อให้ตอนสร้างภาพสรุปครั้งแรกไม่ต้องรอโหลดฟอนต์นาน
+  useEffect(() => {
+    ensureSarabunLoaded();
   }, []);
 
   // โหลดข้อมูลจาก Supabase
@@ -538,20 +590,23 @@ function App() {
     }
   };
 
-  // ขั้นแรก: เลือกเพิ่ม/ลบสต็อก -> เปิดช่องกรอกจำนวน
+  // ขั้นแรก: เลือกเพิ่ม/ลบ/แจกฟรีสต็อก -> เปิดช่องกรอกจำนวน
   const askStockQty = (item, action) => {
     setStockQtyValue("");
+    setStockNote("");
     setStockQtyRequest({ itemId: item.id, itemName: item.name, unit: item.unit, action });
   };
 
-  // ขั้นที่สอง: กรอกจำนวนแล้ว -> ขอรหัสประจำตัว
+  // ขั้นที่สอง: กรอกจำนวนแล้ว -> ปิดหน้ากรอกจำนวน แล้วขอรหัสประจำตัว
   const confirmStockQty = () => {
     const qty = Number(stockQtyValue);
     if (!stockQtyValue || isNaN(qty) || qty <= 0) {
       showToast("กรุณากรอกจำนวนที่ถูกต้อง", "#ef4444");
       return;
     }
-    setPinRequest({ purpose: "stock", payload: { ...stockQtyRequest, quantity: qty } });
+    const payload = { ...stockQtyRequest, quantity: qty, note: stockQtyRequest.action === "free" ? stockNote.trim() : "" };
+    setStockQtyRequest(null);
+    setPinRequest({ purpose: "stock", payload });
   };
 
   // ขั้นที่สาม: ได้รหัสแล้ว -> บันทึกการเคลื่อนไหวสต็อกพร้อมชื่อผู้ทำรายการ
@@ -563,8 +618,9 @@ function App() {
     const movement = {
       id: genId(),
       item_id: payload.itemId,
-      type: payload.action, // "add" | "remove"
+      type: payload.action, // "add" | "remove" | "free"
       quantity: payload.quantity,
+      note: payload.note || null,
       date: todayStr(),
       created_by: name,
       created_at: Date.now(),
@@ -574,18 +630,17 @@ function App() {
     if (error) {
       showToast("บันทึกสต็อกไม่สำเร็จ", "#ef4444");
     } else {
-      showToast(
-        payload.action === "add"
-          ? `✓ เพิ่ม ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`
-          : `✓ ตัดสต็อก ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`
-      );
+      const verb = payload.action === "add" ? "เพิ่ม" : payload.action === "free" ? "แจกฟรี" : "ตัดสต็อก";
+      showToast(`✓ ${verb} ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`);
     }
   };
 
   // สร้างภาพสรุป (เหมือนใบเสร็จ) ด้วย Canvas API ไม่ต้องพึ่งไลบรารีเสริม
-  const generateSummaryImage = () => {
+  const generateSummaryImage = async () => {
     setGeneratingImage(true);
     try {
+      await ensureSarabunLoaded();
+
       const isDay = summaryMode === "day";
       const items = (isDay
         ? activeRecords.filter((r) => r.date === summaryDate)
@@ -610,8 +665,8 @@ function App() {
 
       // คำนวณความสูงของภาพล่วงหน้าตามจำนวนเนื้อหา
       const W = 640;
-      const PAD = 28;
-      const RIGHT_MARGIN = 36; // เผื่อขอบขวาเพิ่ม กันตัวเลขชิดขอบเกินไป
+      const PAD = 32;
+      const RIGHT_MARGIN = 44; // เผื่อขอบขวาเพิ่ม กันตัวเลขชิดขอบเกินไป (เผื่อความกว้างฟอนต์ต่างกันเล็กน้อยตามเครื่อง)
       const lineH = 26;
       let h = 0;
       h += 100; // header (shop name + label)
@@ -808,18 +863,6 @@ function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0", fontFamily: "'Sarabun','Noto Sans Thai',sans-serif" }}>
-      {pinRequest && (
-        <PinModal
-          title={
-            pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" :
-            pinRequest.purpose === "delete" ? "กรอกรหัสประจำตัวเพื่อลบรายการ" :
-            "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
-          }
-          onSubmit={handlePinSubmit}
-          onCancel={() => setPinRequest(null)}
-        />
-      )}
-
       {confirmDelete && (
         <ConfirmModal
           msg={`ต้องการลบ${confirmDelete.label} ใช่หรือไม่?`}
@@ -861,8 +904,23 @@ function App() {
           request={stockQtyRequest}
           value={stockQtyValue}
           setValue={setStockQtyValue}
+          note={stockNote}
+          setNote={setStockNote}
           onConfirm={confirmStockQty}
           onCancel={() => setStockQtyRequest(null)}
+        />
+      )}
+
+      {/* PinModal เรนเดอร์ทีหลังสุดเสมอ เพื่อให้ลอยอยู่บนสุดเมื่อต้องขอรหัสต่อจากโมดัลอื่น */}
+      {pinRequest && (
+        <PinModal
+          title={
+            pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" :
+            pinRequest.purpose === "delete" ? "กรอกรหัสประจำตัวเพื่อลบรายการ" :
+            "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
+          }
+          onSubmit={handlePinSubmit}
+          onCancel={() => setPinRequest(null)}
         />
       )}
 
@@ -1113,15 +1171,19 @@ function App() {
                           <div style={{ fontSize: 11, color: "#64748b" }}>{item.unit}</div>
                         </div>
                       </div>
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => askStockQty(item, "add")} style={{
                           flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                          background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 700, fontSize: 13,
-                        }}>📥 เพิ่มจำนวน</button>
+                          background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 700, fontSize: 12,
+                        }}>📥 เพิ่ม</button>
                         <button onClick={() => askStockQty(item, "remove")} style={{
                           flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                          background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 700, fontSize: 13,
+                          background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 700, fontSize: 12,
                         }}>📤 ขายแล้ว</button>
+                        <button onClick={() => askStockQty(item, "free")} style={{
+                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                          background: "linear-gradient(135deg,#c2410c,#f97316)", color: "#fff", fontWeight: 700, fontSize: 12,
+                        }}>🎁 ฟรี</button>
                       </div>
                     </div>
                   );
@@ -1149,12 +1211,13 @@ function App() {
 
               const dayMap = {};
               itemMovements.forEach((m) => {
-                if (!dayMap[m.date]) dayMap[m.date] = { add: 0, remove: 0 };
+                if (!dayMap[m.date]) dayMap[m.date] = { add: 0, remove: 0, free: 0 };
                 dayMap[m.date][m.type] += m.quantity;
               });
-              const dayRows = Object.entries(dayMap).map(([date, v]) => ({ date, add: v.add, remove: v.remove }));
-              const maxQty = Math.max(...dayRows.map((d) => Math.max(d.add, d.remove, 1)), 1);
+              const dayRows = Object.entries(dayMap).map(([date, v]) => ({ date, add: v.add, remove: v.remove, free: v.free }));
+              const maxQty = Math.max(...dayRows.map((d) => Math.max(d.add, d.remove, d.free, 1)), 1);
               const currentCount = getStockCount(item.id);
+              const freeNotes = itemMovements.filter((m) => m.type === "free");
 
               return (
                 <div>
@@ -1177,21 +1240,25 @@ function App() {
                       <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 การเคลื่อนไหวรายวัน</div>
                       <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
                         {dayRows.map((d) => (
-                          <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, flex: 1 }}>
+                          <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 36, flex: 1 }}>
                             <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: 80, marginBottom: 4 }}>
-                              <div style={{ width: 10, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.add / maxQty) * 76)}px` }} />
-                              <div style={{ width: 10, background: "#ef4444", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.remove / maxQty) * 76)}px` }} />
+                              <div style={{ width: 8, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.add / maxQty) * 76)}px` }} />
+                              <div style={{ width: 8, background: "#ef4444", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.remove / maxQty) * 76)}px` }} />
+                              <div style={{ width: 8, background: "#f97316", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.free / maxQty) * 76)}px` }} />
                             </div>
                             <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ display: "flex", gap: 16, marginTop: 10, justifyContent: "center" }}>
+                      <div style={{ display: "flex", gap: 16, marginTop: 10, justifyContent: "center", flexWrap: "wrap" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
                           <div style={{ width: 10, height: 10, background: "#22c55e", borderRadius: 2 }} /> เพิ่มเข้า
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
                           <div style={{ width: 10, height: 10, background: "#ef4444", borderRadius: 2 }} /> ตัดออก (ขาย)
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#f97316", borderRadius: 2 }} /> แจกฟรี
                         </div>
                       </div>
                     </div>
@@ -1203,7 +1270,7 @@ function App() {
                   )}
 
                   {dayRows.length > 0 && (
-                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
                       <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                         <thead>
@@ -1211,6 +1278,7 @@ function App() {
                             <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
                             <th style={{ textAlign: "right", paddingBottom: 8 }}>เพิ่ม</th>
                             <th style={{ textAlign: "right", paddingBottom: 8 }}>ขาย</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>ฟรี</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1219,10 +1287,26 @@ function App() {
                               <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
                               <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>+{d.add}</td>
                               <td style={{ padding: "7px 0", textAlign: "right", color: "#ef4444" }}>-{d.remove}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#f97316" }}>{d.free > 0 ? `-${d.free}` : "-"}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  )}
+
+                  {freeNotes.length > 0 && (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>🎁 รายการแจกฟรี</div>
+                      {[...freeNotes].sort((a, b) => b.created_at - a.created_at).map((m) => (
+                        <div key={m.id} style={{ padding: "8px 0", borderTop: "1px solid #0f172a", fontSize: 13 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span style={{ color: "#f97316", fontWeight: 700 }}>-{m.quantity} {item.unit}</span>
+                            <span style={{ color: "#64748b", fontSize: 11 }}>{m.date} · {m.created_by}</span>
+                          </div>
+                          {m.note && <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>{m.note}</div>}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
