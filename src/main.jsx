@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import ReactDOM from "react-dom/client";
 
@@ -182,6 +182,24 @@ function ensureSarabunLoaded() {
 
 const formatMoney = (n) =>
   Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// โหลดไลบรารี ZXing สำหรับสแกนบาร์โค้ดผ่านกล้อง (ครั้งเดียว)
+// ใช้ตัวนี้แทน BarcodeDetector ของเบราว์เซอร์ เพราะ Safari บน iPhone ยังไม่รองรับ BarcodeDetector
+// ZXing ทำงานโดยอ่านพิกเซลจากภาพกล้องแล้วประมวลผลด้วย JS ตรงๆ จึงใช้ได้ทั้ง iPhone และ Android
+let _zxingLoadPromise = null;
+function ensureZXingLoaded() {
+  if (_zxingLoadPromise) return _zxingLoadPromise;
+  _zxingLoadPromise = new Promise((resolve, reject) => {
+    if (window.ZXing) { resolve(window.ZXing); return; }
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js";
+    script.async = true;
+    script.onload = () => resolve(window.ZXing);
+    script.onerror = () => reject(new Error("โหลดไลบรารีสแกนบาร์โค้ดไม่สำเร็จ"));
+    document.head.appendChild(script);
+  });
+  return _zxingLoadPromise;
+}
 
 const todayStr = () => {
   const d = new Date();
@@ -498,6 +516,125 @@ function StockQtyModal({ request, value, setValue, note, setNote, onConfirm, onC
   );
 }
 
+// โมดัลสแกนบาร์โค้ดผ่านกล้อง (ใช้ ZXing เพื่อให้ทำงานได้บน iPhone Safari ด้วย)
+function BarcodeScannerModal({ onDetected, onCancel }) {
+  const videoRef = useRef(null);
+  const [status, setStatus] = useState("loading"); // loading | scanning | error
+  const [errorMsg, setErrorMsg] = useState("");
+  const readerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const ZXing = await ensureZXingLoaded();
+        if (cancelled) return;
+        const reader = new ZXing.BrowserMultiFormatReader();
+        readerRef.current = reader;
+        setStatus("scanning");
+        await reader.decodeFromConstraints(
+          { video: { facingMode: "environment" } },
+          videoRef.current,
+          (result, err) => {
+            if (result && !cancelled) {
+              const text = result.getText();
+              cancelled = true;
+              onDetected(text);
+            }
+          }
+        );
+      } catch (e) {
+        if (!cancelled) {
+          setStatus("error");
+          setErrorMsg(e && e.message ? e.message : "ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการใช้กล้อง");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+      try { readerRef.current && readerRef.current.reset(); } catch (e) {}
+    };
+  }, []);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 18,
+        maxWidth: 420, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 12, textAlign: "center" }}>📷 สแกนบาร์โค้ด</div>
+        <div style={{
+          position: "relative", width: "100%", aspectRatio: "1", background: "#000",
+          borderRadius: 10, overflow: "hidden", marginBottom: 14,
+        }}>
+          <video ref={videoRef} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted playsInline />
+          {status === "loading" && (
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 13 }}>
+              ⏳ กำลังเปิดกล้อง...
+            </div>
+          )}
+          {status === "scanning" && (
+            <div style={{ position: "absolute", inset: 20, border: "2px solid #22c55e", borderRadius: 8, pointerEvents: "none" }} />
+          )}
+        </div>
+        {status === "error" && (
+          <div style={{ color: "#ef4444", fontSize: 13, textAlign: "center", marginBottom: 14 }}>{errorMsg}</div>
+        )}
+        <button onClick={onCancel} style={{
+          width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+          background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+        }}>ยกเลิก</button>
+      </div>
+    </div>
+  );
+}
+
+// โมดัลลงทะเบียนสินค้าใหม่ ตอนสแกนบาร์โค้ดที่ยังไม่มีในระบบ
+function RegisterBarcodeModal({ barcode, name, setName, price, setPrice, onConfirm, onCancel }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 340, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>🆕</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>ยังไม่มีสินค้านี้ในระบบ</div>
+        <div style={{ fontSize: 12, color: "#64748b", marginBottom: 16, textAlign: "center" }}>บาร์โค้ด: {barcode}</div>
+        <label style={labelStyle}>ชื่อสินค้า</label>
+        <input type="text" autoFocus placeholder="เช่น ไอติมช็อกโกแลต" value={name}
+          onChange={(e) => setName(e.target.value)} style={{ ...inputStyle, marginBottom: 12 }} />
+        <label style={labelStyle}>ราคา (บาท)</label>
+        <input type="number" placeholder="0.00" value={price}
+          onChange={(e) => setPrice(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
+        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 14, textAlign: "center" }}>
+          ครั้งต่อไปสแกนบาร์โค้ดนี้ จะเพิ่มเข้าออเดอร์อัตโนมัติโดยไม่ต้องตั้งค่าใหม่
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>บันทึกและเพิ่ม</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -511,6 +648,13 @@ function App() {
   const [orderItems, setOrderItems] = useState([]);
   // วิธีรับเงิน (บังคับเลือกตอนบันทึกรายรับหมวดร้านอาหาร): "" | "cash" | "transfer"
   const [paymentMethod, setPaymentMethod] = useState("");
+  // สินค้าที่ลงทะเบียนบาร์โค้ดไว้แล้ว (โหลดจาก Supabase)
+  const [barcodeProducts, setBarcodeProducts] = useState([]);
+  const [showScanner, setShowScanner] = useState(false);
+  // pendingBarcode: บาร์โค้ดที่สแกนได้แต่ยังไม่มีในระบบ -> รอลงทะเบียน
+  const [pendingBarcode, setPendingBarcode] = useState(null);
+  const [newBarcodeName, setNewBarcodeName] = useState("");
+  const [newBarcodePrice, setNewBarcodePrice] = useState("");
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -598,6 +742,25 @@ function App() {
     return () => supabase.removeChannel(channel);
   }, []);
 
+  // โหลดรายการสินค้าที่ลงทะเบียนบาร์โค้ดไว้
+  useEffect(() => {
+    fetchBarcodeProducts();
+    const channel = supabase
+      .channel("barcode-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "barcode_products" }, () => {
+        fetchBarcodeProducts();
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  async function fetchBarcodeProducts() {
+    const { data, error } = await supabase
+      .from("barcode_products")
+      .select("*");
+    if (!error) setBarcodeProducts(data || []);
+  }
+
   async function fetchStockItems() {
     const { data, error } = await supabase
       .from("stock_items")
@@ -662,6 +825,53 @@ function App() {
   };
   const removeOrderItem = (id) => {
     setOrderItems((items) => items.filter((it) => it.id !== id));
+  };
+
+  // เพิ่มสินค้าเข้าออเดอร์จากชื่อ+ราคา ถ้ามีแถวชื่อเดียวกันอยู่แล้วให้บวกจำนวนเพิ่มแทนการสร้างแถวใหม่
+  const addScannedItemToOrder = (name, price) => {
+    setOrderItems((items) => {
+      const existing = items.find((it) => it.name === name);
+      if (existing) {
+        return items.map((it) => it.id === existing.id ? { ...it, qty: Number(it.qty || 0) + 1 } : it);
+      }
+      return [...items, { id: genId(), name, price, qty: 1 }];
+    });
+  };
+
+  // เมื่อสแกนเจอบาร์โค้ด -> หาในระบบ ถ้าเจอเพิ่มเข้าออเดอร์ทันที ถ้าไม่เจอให้ลงทะเบียนใหม่
+  const handleBarcodeDetected = (code) => {
+    setShowScanner(false);
+    const found = barcodeProducts.find((p) => p.barcode === code);
+    if (found) {
+      addScannedItemToOrder(found.name, found.price);
+      showToast(`✓ เพิ่ม ${found.name} แล้ว`);
+    } else {
+      setNewBarcodeName("");
+      setNewBarcodePrice("");
+      setPendingBarcode(code);
+    }
+  };
+
+  // ลงทะเบียนสินค้าใหม่จากบาร์โค้ดที่สแกนไม่เจอ แล้วเพิ่มเข้าออเดอร์ทันที
+  const confirmRegisterBarcode = async () => {
+    if (!newBarcodeName.trim() || !newBarcodePrice || Number(newBarcodePrice) <= 0) {
+      showToast("กรุณากรอกชื่อสินค้าและราคาให้ถูกต้อง", "#ef4444");
+      return;
+    }
+    const product = {
+      barcode: pendingBarcode,
+      name: newBarcodeName.trim(),
+      price: Number(newBarcodePrice),
+      created_at: Date.now(),
+    };
+    const { error } = await supabase.from("barcode_products").insert([product]);
+    if (error) {
+      showToast("ลงทะเบียนสินค้าไม่สำเร็จ", "#ef4444");
+      return;
+    }
+    addScannedItemToOrder(product.name, product.price);
+    setPendingBarcode(null);
+    showToast(`✓ ลงทะเบียนและเพิ่ม ${product.name} แล้ว`);
   };
 
   // ขั้นแรก: กดบันทึก -> ตรวจสอบฟอร์มแล้วขอรหัสประจำตัว
@@ -1135,6 +1345,25 @@ function App() {
         />
       )}
 
+      {showScanner && (
+        <BarcodeScannerModal
+          onDetected={handleBarcodeDetected}
+          onCancel={() => setShowScanner(false)}
+        />
+      )}
+
+      {pendingBarcode && (
+        <RegisterBarcodeModal
+          barcode={pendingBarcode}
+          name={newBarcodeName}
+          setName={setNewBarcodeName}
+          price={newBarcodePrice}
+          setPrice={setNewBarcodePrice}
+          onConfirm={confirmRegisterBarcode}
+          onCancel={() => setPendingBarcode(null)}
+        />
+      )}
+
       {/* PinModal เรนเดอร์ทีหลังสุดเสมอ เพื่อให้ลอยอยู่บนสุดเมื่อต้องขอรหัสต่อจากโมดัลอื่น */}
       {pinRequest && (
         <PinModal
@@ -1423,11 +1652,16 @@ function App() {
                       }}>✕</button>
                     </div>
                   ))}
-                  <button onClick={addOrderItem} style={{
-                    width: "100%", padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
-                    background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
-                    marginBottom: 14,
-                  }}>➕ เพิ่มเมนู</button>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                    <button onClick={addOrderItem} style={{
+                      flex: 1, padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
+                      background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
+                    }}>➕ เพิ่มเมนู</button>
+                    <button onClick={() => setShowScanner(true)} style={{
+                      flex: 1, padding: "10px 0", borderRadius: 10, border: "1px dashed #22c55e",
+                      background: "rgba(34,197,94,0.1)", color: "#4ade80", fontWeight: 700, cursor: "pointer", fontSize: 14,
+                    }}>📷 สแกนบาร์โค้ด</button>
+                  </div>
 
                   <div style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
