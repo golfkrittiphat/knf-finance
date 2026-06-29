@@ -516,65 +516,56 @@ function StockQtyModal({ request, value, setValue, note, setNote, onConfirm, onC
   );
 }
 
-// โมดัลสแกนบาร์โค้ดผ่านกล้อง (ใช้ ZXing เพื่อให้ทำงานได้บน iPhone Safari ด้วย)
+// โมดัลสแกนบาร์โค้ด: ใช้กล้องจริงของมือถือถ่ายรูป (ผ่าน input file) แล้วนำรูปมาอ่านบาร์โค้ด
+// กล้องจริงของมือถือโฟกัสเร็วกว่าและคมกว่ากล้องที่เปิดผ่านเว็บ (getUserMedia) มาก
+// จึงไม่ต้องถือมือถือนิ่งรอกล้องเว็บโฟกัสอีกต่อไป ถ่ายรูปครั้งเดียวแล้วประมวลผลทันที
 function BarcodeScannerModal({ onDetected, onCancel }) {
-  const videoRef = useRef(null);
-  const [status, setStatus] = useState("loading"); // loading | scanning | error
+  const fileInputRef = useRef(null);
+  const [status, setStatus] = useState("idle"); // idle | decoding | error
   const [errorMsg, setErrorMsg] = useState("");
-  const readerRef = useRef(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
+  // เปิดกล้องถ่ายรูปทันทีตอนเปิดหน้านี้ขึ้นมา
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const ZXing = await ensureZXingLoaded();
-        if (cancelled) return;
-
-        // จำกัดให้สแกนหาเฉพาะบาร์โค้ดแบบที่ติดมากับสินค้าจริง (1D เท่านั้น)
-        // ลดเวลาประมวลผลต่อเฟรมลงมาก เพราะไม่ต้องไล่เช็คทุกฟอร์แมต (รวม QR/2D) ที่ไม่เกี่ยวข้อง
-        const hints = new Map();
-        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-          ZXing.BarcodeFormat.EAN_13,
-          ZXing.BarcodeFormat.EAN_8,
-          ZXing.BarcodeFormat.UPC_A,
-          ZXing.BarcodeFormat.UPC_E,
-          ZXing.BarcodeFormat.CODE_128,
-        ]);
-        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-
-        const reader = new ZXing.BrowserMultiFormatReader(hints);
-        readerRef.current = reader;
-        setStatus("scanning");
-        await reader.decodeFromConstraints(
-          {
-            video: {
-              facingMode: "environment",
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-              advanced: [{ focusMode: "continuous" }],
-            },
-          },
-          videoRef.current,
-          (result, err) => {
-            if (result && !cancelled) {
-              const text = result.getText();
-              cancelled = true;
-              onDetected(text);
-            }
-          }
-        );
-      } catch (e) {
-        if (!cancelled) {
-          setStatus("error");
-          setErrorMsg(e && e.message ? e.message : "ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการใช้กล้อง");
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-      try { readerRef.current && readerRef.current.reset(); } catch (e) {}
-    };
+    fileInputRef.current && fileInputRef.current.click();
   }, []);
+
+  const decodeFile = async (file) => {
+    setStatus("decoding");
+    setErrorMsg("");
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    try {
+      const ZXing = await ensureZXingLoaded();
+      const hints = new Map();
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+        ZXing.BarcodeFormat.EAN_13,
+        ZXing.BarcodeFormat.EAN_8,
+        ZXing.BarcodeFormat.UPC_A,
+        ZXing.BarcodeFormat.UPC_E,
+        ZXing.BarcodeFormat.CODE_128,
+      ]);
+      hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+      const reader = new ZXing.BrowserMultiFormatReader(hints);
+      const result = await reader.decodeFromImageUrl(url);
+      onDetected(result.getText());
+    } catch (e) {
+      setStatus("error");
+      setErrorMsg("อ่านบาร์โค้ดในรูปไม่เจอ ลองถ่ายใหม่ให้บาร์โค้ดชัดและเต็มเฟรมขึ้น");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) decodeFile(file);
+    e.target.value = ""; // เคลียร์ค่า เผื่อถ่ายไฟล์ชื่อเดิมซ้ำ
+  };
+
+  const retake = () => {
+    setStatus("idle");
+    setPreviewUrl(null);
+    fileInputRef.current && fileInputRef.current.click();
+  };
 
   return (
     <div style={{
@@ -582,38 +573,55 @@ function BarcodeScannerModal({ onDetected, onCancel }) {
       display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
       padding: 16,
     }}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
       <div style={{
         background: "#1e293b", borderRadius: 16, padding: 18,
-        maxWidth: 420, width: "100%", border: "1px solid #334155",
+        maxWidth: 380, width: "100%", border: "1px solid #334155",
         boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
       }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 12, textAlign: "center" }}>📷 สแกนบาร์โค้ด</div>
-        <div style={{
-          position: "relative", width: "100%", aspectRatio: "1", background: "#000",
-          borderRadius: 10, overflow: "hidden", marginBottom: 14,
-        }}>
-          <video ref={videoRef} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted playsInline />
-          {status === "loading" && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 13 }}>
-              ⏳ กำลังเปิดกล้อง...
-            </div>
-          )}
-          {status === "scanning" && (
-            <div style={{ position: "absolute", inset: 20, border: "2px solid #22c55e", borderRadius: 8, pointerEvents: "none" }} />
-          )}
-        </div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 12, textAlign: "center" }}>📷 ถ่ายรูปบาร์โค้ด</div>
+
+        {previewUrl && (
+          <div style={{
+            width: "100%", aspectRatio: "1", background: "#000",
+            borderRadius: 10, overflow: "hidden", marginBottom: 14,
+          }}>
+            <img src={previewUrl} alt="บาร์โค้ดที่ถ่าย" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          </div>
+        )}
+
+        {status === "idle" && !previewUrl && (
+          <div style={{ color: "#94a3b8", fontSize: 13, textAlign: "center", marginBottom: 14 }}>
+            กำลังเปิดกล้อง... ถ่ายรูปบาร์โค้ดให้ชัดและเต็มเฟรม
+          </div>
+        )}
+        {status === "decoding" && (
+          <div style={{ color: "#94a3b8", fontSize: 13, textAlign: "center", marginBottom: 14 }}>⏳ กำลังอ่านบาร์โค้ด...</div>
+        )}
         {status === "error" && (
           <div style={{ color: "#ef4444", fontSize: 13, textAlign: "center", marginBottom: 14 }}>{errorMsg}</div>
         )}
-        {status === "scanning" && (
-          <div style={{ color: "#64748b", fontSize: 12, textAlign: "center", marginBottom: 14 }}>
-            ถือให้บาร์โค้ดเต็มกรอบเขียว ห่างประมาณ 10-15 ซม. ในที่มีแสงพอ แล้วถือนิ่งๆ รอ 1-2 วินาที
-          </div>
-        )}
-        <button onClick={onCancel} style={{
-          width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
-          background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
-        }}>ยกเลิก</button>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          {status === "error" && (
+            <button onClick={retake} style={{
+              flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+              background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+              fontWeight: 700, cursor: "pointer", fontSize: 15,
+            }}>📷 ถ่ายใหม่</button>
+          )}
+        </div>
       </div>
     </div>
   );
