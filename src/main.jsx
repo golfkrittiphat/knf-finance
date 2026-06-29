@@ -529,11 +529,31 @@ function BarcodeScannerModal({ onDetected, onCancel }) {
       try {
         const ZXing = await ensureZXingLoaded();
         if (cancelled) return;
-        const reader = new ZXing.BrowserMultiFormatReader();
+
+        // จำกัดให้สแกนหาเฉพาะบาร์โค้ดแบบที่ติดมากับสินค้าจริง (1D เท่านั้น)
+        // ลดเวลาประมวลผลต่อเฟรมลงมาก เพราะไม่ต้องไล่เช็คทุกฟอร์แมต (รวม QR/2D) ที่ไม่เกี่ยวข้อง
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+          ZXing.BarcodeFormat.EAN_13,
+          ZXing.BarcodeFormat.EAN_8,
+          ZXing.BarcodeFormat.UPC_A,
+          ZXing.BarcodeFormat.UPC_E,
+          ZXing.BarcodeFormat.CODE_128,
+        ]);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+
+        const reader = new ZXing.BrowserMultiFormatReader(hints);
         readerRef.current = reader;
         setStatus("scanning");
         await reader.decodeFromConstraints(
-          { video: { facingMode: "environment" } },
+          {
+            video: {
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              advanced: [{ focusMode: "continuous" }],
+            },
+          },
           videoRef.current,
           (result, err) => {
             if (result && !cancelled) {
@@ -584,6 +604,11 @@ function BarcodeScannerModal({ onDetected, onCancel }) {
         </div>
         {status === "error" && (
           <div style={{ color: "#ef4444", fontSize: 13, textAlign: "center", marginBottom: 14 }}>{errorMsg}</div>
+        )}
+        {status === "scanning" && (
+          <div style={{ color: "#64748b", fontSize: 12, textAlign: "center", marginBottom: 14 }}>
+            ถือให้บาร์โค้ดเต็มกรอบเขียว ห่างประมาณ 10-15 ซม. ในที่มีแสงพอ แล้วถือนิ่งๆ รอ 1-2 วินาที
+          </div>
         )}
         <button onClick={onCancel} style={{
           width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
