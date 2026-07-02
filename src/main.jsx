@@ -14,143 +14,44 @@ const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่ง�
 // *** แก้ไขรายชื่อเมนูและราคาจริงได้ที่นี่ ***
 // พิมพ์ชื่อเมนูใหม่ที่ไม่อยู่ในลิสต์นี้ได้เหมือนกัน (ระบบจะให้กรอกราคาเองตอนนั้น)
 const MENU_ITEMS = [
-    // เมนูตำ
-    { name: "ตำไทย", price: 50 },
-    { name: "ตำไทยปู", price: 55 },
-    { name: "ตำไทยปูไข่เค็ม", price: 60 },
-    { name: "ตำปลาร้า", price: 50 },
-    { name: "ตำปูปลาร้า", price: 55 },
-    { name: "ตำปูปลาร้ากุ้ง (สด/ลวก)", price: 70 },
-    { name: "ตำปูปลาร้าหอยดอง", price: 70 },
-    { name: "ตำปูปลาร้าหอยแครง", price: 80 },
-    { name: "ตำไหลบัวปูปลาร้า", price: 60 },
-    { name: "ตำไหลบัวปลาร้ากุ้ง (สด/ลวก)", price: 70 },
-    { name: "ตำไหลบัวหมูยอ", price: 60 },
-    { name: "ตำหมูยอ", price: 60 },
-    { name: "ตำหมูกรอบ", price: 70 },
-    { name: "ตำแดง (ปลาร้า/ไม่ปลาร้า)", price: 50 },
-    { name: "ตำแดงปู (ปลาร้า/ไม่ปลาร้า)", price: 55 },
-    { name: "ตำแดงไทยไข่เค็ม", price: 60 },
-    { name: "ตำแดงไทยปูไข่เค็ม", price: 65 },
-    { name: "ตำข้าวโพด", price: 50 },
-    { name: "ตำข้าวโพดไข่เค็ม", price: 60 },
-    { name: "ตำกระท้อนไทยปู", price: 60 },
-    { name: "ตำกระท้อนปูปลาร้า", price: 70 },
-    { name: "ตำกระท้อนปลาร้าหมูยอ", price: 70 },
-    { name: "ตำกระท้อนปูปลาร้ากุ้งสด", price: 80 },
+  { name: "ผัดเครื่องแกงหมู", price: 50 },
+  { name: "ผัดพริกทะเล", price: 60 },
+  { name: "ลาบหมู", price: 60 },
+  { name: "ยำสามกรอบ", price: 70 },
+  { name: "ตำปูปลาร้า", price: 60 },
+  { name: "ข้าวผัดกะเพราหมูกรอบ", price: 50 },
+  { name: "ไอศครีม", price: 20 },
+  { name: "น้ำแข็ง", price: 10 },
+  { name: "น้ำเปล่า", price: 10 },
+];
 
-    // เมนูลาบ
-    { name: "ลาบหมู", price: 60 },
-    { name: "ลาบไก่", price: 60 },
-    { name: "ลาบกุ้ง", price: 80 },
-    { name: "ลาบปลาทอด", price: 100 },
-    { name: "ตับหวาน", price: 70 },
+// หมวดหมู่และรายชื่อสินค้าในสต็อก (สำหรับแสดงในตารางสรุป)
+// *** เพิ่ม/แก้ไขรายชื่อสินค้าได้ที่นี่ ***
+const STOCK_CATALOG = [
+  {
+    category: "🥤 เครื่องดื่ม",
+    items: ["น้ำดื่มเล็ก", "น้ำดื่มใหญ่", "น้ำอัดลมเล็ก", "น้ำอัดลมใหญ่", "เบียร์สิงห์", "เบียร์ลีโอ", "น้ำแข็ง"],
+  },
+  {
+    category: "🍦 ไอศกรีม",
+    items: [
+      "ไอซ์ สตรอเบอร์รี่ ซันเด", "ไอซ์ ช็อกโกแลต คริสปี้", "ไอซ์ บิงโกคุกกี้",
+      "ไอซ์ สตรอเบอร์รี่", "ไอซ์ ฟรุซซี่ เกรป", "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต",
+      "ไอซ์ โมจิ ช็อกโกแลต", "ไอซ์ โมจิ วานิลลา", "ไอซ์ ซามังก้า", "ไอซ์ ช็อกโก มอลต์",
+    ],
+  },
+  {
+    category: "🍹 อื่นๆ",
+    items: ["สละลอยแก้ว"],
+  },
+];
 
-    // เมนูยำ
-    { name: "ยำวุ้นเส้นหมูสับ", price: 60 },
-    { name: "ยำวุ้นเส้นทะเล/รวมมิตร", price: 70 },
-    { name: "ยำรวมมิตร", price: 70 },
-    { name: "ยำหมูยอ", price: 60 },
-    { name: "ยำหมึกสด", price: 80 },
-    { name: "ยำสามกรอบ", price: 70 },
-    { name: "ยำไข่เค็ม", price: 50 },
-    { name: "ยำหมูกรอบ", price: 70 },
-    { name: "ยำไส้ต้น", price: 70 },
-    { name: "หมูมะนาว", price: 70 },
-    { name: "พล่ากุ้ง (สด/ลวก)", price: 70 },
-
-    // เมนูต้ม
-    { name: "ต้มยำรวมมิตร (น้ำข้น/น้ำใส)", price: 100 },
-    { name: "ต้มยำทะเล (น้ำข้น/น้ำใส)", price: 100 },
-    { name: "ต้มยำกุ้ง (น้ำข้น/น้ำใส)", price: 100 },
-    { name: "ต้มยำปลากะพง (น้ำข้น/น้ำใส)", price: 100 },
-    { name: "แกงเห็ด (ปลาร้า/ไม่ปลาร้า)", price: 60 },
-    { name: "แกงอ่อม (หมู/ไก่)", price: 70 },
-    { name: "ต้มจืดเต้าหู้หมูสับ", price: 60 },
-
-    // เมนูอาหารจานเดียว
-    { name: "ข้าวผัดหมู, ไก่ (เล็ก)", price: 50 },
-    { name: "ข้าวผัดหมู, ไก่ (กลาง)", price: 100 },
-    { name: "ข้าวผัดหมู, ไก่ (ใหญ่)", price: 150 },
-    { name: "ข้าวผัดทะเล, รวม (เล็ก)", price: 60 },
-    { name: "ข้าวผัดทะเล, รวม (กลาง)", price: 120 },
-    { name: "ข้าวผัดทะเล, รวม (ใหญ่)", price: 180 },
-    { name: "ผัดเครื่องแกงหมู, ไก่", price: 50 },
-    { name: "ผัดเครื่องแกงทะเล, รวม", price: 60 },
-    { name: "ผัดเครื่องแกงหมูกรอบ", price: 60 },
-    { name: "ผัดกะเพราหมู, ไก่", price: 50 },
-    { name: "ผัดกะเพราทะเล, รวม", price: 60 },
-    { name: "ผัดกะเพราหมูกรอบ", price: 60 },
-    { name: "ผัดพริกหมู, ไก่", price: 50 },
-    { name: "ผัดพริกทะเล, รวม", price: 60 },
-    { name: "ผัดพริกหมูกรอบ", price: 60 },
-    { name: "ผัดพริกไทยดำหมู, ไก่", price: 50 },
-    { name: "ผัดพริกไทยดำทะเล, รวม", price: 60 },
-    { name: "ผัดคะน้าหมูกรอบ", price: 60 },
-    { name: "ผัดคื่นฉ่ายปลากะพง", price: 70 },
-    { name: "ผัดกะปิสะตอหมู, ไก่", price: 60 },
-    { name: "ผัดกะปิสะตอทะเล, รวม", price: 70 },
-    { name: "ผัดฉ่า (กุ้ง/หมึก/ทะเล/ปลา)", price: 70 },
-    { name: "คั่วกลิ้งหมู, ไก่", price: 50 },
-    { name: "ราดหน้าหมู, ไก่", price: 50 },
-    { name: "ราดหน้าทะเล, รวม", price: 60 },
-    { name: "ผัดซีอิ๊วหมู, ไก่", price: 50 },
-    { name: "ผัดซีอิ๊วทะเล, รวม", price: 60 },
-    { name: "สุกี้หมู, ไก่ (น้ำ/แห้ง)", price: 50 },
-    { name: "สุกี้ทะเล, รวม (น้ำ/แห้ง)", price: 60 },
-
-    // เมนูทอด
-    { name: "ไก่ทอด", price: 60 },
-    { name: "เอ็นไก่ทอด", price: 80 },
-    { name: "กุ้งชุบแป้งทอด", price: 80 },
-    { name: "ทอดมันกุ้ง", price: 80 },
-    { name: "ไก่ทอดกระเทียม", price: 60 },
-    { name: "หมูทอดกระเทียม", price: 60 },
-    { name: "ปลาหมึกทอดกระเทียม", price: 70 },
-    { name: "ไส้ต้นทอดกระเทียม", price: 70 },
-    { name: "ซี่โครงหมูทอดกระเทียม", price: 70 },
-    { name: "ปลากะพงทอดกระเทียม", price: 100 },
-    { name: "ปลากะพงทอดสามรส", price: 100 },
-    { name: "ปลากะพงทอดราดพริก", price: 100 },
-    { name: "ปลากะพงทอดลุยสวน", price: 100 },
-
-    // เมนูเครื่องดื่ม
-    { name: "น้ำดื่ม (เล็ก)", price: 10 },
-    { name: "น้ำดื่ม (ใหญ่)", price: 20 },
-    { name: "น้ำอัดลม (เล็ก)", price: 12 },
-    { name: "น้ำอัดลม (ใหญ่)", price: 30 },
-    { name: "น้ำแข็ง (เล็ก)", price: 10 },
-    { name: "น้ำแข็ง (ใหญ่)", price: 20 },
-
-    // อื่นๆ
-    { name: "ข้าวเหนียว", price: 10 },
-    { name: "ขนมจีน", price: 10 },
-    { name: "ข้าว (จาน)", price: 10 },
-    { name: "ข้าว (หม้อ)", price: 60 },
-    { name: "ไข่ดาว", price: 10 },
-    { name: "ไข่เจียว", price: 10 },
-
-    { name: "ไอซ์ สตรอเบอร์รี่ ซันเด", price: 20 },
-    { name: "ไอซ์ ช็อกโกแลต คริสปี้", price: 20 },
-    { name: "ไอซ์ บิงโกคุกกี้", price: 20 },
-    { name: "ไอซ์ สตรอเบอร์รี่", price: 20 },
-    { name: "ไอซ์ ฟรุซซี่ เกรป", price: 10 },
-    { name: "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต", price: 10 },
-    { name: "ไอซ์ โมจิ ช็อกโกแลต", price: 10 },
-    { name: "ไอซ์ โมจิ วานิลลา", price: 10 },
-    { name: "ไอซ์ ซามังก้า", price: 10 },
-    { name: "ไอซ์ ช็อกโก มอลต์", price: 10 },
-
-  ];
-
-  // รหัสประจำตัวพนักงาน -> ชื่อที่จะแสดง
-  // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
-  const STAFF_PINS = {
-    "1203": "กอล์ฟ",
-    "121": "น้ำ",
-    "313": "กิ๊บ",
-  };
-
+// แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
+const STAFF_PINS = {
+  "1203": "กอล์ฟ",
+  "121": "น้ำ",
+  "313": "กิ๊บ",
+};
 
 // โหลดฟอนต์ Sarabun จาก Google Fonts จริงๆ (ครั้งเดียว) เพื่อให้ภาพสรุปหน้าตาเหมือนกันทุกอุปกรณ์
 // ถ้าไม่โหลดฟอนต์เอง เบราว์เซอร์แต่ละเครื่อง/แต่ละ OS จะใช้ฟอนต์สำรองคนละตัว
@@ -183,26 +84,18 @@ function ensureSarabunLoaded() {
 const formatMoney = (n) =>
   Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// โหลดไลบรารี ZXing สำหรับสแกนบาร์โค้ดผ่านกล้อง (ครั้งเดียว)
-// ใช้ตัวนี้แทน BarcodeDetector ของเบราว์เซอร์ เพราะ Safari บน iPhone ยังไม่รองรับ BarcodeDetector
-// ZXing ทำงานโดยอ่านพิกเซลจากภาพกล้องแล้วประมวลผลด้วย JS ตรงๆ จึงใช้ได้ทั้ง iPhone และ Android
-let _zxingLoadPromise = null;
-function ensureZXingLoaded() {
-  if (_zxingLoadPromise) return _zxingLoadPromise;
-  _zxingLoadPromise = new Promise((resolve, reject) => {
-    if (window.ZXing) { resolve(window.ZXing); return; }
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js";
-    script.async = true;
-    script.onload = () => resolve(window.ZXing);
-    script.onerror = () => reject(new Error("โหลดไลบรารีสแกนบาร์โค้ดไม่สำเร็จ"));
-    document.head.appendChild(script);
-  });
-  return _zxingLoadPromise;
-}
-
 const todayStr = () => {
   const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+// คืนค่าวันที่ (yyyy-mm-dd) ของ N วันก่อนวันนี้
+const daysAgoStr = (n) => {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -516,158 +409,6 @@ function StockQtyModal({ request, value, setValue, note, setNote, onConfirm, onC
   );
 }
 
-// โมดัลสแกนบาร์โค้ด: ใช้กล้องจริงของมือถือถ่ายรูป (ผ่าน input file) แล้วนำรูปมาอ่านบาร์โค้ด
-// กล้องจริงของมือถือโฟกัสเร็วกว่าและคมกว่ากล้องที่เปิดผ่านเว็บ (getUserMedia) มาก
-// จึงไม่ต้องถือมือถือนิ่งรอกล้องเว็บโฟกัสอีกต่อไป ถ่ายรูปครั้งเดียวแล้วประมวลผลทันที
-function BarcodeScannerModal({ onDetected, onCancel }) {
-  const fileInputRef = useRef(null);
-  const [status, setStatus] = useState("idle"); // idle | decoding | error
-  const [errorMsg, setErrorMsg] = useState("");
-  const [previewUrl, setPreviewUrl] = useState(null);
-
-  // เปิดกล้องถ่ายรูปทันทีตอนเปิดหน้านี้ขึ้นมา
-  useEffect(() => {
-    fileInputRef.current && fileInputRef.current.click();
-  }, []);
-
-  const decodeFile = async (file) => {
-    setStatus("decoding");
-    setErrorMsg("");
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    try {
-      const ZXing = await ensureZXingLoaded();
-      const hints = new Map();
-      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-        ZXing.BarcodeFormat.EAN_13,
-        ZXing.BarcodeFormat.EAN_8,
-        ZXing.BarcodeFormat.UPC_A,
-        ZXing.BarcodeFormat.UPC_E,
-        ZXing.BarcodeFormat.CODE_128,
-      ]);
-      hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-      const reader = new ZXing.BrowserMultiFormatReader(hints);
-      const result = await reader.decodeFromImageUrl(url);
-      onDetected(result.getText());
-    } catch (e) {
-      setStatus("error");
-      setErrorMsg("อ่านบาร์โค้ดในรูปไม่เจอ ลองถ่ายใหม่ให้บาร์โค้ดชัดและเต็มเฟรมขึ้น");
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) decodeFile(file);
-    e.target.value = ""; // เคลียร์ค่า เผื่อถ่ายไฟล์ชื่อเดิมซ้ำ
-  };
-
-  const retake = () => {
-    setStatus("idle");
-    setPreviewUrl(null);
-    fileInputRef.current && fileInputRef.current.click();
-  };
-
-  return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)",
-      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
-      padding: 16,
-    }}>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
-      <div style={{
-        background: "#1e293b", borderRadius: 16, padding: 18,
-        maxWidth: 380, width: "100%", border: "1px solid #334155",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 12, textAlign: "center" }}>📷 ถ่ายรูปบาร์โค้ด</div>
-
-        {previewUrl && (
-          <div style={{
-            width: "100%", aspectRatio: "1", background: "#000",
-            borderRadius: 10, overflow: "hidden", marginBottom: 14,
-          }}>
-            <img src={previewUrl} alt="บาร์โค้ดที่ถ่าย" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-          </div>
-        )}
-
-        {status === "idle" && !previewUrl && (
-          <div style={{ color: "#94a3b8", fontSize: 13, textAlign: "center", marginBottom: 14 }}>
-            กำลังเปิดกล้อง... ถ่ายรูปบาร์โค้ดให้ชัดและเต็มเฟรม
-          </div>
-        )}
-        {status === "decoding" && (
-          <div style={{ color: "#94a3b8", fontSize: 13, textAlign: "center", marginBottom: 14 }}>⏳ กำลังอ่านบาร์โค้ด...</div>
-        )}
-        {status === "error" && (
-          <div style={{ color: "#ef4444", fontSize: 13, textAlign: "center", marginBottom: 14 }}>{errorMsg}</div>
-        )}
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onCancel} style={{
-            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
-            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
-          }}>ยกเลิก</button>
-          {status === "error" && (
-            <button onClick={retake} style={{
-              flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
-              background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
-              fontWeight: 700, cursor: "pointer", fontSize: 15,
-            }}>📷 ถ่ายใหม่</button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// โมดัลลงทะเบียนสินค้าใหม่ ตอนสแกนบาร์โค้ดที่ยังไม่มีในระบบ
-function RegisterBarcodeModal({ barcode, name, setName, price, setPrice, onConfirm, onCancel }) {
-  return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
-      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
-      padding: 16,
-    }}>
-      <div style={{
-        background: "#1e293b", borderRadius: 16, padding: 20,
-        maxWidth: 340, width: "100%", border: "1px solid #334155",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-      }}>
-        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>🆕</div>
-        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>ยังไม่มีสินค้านี้ในระบบ</div>
-        <div style={{ fontSize: 12, color: "#64748b", marginBottom: 16, textAlign: "center" }}>บาร์โค้ด: {barcode}</div>
-        <label style={labelStyle}>ชื่อสินค้า</label>
-        <input type="text" autoFocus placeholder="เช่น ไอติมช็อกโกแลต" value={name}
-          onChange={(e) => setName(e.target.value)} style={{ ...inputStyle, marginBottom: 12 }} />
-        <label style={labelStyle}>ราคา (บาท)</label>
-        <input type="number" placeholder="0.00" value={price}
-          onChange={(e) => setPrice(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
-        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 14, textAlign: "center" }}>
-          ครั้งต่อไปสแกนบาร์โค้ดนี้ จะเพิ่มเข้าออเดอร์อัตโนมัติโดยไม่ต้องตั้งค่าใหม่
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onCancel} style={{
-            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
-            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
-          }}>ยกเลิก</button>
-          <button onClick={onConfirm} style={{
-            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
-            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
-            fontWeight: 700, cursor: "pointer", fontSize: 15,
-          }}>บันทึกและเพิ่ม</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -681,13 +422,6 @@ function App() {
   const [orderItems, setOrderItems] = useState([]);
   // วิธีรับเงิน (บังคับเลือกตอนบันทึกรายรับหมวดร้านอาหาร): "" | "cash" | "transfer"
   const [paymentMethod, setPaymentMethod] = useState("");
-  // สินค้าที่ลงทะเบียนบาร์โค้ดไว้แล้ว (โหลดจาก Supabase)
-  const [barcodeProducts, setBarcodeProducts] = useState([]);
-  const [showScanner, setShowScanner] = useState(false);
-  // pendingBarcode: บาร์โค้ดที่สแกนได้แต่ยังไม่มีในระบบ -> รอลงทะเบียน
-  const [pendingBarcode, setPendingBarcode] = useState(null);
-  const [newBarcodeName, setNewBarcodeName] = useState("");
-  const [newBarcodePrice, setNewBarcodePrice] = useState("");
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -709,6 +443,11 @@ function App() {
   const [stockView, setStockView] = useState("list"); // "list" | "graph"
   const [selectedStockItemId, setSelectedStockItemId] = useState(null);
   const [stockGraphMonth, setStockGraphMonth] = useState(todayStr().slice(0, 7));
+  // ช่วงวันที่ที่ใช้แสดงในตารางสรุปยอดขายรายวัน (หน้ารายการสต็อก) — ตั้งต้นเป็น 7 วันล่าสุด
+  const [stockRangeStart, setStockRangeStart] = useState(daysAgoStr(6));
+  const [stockRangeEnd, setStockRangeEnd] = useState(todayStr());
+  // pendingStockAction: เปิด item-picker ให้เลือกสินค้าก่อนเพิ่ม/ลดสต็อก
+  const [pendingStockAction, setPendingStockAction] = useState(null); // "add" | "remove" | "free"
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemName, setNewItemName] = useState("");
   const [newItemUnit, setNewItemUnit] = useState("");
@@ -775,25 +514,6 @@ function App() {
     return () => supabase.removeChannel(channel);
   }, []);
 
-  // โหลดรายการสินค้าที่ลงทะเบียนบาร์โค้ดไว้
-  useEffect(() => {
-    fetchBarcodeProducts();
-    const channel = supabase
-      .channel("barcode-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "barcode_products" }, () => {
-        fetchBarcodeProducts();
-      })
-      .subscribe();
-    return () => supabase.removeChannel(channel);
-  }, []);
-
-  async function fetchBarcodeProducts() {
-    const { data, error } = await supabase
-      .from("barcode_products")
-      .select("*");
-    if (!error) setBarcodeProducts(data || []);
-  }
-
   async function fetchStockItems() {
     const { data, error } = await supabase
       .from("stock_items")
@@ -858,53 +578,6 @@ function App() {
   };
   const removeOrderItem = (id) => {
     setOrderItems((items) => items.filter((it) => it.id !== id));
-  };
-
-  // เพิ่มสินค้าเข้าออเดอร์จากชื่อ+ราคา ถ้ามีแถวชื่อเดียวกันอยู่แล้วให้บวกจำนวนเพิ่มแทนการสร้างแถวใหม่
-  const addScannedItemToOrder = (name, price) => {
-    setOrderItems((items) => {
-      const existing = items.find((it) => it.name === name);
-      if (existing) {
-        return items.map((it) => it.id === existing.id ? { ...it, qty: Number(it.qty || 0) + 1 } : it);
-      }
-      return [...items, { id: genId(), name, price, qty: 1 }];
-    });
-  };
-
-  // เมื่อสแกนเจอบาร์โค้ด -> หาในระบบ ถ้าเจอเพิ่มเข้าออเดอร์ทันที ถ้าไม่เจอให้ลงทะเบียนใหม่
-  const handleBarcodeDetected = (code) => {
-    setShowScanner(false);
-    const found = barcodeProducts.find((p) => p.barcode === code);
-    if (found) {
-      addScannedItemToOrder(found.name, found.price);
-      showToast(`✓ เพิ่ม ${found.name} แล้ว`);
-    } else {
-      setNewBarcodeName("");
-      setNewBarcodePrice("");
-      setPendingBarcode(code);
-    }
-  };
-
-  // ลงทะเบียนสินค้าใหม่จากบาร์โค้ดที่สแกนไม่เจอ แล้วเพิ่มเข้าออเดอร์ทันที
-  const confirmRegisterBarcode = async () => {
-    if (!newBarcodeName.trim() || !newBarcodePrice || Number(newBarcodePrice) <= 0) {
-      showToast("กรุณากรอกชื่อสินค้าและราคาให้ถูกต้อง", "#ef4444");
-      return;
-    }
-    const product = {
-      barcode: pendingBarcode,
-      name: newBarcodeName.trim(),
-      price: Number(newBarcodePrice),
-      created_at: Date.now(),
-    };
-    const { error } = await supabase.from("barcode_products").insert([product]);
-    if (error) {
-      showToast("ลงทะเบียนสินค้าไม่สำเร็จ", "#ef4444");
-      return;
-    }
-    addScannedItemToOrder(product.name, product.price);
-    setPendingBarcode(null);
-    showToast(`✓ ลงทะเบียนและเพิ่ม ${product.name} แล้ว`);
   };
 
   // ขั้นแรก: กดบันทึก -> ตรวจสอบฟอร์มแล้วขอรหัสประจำตัว
@@ -1378,25 +1051,6 @@ function App() {
         />
       )}
 
-      {showScanner && (
-        <BarcodeScannerModal
-          onDetected={handleBarcodeDetected}
-          onCancel={() => setShowScanner(false)}
-        />
-      )}
-
-      {pendingBarcode && (
-        <RegisterBarcodeModal
-          barcode={pendingBarcode}
-          name={newBarcodeName}
-          setName={setNewBarcodeName}
-          price={newBarcodePrice}
-          setPrice={setNewBarcodePrice}
-          onConfirm={confirmRegisterBarcode}
-          onCancel={() => setPendingBarcode(null)}
-        />
-      )}
-
       {/* PinModal เรนเดอร์ทีหลังสุดเสมอ เพื่อให้ลอยอยู่บนสุดเมื่อต้องขอรหัสต่อจากโมดัลอื่น */}
       {pinRequest && (
         <PinModal
@@ -1685,16 +1339,11 @@ function App() {
                       }}>✕</button>
                     </div>
                   ))}
-                  <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-                    <button onClick={addOrderItem} style={{
-                      flex: 1, padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
-                      background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
-                    }}>➕ เพิ่มเมนู</button>
-                    <button onClick={() => setShowScanner(true)} style={{
-                      flex: 1, padding: "10px 0", borderRadius: 10, border: "1px dashed #22c55e",
-                      background: "rgba(34,197,94,0.1)", color: "#4ade80", fontWeight: 700, cursor: "pointer", fontSize: 14,
-                    }}>📷 สแกนบาร์โค้ด</button>
-                  </div>
+                  <button onClick={addOrderItem} style={{
+                    width: "100%", padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
+                    background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
+                    marginBottom: 14,
+                  }}>➕ เพิ่มเมนู</button>
 
                   <div style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -1749,63 +1398,194 @@ function App() {
         {/* STOCK */}
         {tab === "stock" && (
           <div>
-            {stockView === "list" && (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>📦 สต็อกสินค้า</div>
-                  <button onClick={() => setShowNewItemModal(true)} style={{
-                    padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
-                    background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
-                    fontWeight: 700, fontSize: 13,
-                  }}>➕ เพิ่มสินค้า</button>
-                </div>
-
-                {stockItems.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "50px 0", color: "#475569" }}>
-                    <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-                    <div>ยังไม่มีสินค้าในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น</div>
+            {/* Item picker modal — เปิดตอนกดปุ่ม เพิ่ม/ขาย/ฟรี ด้านล่างตาราง */}
+            {pendingStockAction && (
+              <div style={{
+                position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+                display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9998,
+              }}>
+                <div style={{
+                  background: "#1e293b", borderRadius: "16px 16px 0 0", padding: "20px 16px 32px",
+                  width: "100%", maxWidth: 480, maxHeight: "70vh", overflowY: "auto",
+                  border: "1px solid #334155",
+                }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", marginBottom: 14, textAlign: "center" }}>
+                    {pendingStockAction === "add" ? "📥 เลือกสินค้าที่จะเพิ่ม" : pendingStockAction === "remove" ? "📤 เลือกสินค้าที่ขายแล้ว" : "🎁 เลือกสินค้าที่แจกฟรี"}
                   </div>
-                )}
-
-                {stockItems.map((item) => {
-                  const count = getStockCount(item.id);
-                  return (
-                    <div key={item.id} style={{
-                      background: "#1e293b", borderRadius: 12, padding: "14px", marginBottom: 10,
-                      border: "1px solid #334155",
-                    }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <button
-                          onClick={() => { setSelectedStockItemId(item.id); setStockView("graph"); }}
-                          style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0 }}
-                        >
-                          <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>{item.name}</div>
-                          <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>📈 ดูกราฟรายวัน</div>
-                        </button>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: count > 0 ? "#22c55e" : "#ef4444" }}>{count}</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{item.unit}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={() => askStockQty(item, "add")} style={{
-                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                          background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 700, fontSize: 12,
-                        }}>📥 เพิ่ม</button>
-                        <button onClick={() => askStockQty(item, "remove")} style={{
-                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                          background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 700, fontSize: 12,
-                        }}>📤 ขายแล้ว</button>
-                        <button onClick={() => askStockQty(item, "free")} style={{
-                          flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                          background: "linear-gradient(135deg,#c2410c,#f97316)", color: "#fff", fontWeight: 700, fontSize: 12,
-                        }}>🎁 ฟรี</button>
-                      </div>
+                  {STOCK_CATALOG.map((cat) => (
+                    <div key={cat.category} style={{ marginBottom: 16 }}>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>{cat.category}</div>
+                      {cat.items.map((name) => {
+                        const item = stockItems.find((s) => s.name === name);
+                        if (!item) return null;
+                        const count = getStockCount(item.id);
+                        return (
+                          <button key={name} onClick={() => { setPendingStockAction(null); askStockQty(item, pendingStockAction); }} style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            width: "100%", padding: "10px 12px", marginBottom: 6, borderRadius: 10,
+                            border: "1px solid #334155", background: "#0f172a", cursor: "pointer", textAlign: "left",
+                          }}>
+                            <span style={{ color: "#f1f5f9", fontSize: 14 }}>{name}</span>
+                            <span style={{ color: count > 0 ? "#22c55e" : "#ef4444", fontWeight: 700, fontSize: 14 }}>{count} {item.unit}</span>
+                          </button>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  ))}
+                  <button onClick={() => setPendingStockAction(null)} style={{
+                    width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+                    background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15, marginTop: 8,
+                  }}>ยกเลิก</button>
+                </div>
               </div>
             )}
+
+            {stockView === "list" && (() => {
+              // สร้างช่วงวันที่ตามที่ผู้ใช้เลือก (stockRangeStart -> stockRangeEnd)
+              // ถ้าผู้ใช้เผลอเลือกวันเริ่มหลังวันสิ้นสุด ให้สลับให้อัตโนมัติ
+              let rangeStart = stockRangeStart;
+              let rangeEnd = stockRangeEnd;
+              if (rangeStart > rangeEnd) { const tmp = rangeStart; rangeStart = rangeEnd; rangeEnd = tmp; }
+
+              const dayDates = [];
+              {
+                const cursor = new Date(rangeStart + "T00:00:00");
+                const endD = new Date(rangeEnd + "T00:00:00");
+                // จำกัดสูงสุด 62 วัน กันตารางกว้างเกินไปโดยไม่ตั้งใจ
+                let guard = 0;
+                while (cursor <= endD && guard < 62) {
+                  const yyyy = cursor.getFullYear();
+                  const mm = String(cursor.getMonth() + 1).padStart(2, "0");
+                  const dd = String(cursor.getDate()).padStart(2, "0");
+                  dayDates.push(`${yyyy}-${mm}-${dd}`);
+                  cursor.setDate(cursor.getDate() + 1);
+                  guard++;
+                }
+              }
+              const days = dayDates.map((d) => d.slice(5)); // mm-dd สำหรับหัวตาราง
+
+              // คำนวณยอดขาย (remove+free) ต่อวัน ต่อ item
+              const getSoldOnDay = (itemId, date) =>
+                stockMovements
+                  .filter((m) => m.item_id === itemId && m.date === date && (m.type === "remove" || m.type === "free"))
+                  .reduce((s, m) => s + m.quantity, 0);
+
+              return (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>📦 สต็อกสินค้า</div>
+                    <button onClick={() => setShowNewItemModal(true)} style={{
+                      padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+                      fontWeight: 700, fontSize: 12,
+                    }}>➕ เพิ่มสินค้า</button>
+                  </div>
+
+                  {/* ตัวเลือกช่วงวันที่สำหรับตารางยอดขายรายวัน */}
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+                    background: "#1e293b", border: "1px solid #334155", borderRadius: 10,
+                    padding: "10px 12px", marginBottom: 16,
+                  }}>
+                    <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>ช่วงวันที่:</span>
+                    <input type="date" value={stockRangeStart} onChange={(e) => setStockRangeStart(e.target.value)}
+                      style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                    <input type="date" value={stockRangeEnd} onChange={(e) => setStockRangeEnd(e.target.value)}
+                      style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+                      <button onClick={() => { setStockRangeStart(daysAgoStr(6)); setStockRangeEnd(todayStr()); }} style={{
+                        padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                        color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                      }}>7 วันล่าสุด</button>
+                      <button onClick={() => { setStockRangeStart(daysAgoStr(29)); setStockRangeEnd(todayStr()); }} style={{
+                        padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                        color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                      }}>30 วันล่าสุด</button>
+                    </div>
+                  </div>
+
+                  {STOCK_CATALOG.map((cat) => {
+                    const catItems = cat.items
+                      .map((name) => stockItems.find((s) => s.name === name))
+                      .filter(Boolean);
+                    if (catItems.length === 0) return null;
+
+                    return (
+                      <div key={cat.category} style={{ marginBottom: 20 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>{cat.category}</div>
+                        <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #334155" }}>
+                          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 460 }}>
+                            <thead>
+                              <tr style={{ background: "#0f172a" }}>
+                                <th style={{ textAlign: "left", padding: "8px 10px", color: "#64748b", fontWeight: 700, minWidth: 110 }}>สินค้า</th>
+                                <th style={{ textAlign: "center", padding: "8px 6px", color: "#22c55e", fontWeight: 700, minWidth: 52 }}>คงเหลือ</th>
+                                {days.map((d) => (
+                                  <th key={d} style={{ textAlign: "center", padding: "8px 4px", color: "#64748b", fontWeight: 600, minWidth: 36 }}>{d}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {catItems.map((item, idx) => {
+                                const count = getStockCount(item.id);
+                                return (
+                                  <tr key={item.id} style={{ borderTop: "1px solid #1e293b", background: idx % 2 === 0 ? "#1e293b" : "#172033" }}>
+                                    <td style={{ padding: "9px 10px" }}>
+                                      <button onClick={() => { setSelectedStockItemId(item.id); setStockView("graph"); }}
+                                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                                        <span style={{ color: "#e2e8f0", fontSize: 12 }}>{item.name}</span>
+                                        <span style={{ display: "block", fontSize: 10, color: "#3b82f6" }}>📈 ดูกราฟ</span>
+                                      </button>
+                                    </td>
+                                    <td style={{ textAlign: "center", padding: "9px 6px", fontWeight: 800, fontSize: 14, color: count > 0 ? "#22c55e" : "#ef4444" }}>
+                                      {count}
+                                    </td>
+                                    {dayDates.map((date) => {
+                                      const sold = getSoldOnDay(item.id, date);
+                                      return (
+                                        <td key={date} style={{ textAlign: "center", padding: "9px 4px", color: sold > 0 ? "#ef4444" : "#334155", fontWeight: sold > 0 ? 700 : 400 }}>
+                                          {sold > 0 ? sold : "—"}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {stockItems.length === 0 && (
+                    <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                      <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+                      <div>ยังไม่มีสินค้าในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น</div>
+                    </div>
+                  )}
+
+                  {/* ปุ่มลงรายการ ด้านล่างสุดของตาราง */}
+                  <div style={{ display: "flex", gap: 8, marginTop: 10, position: "sticky", bottom: 16 }}>
+                    <button onClick={() => setPendingStockAction("add")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>📥 เพิ่มสต็อก</button>
+                    <button onClick={() => setPendingStockAction("remove")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>📤 ขายแล้ว</button>
+                    <button onClick={() => setPendingStockAction("free")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#c2410c,#f97316)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>🎁 ฟรี</button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {stockView === "graph" && (() => {
               const item = stockItems.find((i) => i.id === selectedStockItemId);
@@ -1817,7 +1597,7 @@ function App() {
                     <button onClick={() => setStockView("list")} style={{
                       padding: "9px 18px", borderRadius: 8, border: "1px solid #334155",
                       background: "#1e293b", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 13,
-                    }}>← กลับไปหน้ารายการสินค้า</button>
+                    }}>← กลับไปหน้าสต็อก</button>
                   </div>
                 );
               }
@@ -1840,7 +1620,7 @@ function App() {
                   <button onClick={() => setStockView("list")} style={{
                     background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
                     fontSize: 13, marginBottom: 14, padding: 0,
-                  }}>← กลับไปหน้ารายการสินค้า</button>
+                  }}>← กลับไปหน้าสต็อก</button>
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                     <div>
