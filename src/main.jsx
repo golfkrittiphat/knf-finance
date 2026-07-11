@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import ReactDOM from "react-dom/client";
+import * as XLSX from "xlsx";
 
 const SUPABASE_URL = "https://sbpmkmuxtslmxwsdaral.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicG1rbXV4dHNsbXh3c2RhcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTczNjAsImV4cCI6MjA5ODEzMzM2MH0.9xWYG8SG5CmP5pVvnyxS79JrEL0g-pku0334GiOEOTs";
@@ -1163,6 +1164,85 @@ function App() {
     }
   };
 
+  const exportExcel = () => {
+    const wb = XLSX.utils.book_new();
+
+    // ชีต 1: รายการทั้งหมด (ไม่รวมรายการที่ถูกลบ)
+    const allRows = [...activeRecords]
+      .sort((a, b) => a.date.localeCompare(b.date) || a.created_at - b.created_at)
+      .map((r) => ({
+        "วันที่": r.date,
+        "ประเภท": r.type === "income" ? "รายรับ" : "รายจ่าย",
+        "หมวดหมู่": r.category,
+        "จำนวนเงิน": r.amount,
+        "วิธีรับเงิน": r.payment_method === "cash" ? "เงินสด" : r.payment_method === "transfer" ? "โอน" : "",
+        "หมายเหตุ": r.note || "",
+        "บันทึกโดย": r.created_by || "",
+      }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allRows), "รายการทั้งหมด");
+
+    // ชีต 2: สรุปรายวัน
+    const dailyMap2 = {};
+    activeRecords.forEach((r) => {
+      if (!dailyMap2[r.date]) dailyMap2[r.date] = { income: 0, expense: 0 };
+      dailyMap2[r.date][r.type] += r.amount;
+    });
+    const dailyRows2 = Object.entries(dailyMap2)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, v]) => ({
+        "วันที่": date,
+        "รายรับ": v.income,
+        "รายจ่าย": v.expense,
+        "กำไรสุทธิ": v.income - v.expense,
+      }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyRows2), "สรุปรายวัน");
+
+    // ชีต 3: ยอดขายตามเมนู
+    const menuMap = {};
+    activeRecords
+      .filter((r) => r.type === "income" && r.category === "ร้านอาหาร" && r.items)
+      .forEach((r) => {
+        let parsed = [];
+        try { parsed = JSON.parse(r.items); } catch (e) { parsed = []; }
+        parsed.forEach((it) => {
+          if (!menuMap[it.name]) menuMap[it.name] = { qty: 0, total: 0 };
+          menuMap[it.name].qty += Number(it.qty) || 0;
+          menuMap[it.name].total += (Number(it.qty) || 0) * (Number(it.price) || 0);
+        });
+      });
+    const menuRows = Object.entries(menuMap)
+      .map(([name, v]) => ({ "เมนู": name, "จำนวนที่ขาย": v.qty, "ยอดขายรวม": v.total }))
+      .sort((a, b) => b["จำนวนที่ขาย"] - a["จำนวนที่ขาย"]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(menuRows), "ยอดขายตามเมนู");
+
+    // ชีต 4: สรุปตามหมวดหมู่
+    const catMap = {};
+    activeRecords.forEach((r) => {
+      const key = `${r.type === "income" ? "รายรับ" : "รายจ่าย"} - ${r.category}`;
+      catMap[key] = (catMap[key] || 0) + r.amount;
+    });
+    const catRows = Object.entries(catMap).map(([k, v]) => ({ "ประเภท-หมวดหมู่": k, "ยอดรวม": v }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "สรุปตามหมวดหมู่");
+
+    // ชีต 5: สต็อกของสด (ประวัติการซื้อ)
+    const freshRows = [...freshStockMovements]
+      .filter((m) => m.type === "add")
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((m) => {
+        const item = freshStockItems.find((i) => i.id === m.item_id);
+        return {
+          "วันที่": m.date,
+          "สินค้า": item ? item.name : m.item_id,
+          "จำนวนที่ซื้อ": m.quantity,
+          "หน่วย": item ? item.unit : "",
+          "บันทึกโดย": m.created_by,
+        };
+      });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(freshRows), "สต็อกของสด");
+
+    XLSX.writeFile(wb, `สรุปข้อมูลร้าน_${todayStr()}.xlsx`);
+  };
+  
   // สร้างภาพสรุป (เหมือนใบเสร็จ) ด้วย Canvas API ไม่ต้องพึ่งไลบรารีเสริม
   const generateSummaryImage = async () => {
     setGeneratingImage(true);
@@ -1556,6 +1636,11 @@ function App() {
                 background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
                 cursor: "pointer", fontSize: 16, flexShrink: 0,
               }}>📷</button>
+              <button onClick={exportExcel} title="ส่งออก Excel" style={{
+                width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                cursor: "pointer", fontSize: 16, flexShrink: 0,
+              }}>📊</button>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
