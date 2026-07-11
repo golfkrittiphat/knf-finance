@@ -569,7 +569,7 @@ function SummaryPickerModal({ summaryMode, setSummaryMode, summaryDate, setSumma
 }
 
 // โมดัลเพิ่มสินค้าใหม่ในสต็อก
-function NewItemModal({ name, setName, unit, setUnit, onConfirm, onCancel }) {
+function NewItemModal({ title, name, setName, unit, setUnit, onConfirm, onCancel, confirmLabel }) {
   return (
     <div style={{
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
@@ -581,12 +581,12 @@ function NewItemModal({ name, setName, unit, setUnit, onConfirm, onCancel }) {
         maxWidth: 340, width: "100%", border: "1px solid #334155",
         boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
       }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>📦 เพิ่มสินค้าในสต็อก</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>{title || "📦 เพิ่มสินค้าในสต็อก"}</div>
         <label style={labelStyle}>ชื่อสินค้า</label>
         <input type="text" autoFocus placeholder="เช่น ไอติม, น้ำอัดลม" value={name}
           onChange={(e) => setName(e.target.value)} style={{ ...inputStyle, marginBottom: 12 }} />
         <label style={labelStyle}>หน่วยนับ (ไม่บังคับ)</label>
-        <input type="text" placeholder="เช่น แท่ง, ขวด, ชิ้น" value={unit}
+        <input type="text" placeholder="เช่น แท่ง, ขวด, ชิ้น, กิโลกรัม" value={unit}
           onChange={(e) => setUnit(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{
@@ -597,7 +597,7 @@ function NewItemModal({ name, setName, unit, setUnit, onConfirm, onCancel }) {
             flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
             background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff",
             fontWeight: 700, cursor: "pointer", fontSize: 15,
-          }}>เพิ่มสินค้า</button>
+          }}>{confirmLabel || "เพิ่มสินค้า"}</button>
         </div>
       </div>
     </div>
@@ -714,6 +714,28 @@ function App() {
   const [stockNote, setStockNote] = useState("");
   const [savingStock, setSavingStock] = useState(false);
 
+  // สลับมุมมองระหว่าง "สต็อกทั่วไป" กับ "สต็อกของสด" ในแท็บ 📦 สต็อก
+  const [stockKind, setStockKind] = useState("general"); // "general" | "fresh"
+
+  // ระบบสต็อกของสด (แยกจากสต็อกทั่วไป — ไม่มีการแบ่งหมวดหมู่ เป็นรายการเดียวแบน ๆ)
+  const [freshStockItems, setFreshStockItems] = useState([]);
+  const [freshStockMovements, setFreshStockMovements] = useState([]);
+  const [freshStockView, setFreshStockView] = useState("list"); // "list" | "graph"
+  const [selectedFreshStockItemId, setSelectedFreshStockItemId] = useState(null);
+  const [freshStockGraphMonth, setFreshStockGraphMonth] = useState(todayStr().slice(0, 7));
+  const [freshStockRangeStart, setFreshStockRangeStart] = useState(daysAgoStr(6));
+  const [freshStockRangeEnd, setFreshStockRangeEnd] = useState(todayStr());
+  const [pendingFreshStockAction, setPendingFreshStockAction] = useState(null); // "add" | "remove" | "free"
+  // การเพิ่มสินค้าของสดใหม่ ต้องกรอกรหัสประจำตัวก่อนถึงจะเพิ่มได้:
+  // 1) กรอกชื่อ/หน่วย ในโมดัล -> 2) ขอรหัสประจำตัว -> 3) รหัสถูกต้องจึงบันทึกลงฐานข้อมูล
+  const [showNewFreshItemModal, setShowNewFreshItemModal] = useState(false);
+  const [newFreshItemName, setNewFreshItemName] = useState("");
+  const [newFreshItemUnit, setNewFreshItemUnit] = useState("");
+  const [freshStockQtyRequest, setFreshStockQtyRequest] = useState(null);
+  const [freshStockQtyValue, setFreshStockQtyValue] = useState("");
+  const [freshStockNote, setFreshStockNote] = useState("");
+  const [savingFreshStock, setSavingFreshStock] = useState(false);
+
   // ตั้งพื้นหลังของหน้าเว็บ (html/body) ให้เป็นสีเดียวกับแอป
   // กันไม่ให้เห็นขอบ/แถบสีขาวตอนเนื้อหาสั้นกว่าจอ หรือตอนเลื่อนหน้าจอเด้ง (overscroll)
   useEffect(() => {
@@ -771,6 +793,22 @@ function App() {
     return () => supabase.removeChannel(channel);
   }, []);
 
+  // โหลดข้อมูลสต็อกของสดจาก Supabase (ตารางแยกจากสต็อกทั่วไป)
+  useEffect(() => {
+    fetchFreshStockItems();
+    fetchFreshStockMovements();
+    const channel = supabase
+      .channel("fresh-stock-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "fresh_stock_items" }, () => {
+        fetchFreshStockItems();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "fresh_stock_movements" }, () => {
+        fetchFreshStockMovements();
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, []);
+
   async function fetchStockItems() {
     const { data, error } = await supabase
       .from("stock_items")
@@ -785,6 +823,22 @@ function App() {
       .select("*")
       .order("created_at", { ascending: false });
     if (!error) setStockMovements(data || []);
+  }
+
+  async function fetchFreshStockItems() {
+    const { data, error } = await supabase
+      .from("fresh_stock_items")
+      .select("*")
+      .order("created_at", { ascending: true });
+    if (!error) setFreshStockItems(data || []);
+  }
+
+  async function fetchFreshStockMovements() {
+    const { data, error } = await supabase
+      .from("fresh_stock_movements")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error) setFreshStockMovements(data || []);
   }
 
   async function fetchRecords() {
@@ -936,6 +990,8 @@ function App() {
     if (pinRequest.purpose === "save") doSave(result);
     else if (pinRequest.purpose === "delete") onPinForDelete(result);
     else if (pinRequest.purpose === "stock") doStockMovement(result);
+    else if (pinRequest.purpose === "fresh-stock") doFreshStockMovement(result);
+    else if (pinRequest.purpose === "fresh-new-item") doAddFreshItem(result);
   };
 
   // คำนวณจำนวนสต็อกล่าสุดของแต่ละสินค้า จากผลรวมการเพิ่ม/ลบ
@@ -1007,6 +1063,99 @@ function App() {
     setSavingStock(false);
     if (error) {
       showToast("บันทึกสต็อกไม่สำเร็จ", "#ef4444");
+    } else {
+      const verb = payload.action === "add" ? "เพิ่ม" : payload.action === "free" ? "แจกฟรี" : "ตัดสต็อก";
+      showToast(`✓ ${verb} ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`);
+    }
+  };
+
+  // ===== ระบบสต็อกของสด (แยกจากสต็อกทั่วไป) =====
+
+  // คำนวณจำนวนของสดคงเหลือ จากผลรวมการเพิ่ม/ลบ/แจกฟรี
+  const getFreshStockCount = (itemId) => {
+    return freshStockMovements
+      .filter((m) => m.item_id === itemId)
+      .reduce((sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity), 0);
+  };
+
+  // ขั้นแรก: กดเพิ่มสินค้าของสด -> เปิดโมดัลกรอกชื่อ/หน่วย (ยังไม่บันทึก)
+  const askNewFreshItem = () => {
+    setNewFreshItemName("");
+    setNewFreshItemUnit("");
+    setShowNewFreshItemModal(true);
+  };
+
+  // ขั้นที่สอง: กรอกชื่อ/หน่วยแล้ว -> ปิดโมดัลกรอกข้อมูล แล้วขอรหัสประจำตัวก่อนบันทึกจริง
+  const confirmNewFreshItem = () => {
+    if (!newFreshItemName.trim()) {
+      showToast("กรุณากรอกชื่อสินค้า", "#ef4444");
+      return;
+    }
+    const payload = { name: newFreshItemName.trim(), unit: newFreshItemUnit.trim() || "กก." };
+    setShowNewFreshItemModal(false);
+    setPinRequest({ purpose: "fresh-new-item", payload });
+  };
+
+  // ขั้นที่สาม: รหัสถูกต้อง -> บันทึกสินค้าของสดใหม่ลง Supabase พร้อมชื่อผู้เพิ่ม
+  const doAddFreshItem = async ({ name }) => {
+    const payload = pinRequest.payload;
+    setPinRequest(null);
+    const item = {
+      id: genId(),
+      name: payload.name,
+      unit: payload.unit,
+      created_at: Date.now(),
+      created_by: name,
+    };
+    const { error } = await supabase.from("fresh_stock_items").insert([item]);
+    if (error) {
+      showToast("เพิ่มสินค้าของสดไม่สำเร็จ", "#ef4444");
+    } else {
+      setNewFreshItemName("");
+      setNewFreshItemUnit("");
+      showToast("✓ เพิ่มสินค้าของสดแล้ว");
+    }
+  };
+
+  // ขั้นแรก: เลือกเพิ่ม/ลบ/แจกฟรีของสด -> เปิดช่องกรอกจำนวน
+  const askFreshStockQty = (item, action) => {
+    setFreshStockQtyValue("");
+    setFreshStockNote("");
+    setFreshStockQtyRequest({ itemId: item.id, itemName: item.name, unit: item.unit, action });
+  };
+
+  // ขั้นที่สอง: กรอกจำนวนแล้ว -> ขอรหัสประจำตัว
+  const confirmFreshStockQty = () => {
+    const qty = Number(freshStockQtyValue);
+    if (!freshStockQtyValue || isNaN(qty) || qty <= 0) {
+      showToast("กรุณากรอกจำนวนที่ถูกต้อง", "#ef4444");
+      return;
+    }
+    const payload = { ...freshStockQtyRequest, quantity: qty, note: freshStockQtyRequest.action === "free" ? freshStockNote.trim() : "" };
+    setFreshStockQtyRequest(null);
+    setPinRequest({ purpose: "fresh-stock", payload });
+  };
+
+  // ขั้นที่สาม: ได้รหัสแล้ว -> บันทึกการเคลื่อนไหวของสดพร้อมชื่อผู้ทำรายการ
+  const doFreshStockMovement = async ({ name }) => {
+    const payload = pinRequest.payload;
+    setPinRequest(null);
+    setFreshStockQtyRequest(null);
+    setSavingFreshStock(true);
+    const movement = {
+      id: genId(),
+      item_id: payload.itemId,
+      type: payload.action, // "add" | "remove" | "free"
+      quantity: payload.quantity,
+      note: payload.note || null,
+      date: todayStr(),
+      created_by: name,
+      created_at: Date.now(),
+    };
+    const { error } = await supabase.from("fresh_stock_movements").insert([movement]);
+    setSavingFreshStock(false);
+    if (error) {
+      showToast("บันทึกของสดไม่สำเร็จ", "#ef4444");
     } else {
       const verb = payload.action === "add" ? "เพิ่ม" : payload.action === "free" ? "แจกฟรี" : "ตัดสต็อก";
       showToast(`✓ ${verb} ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`);
@@ -1308,12 +1457,39 @@ function App() {
         />
       )}
 
+      {showNewFreshItemModal && (
+        <NewItemModal
+          title="🥬 เพิ่มสินค้าของสด"
+          confirmLabel="ถัดไป: กรอกรหัส"
+          name={newFreshItemName}
+          setName={setNewFreshItemName}
+          unit={newFreshItemUnit}
+          setUnit={setNewFreshItemUnit}
+          onConfirm={confirmNewFreshItem}
+          onCancel={() => { setShowNewFreshItemModal(false); setNewFreshItemName(""); setNewFreshItemUnit(""); }}
+        />
+      )}
+
+      {freshStockQtyRequest && (
+        <StockQtyModal
+          request={freshStockQtyRequest}
+          value={freshStockQtyValue}
+          setValue={setFreshStockQtyValue}
+          note={freshStockNote}
+          setNote={setFreshStockNote}
+          onConfirm={confirmFreshStockQty}
+          onCancel={() => setFreshStockQtyRequest(null)}
+        />
+      )}
+
       {/* PinModal เรนเดอร์ทีหลังสุดเสมอ เพื่อให้ลอยอยู่บนสุดเมื่อต้องขอรหัสต่อจากโมดัลอื่น */}
       {pinRequest && (
         <PinModal
           title={
             pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" :
             pinRequest.purpose === "delete" ? "กรอกรหัสประจำตัวเพื่อลบรายการ" :
+            pinRequest.purpose === "fresh-new-item" ? "กรอกรหัสประจำตัวเพื่อเพิ่มสินค้าของสด" :
+            pinRequest.purpose === "fresh-stock" ? "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อกของสด" :
             "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
           }
           onSubmit={handlePinSubmit}
@@ -1655,6 +1831,19 @@ function App() {
         {/* STOCK */}
         {tab === "stock" && (
           <div>
+            {/* สลับระหว่างสต็อกทั่วไป กับ สต็อกของสด */}
+            <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 16, border: "1px solid #334155" }}>
+              {[{ key: "general", label: "📦 ของทั่วไป" }, { key: "fresh", label: "🥬 ของสด" }].map((k) => (
+                <button key={k.key} onClick={() => setStockKind(k.key)} style={{
+                  flex: 1, padding: "11px 0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700,
+                  background: stockKind === k.key ? "#0f4c2a" : "#0f172a",
+                  color: stockKind === k.key ? "#fff" : "#64748b", transition: "all 0.2s",
+                }}>{k.label}</button>
+              ))}
+            </div>
+
+            {stockKind === "general" && (
+            <div>
             {/* Item picker modal — เปิดตอนกดปุ่ม เพิ่ม/ขาย/ฟรี ด้านล่างตาราง */}
             {pendingStockAction && (
               <div style={{
@@ -1962,6 +2151,268 @@ function App() {
                       ))}
                     </div>
                   )}
+                </div>
+              );
+            })()}
+            </div>
+            )}
+
+            {stockKind === "fresh" && (() => {
+              // Item picker modal ของสด — เปิดตอนกดปุ่ม "บันทึกซื้อของเพิ่ม" ด้านล่างตาราง
+              return (
+                <div>
+                  {pendingFreshStockAction && (
+                    <div style={{
+                      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+                      display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9998,
+                    }}>
+                      <div style={{
+                        background: "#1e293b", borderRadius: "16px 16px 0 0", padding: "20px 16px 32px",
+                        width: "100%", maxWidth: 480, maxHeight: "70vh", overflowY: "auto",
+                        border: "1px solid #334155",
+                      }}>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", marginBottom: 14, textAlign: "center" }}>
+                          📥 เลือกของที่จะซื้อเพิ่ม
+                        </div>
+                        {freshStockItems.length === 0 && (
+                          <div style={{ textAlign: "center", padding: "20px 0", color: "#64748b", fontSize: 13 }}>ยังไม่มีสินค้าของสด กด "เพิ่มสินค้า" ก่อน</div>
+                        )}
+                        {freshStockItems.map((item) => {
+                          const total = getFreshStockCount(item.id);
+                          return (
+                            <button key={item.id} onClick={() => { setPendingFreshStockAction(null); askFreshStockQty(item, "add"); }} style={{
+                              display: "flex", justifyContent: "space-between", alignItems: "center",
+                              width: "100%", padding: "10px 12px", marginBottom: 6, borderRadius: 10,
+                              border: "1px solid #334155", background: "#0f172a", cursor: "pointer", textAlign: "left",
+                            }}>
+                              <span style={{ color: "#f1f5f9", fontSize: 14 }}>{item.name}</span>
+                              <span style={{ color: "#64748b", fontWeight: 700, fontSize: 13 }}>ซื้อสะสม {total} {item.unit}</span>
+                            </button>
+                          );
+                        })}
+                        <button onClick={() => setPendingFreshStockAction(null)} style={{
+                          width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+                          background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15, marginTop: 8,
+                        }}>ยกเลิก</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {freshStockView === "list" && (() => {
+                    let rangeStart = freshStockRangeStart;
+                    let rangeEnd = freshStockRangeEnd;
+                    if (rangeStart > rangeEnd) { const tmp = rangeStart; rangeStart = rangeEnd; rangeEnd = tmp; }
+
+                    const dayDates = [];
+                    {
+                      const cursor = new Date(rangeStart + "T00:00:00");
+                      const endD = new Date(rangeEnd + "T00:00:00");
+                      let guard = 0;
+                      while (cursor <= endD && guard < 62) {
+                        const yyyy = cursor.getFullYear();
+                        const mm = String(cursor.getMonth() + 1).padStart(2, "0");
+                        const dd = String(cursor.getDate()).padStart(2, "0");
+                        dayDates.push(`${yyyy}-${mm}-${dd}`);
+                        cursor.setDate(cursor.getDate() + 1);
+                        guard++;
+                      }
+                    }
+                    const days = dayDates.map((d) => d.slice(5));
+
+                    // จำนวนที่ซื้อเข้าเฉพาะวันนั้น (คอลัมรายวัน)
+                    const getPurchasedOnDay = (itemId, date) =>
+                      freshStockMovements
+                        .filter((m) => m.item_id === itemId && m.date === date && m.type === "add")
+                        .reduce((s, m) => s + m.quantity, 0);
+
+                    // ผลรวมที่ซื้อเข้าทั้งหมด เฉพาะภายในช่วงวันที่ที่เลือกอยู่ (คอลัม "ทั้งหมด")
+                    const getPurchasedInRange = (itemId) =>
+                      freshStockMovements
+                        .filter((m) => m.item_id === itemId && m.type === "add" && dayDates.includes(m.date))
+                        .reduce((s, m) => s + m.quantity, 0);
+
+                    return (
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                          <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>🥬 สต็อกของสด (บันทึกการซื้อ)</div>
+                          <button onClick={askNewFreshItem} style={{
+                            padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer",
+                            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+                            fontWeight: 700, fontSize: 12,
+                          }}>➕ เพิ่มสินค้า</button>
+                        </div>
+
+                        <div style={{
+                          display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+                          background: "#1e293b", border: "1px solid #334155", borderRadius: 10,
+                          padding: "10px 12px", marginBottom: 16,
+                        }}>
+                          <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>ช่วงวันที่:</span>
+                          <input type="date" value={freshStockRangeStart} onChange={(e) => setFreshStockRangeStart(e.target.value)}
+                            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                          <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                          <input type="date" value={freshStockRangeEnd} onChange={(e) => setFreshStockRangeEnd(e.target.value)}
+                            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                          <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+                            <button onClick={() => { setFreshStockRangeStart(daysAgoStr(6)); setFreshStockRangeEnd(todayStr()); }} style={{
+                              padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                              color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                            }}>7 วันล่าสุด</button>
+                            <button onClick={() => { setFreshStockRangeStart(daysAgoStr(29)); setFreshStockRangeEnd(todayStr()); }} style={{
+                              padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                              color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                            }}>30 วันล่าสุด</button>
+                          </div>
+                        </div>
+
+                        {freshStockItems.length > 0 ? (
+                          <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #334155", marginBottom: 16 }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 460 }}>
+                              <thead>
+                                <tr style={{ background: "#0f172a" }}>
+                                  <th style={{ textAlign: "left", padding: "8px 10px", color: "#64748b", fontWeight: 700, minWidth: 110 }}>สินค้า</th>
+                                  <th style={{ textAlign: "center", padding: "8px 6px", color: "#22c55e", fontWeight: 700, minWidth: 52 }}>ทั้งหมด</th>
+                                  {days.map((d) => (
+                                    <th key={d} style={{ textAlign: "center", padding: "8px 4px", color: "#64748b", fontWeight: 600, minWidth: 36 }}>{d}</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {freshStockItems.map((item, idx) => {
+                                  const total = getPurchasedInRange(item.id);
+                                  return (
+                                    <tr key={item.id} style={{ borderTop: "1px solid #1e293b", background: idx % 2 === 0 ? "#1e293b" : "#172033" }}>
+                                      <td style={{ padding: "9px 10px" }}>
+                                        <button onClick={() => { setSelectedFreshStockItemId(item.id); setFreshStockView("graph"); }}
+                                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                                          <span style={{ color: "#e2e8f0", fontSize: 12 }}>{item.name}</span>
+                                          <span style={{ display: "block", fontSize: 10, color: "#3b82f6" }}>📈 ดูกราฟ</span>
+                                        </button>
+                                      </td>
+                                      <td style={{ textAlign: "center", padding: "9px 6px", fontWeight: 800, fontSize: 14, color: total > 0 ? "#22c55e" : "#64748b" }}>
+                                        {total}
+                                      </td>
+                                      {dayDates.map((date) => {
+                                        const bought = getPurchasedOnDay(item.id, date);
+                                        return (
+                                          <td key={date} style={{ textAlign: "center", padding: "9px 4px", color: bought > 0 ? "#22c55e" : "#334155", fontWeight: bought > 0 ? 700 : 400 }}>
+                                            {bought > 0 ? bought : "—"}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                            <div style={{ fontSize: 40, marginBottom: 12 }}>🥬</div>
+                            <div>ยังไม่มีสินค้าของสดในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น (ต้องกรอกรหัสประจำตัว)</div>
+                          </div>
+                        )}
+
+                        {/* เหลือปุ่มเดียว: บันทึกการซื้อของเพิ่ม */}
+                        <div style={{ marginTop: 10, position: "sticky", bottom: 16 }}>
+                          <button onClick={() => setPendingFreshStockAction("add")} style={{
+                            width: "100%", padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                            background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 800, fontSize: 14,
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                          }}>📥 บันทึกซื้อของเพิ่ม</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {freshStockView === "graph" && (() => {
+                    const item = freshStockItems.find((i) => i.id === selectedFreshStockItemId);
+                    if (!item) {
+                      return (
+                        <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                          <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                          <div style={{ marginBottom: 14 }}>ไม่พบสินค้านี้</div>
+                          <button onClick={() => setFreshStockView("list")} style={{
+                            padding: "9px 18px", borderRadius: 8, border: "1px solid #334155",
+                            background: "#1e293b", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 13,
+                          }}>← กลับไปหน้าสต็อกของสด</button>
+                        </div>
+                      );
+                    }
+                    const itemMovements = freshStockMovements
+                      .filter((m) => m.item_id === item.id && m.type === "add" && m.date.startsWith(freshStockGraphMonth))
+                      .sort((a, b) => a.date.localeCompare(b.date));
+
+                    const dayMap = {};
+                    itemMovements.forEach((m) => {
+                      if (!dayMap[m.date]) dayMap[m.date] = 0;
+                      dayMap[m.date] += m.quantity;
+                    });
+                    const dayRows = Object.entries(dayMap).map(([date, qty]) => ({ date, qty }));
+                    const maxQty = Math.max(...dayRows.map((d) => d.qty), 1);
+                    const totalThisMonth = dayRows.reduce((s, d) => s + d.qty, 0);
+
+                    return (
+                      <div>
+                        <button onClick={() => setFreshStockView("list")} style={{
+                          background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
+                          fontSize: 13, marginBottom: 14, padding: 0,
+                        }}>← กลับไปหน้าสต็อกของสด</button>
+
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                          <div>
+                            <div style={{ fontWeight: 800, fontSize: 17, color: "#f1f5f9" }}>{item.name}</div>
+                            <div style={{ fontSize: 12, color: "#64748b" }}>ซื้อเข้าเดือนนี้: <span style={{ color: "#22c55e", fontWeight: 700 }}>{totalThisMonth} {item.unit}</span></div>
+                          </div>
+                          <input type="month" value={freshStockGraphMonth} onChange={(e) => setFreshStockGraphMonth(e.target.value)}
+                            style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                        </div>
+
+                        {dayRows.length > 0 ? (
+                          <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                            <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 ยอดซื้อรายวัน</div>
+                            <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
+                              {dayRows.map((d) => (
+                                <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, flex: 1 }}>
+                                  <div style={{ height: 80, display: "flex", alignItems: "flex-end", marginBottom: 4 }}>
+                                    <div style={{ width: 14, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.qty / maxQty) * 76)}px` }} />
+                                  </div>
+                                  <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                            <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                            <div>ไม่มีการซื้อเข้าในเดือนนี้</div>
+                          </div>
+                        )}
+
+                        {dayRows.length > 0 && (
+                          <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                            <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
+                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                              <thead>
+                                <tr style={{ color: "#64748b" }}>
+                                  <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
+                                  <th style={{ textAlign: "right", paddingBottom: 8 }}>ซื้อเข้า</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {[...dayRows].reverse().map((d) => (
+                                  <tr key={d.date} style={{ borderTop: "1px solid #0f172a" }}>
+                                    <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
+                                    <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>+{d.qty}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })()}
