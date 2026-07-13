@@ -686,7 +686,9 @@ function App() {
   // วิธีรับเงิน (บังคับเลือกตอนบันทึกรายรับหมวดร้านอาหาร): "" | "cash" | "transfer"
   const [paymentMethod, setPaymentMethod] = useState("");
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
-  const [toast, setToast] = useState(null);
+  const [dashDateMode, setDashDateMode] = useState("month"); // "month" | "range"
+  const [dashRangeStart, setDashRangeStart] = useState(daysAgoStr(6));
+  const [dashRangeEnd, setDashRangeEnd] = useState(todayStr());  const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   // pinRequest: { purpose: "save" | "delete", payload }
   const [pinRequest, setPinRequest] = useState(null);
@@ -1443,7 +1445,14 @@ function App() {
 
   // Stats: ไม่นับรายการที่ถูกลบแล้ว
   const activeRecords = records.filter((r) => !r.deleted);
-  const monthRecords = activeRecords.filter((r) => r.date.startsWith(filterMonth));
+  const monthRecords = (() => {
+    if (dashDateMode === "month") {
+      return activeRecords.filter((r) => r.date.startsWith(filterMonth));
+    }
+    let s = dashRangeStart, e = dashRangeEnd;
+    if (s > e) { const t = s; s = e; e = t; }
+    return activeRecords.filter((r) => r.date >= s && r.date <= e);
+  })();
   const totalIncome = monthRecords.filter((r) => r.type === "income").reduce((s, r) => s + r.amount, 0);
   const totalExpense = monthRecords.filter((r) => r.type === "expense").reduce((s, r) => s + r.amount, 0);
   const profit = totalIncome - totalExpense;
@@ -1632,20 +1641,52 @@ function App() {
         {/* DASHBOARD */}
         {tab === "dashboard" && (
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-              <label style={{ color: "#94a3b8", fontSize: 13 }}>เดือน:</label>
-              <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
-                style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 12px", borderRadius: 8, fontSize: 14 }} />
-              <button onClick={() => setShowSummaryPicker(true)} title="สร้างภาพสรุป" style={{
-                width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
-                background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
-                cursor: "pointer", fontSize: 16, flexShrink: 0,
-              }}>📷</button>
-              <button onClick={exportExcel} title="ส่งออก Excel" style={{
-                width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
-                background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
-                cursor: "pointer", fontSize: 16, flexShrink: 0,
-              }}>📊</button>
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid #334155", flexShrink: 0 }}>
+                  {[{ key: "month", label: "รายเดือน" }, { key: "range", label: "ช่วงวันที่" }].map((m) => (
+                    <button key={m.key} onClick={() => setDashDateMode(m.key)} style={{
+                      padding: "7px 14px", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
+                      background: dashDateMode === m.key ? "#0f4c2a" : "#0f172a",
+                      color: dashDateMode === m.key ? "#fff" : "#64748b", transition: "all 0.2s",
+                    }}>{m.label}</button>
+                  ))}
+                </div>
+
+                {dashDateMode === "month" ? (
+                  <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
+                    style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 12px", borderRadius: 8, fontSize: 14 }} />
+                ) : (
+                  <>
+                    <input type="date" value={dashRangeStart} onChange={(e) => setDashRangeStart(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                    <input type="date" value={dashRangeEnd} onChange={(e) => setDashRangeEnd(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <button onClick={() => { setDashRangeStart(daysAgoStr(6)); setDashRangeEnd(todayStr()); }} style={{
+                      padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                      color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    }}>7 วันล่าสุด</button>
+                    <button onClick={() => { setDashRangeStart(daysAgoStr(29)); setDashRangeEnd(todayStr()); }} style={{
+                      padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                      color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    }}>30 วันล่าสุด</button>
+                  </>
+                )}
+              </div>
+
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setShowSummaryPicker(true)} title="สร้างภาพสรุป" style={{
+                  width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                  cursor: "pointer", fontSize: 16, flexShrink: 0,
+                }}>📷</button>
+                <button onClick={exportExcel} title="ส่งออก Excel" style={{
+                  width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                  cursor: "pointer", fontSize: 16, flexShrink: 0,
+                }}>📊</button>
+              </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
