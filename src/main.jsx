@@ -7,8 +7,8 @@ const SUPABASE_URL = "https://sbpmkmuxtslmxwsdaral.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicG1rbXV4dHNsbXh3c2RhcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTczNjAsImV4cCI6MjA5ODEzMzM2MH0.9xWYG8SG5CmP5pVvnyxS79JrEL0g-pku0334GiOEOTs";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "ผลไม้", "อื่นๆ"];
-const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "อื่นๆ"];
+const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "ผลไม้", "แมงพลัด" , "อื่นๆ"];
+const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "แมงพลัด" , "อื่นๆ"];
 const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่งท่าเรือ";
 
 // รายการเมนูอาหาร + ราคา ของหมวด "ร้านอาหาร"
