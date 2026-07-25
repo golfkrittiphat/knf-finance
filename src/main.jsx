@@ -4,18 +4,11 @@ import ReactDOM from "react-dom/client";
 import * as XLSX from "xlsx";
 
 const SUPABASE_URL = "https://sbpmkmuxtslmxwsdaral.supabase.co";
-const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicG1rbXV4dHNsbXh3c2RhcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTczNjAsImV4cCI6MjA5ODEzMzM2MH0.9xWYG8SG5CmP5pVvnyxS79JrEL0g-pku0334GiOEOTs";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicG1rbXV4dHNsbXh3c2RhcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTczNjAsImV4cCI6MjA5ODEzMzM2MH0.9xWYG8SG5CmP5pVvnyxS79JrEL0g-pku0334GiOEOTs";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "ผลไม้", "อื่นๆ"];
-const CATEGORIES_EXPENSE = [
-  "วัตถุดิบ",
-  "ค่าแรง",
-  "ค่าอุปกรณ์ครัว",
-  "ค่าซ่อมบำรุง",
-  "อื่นๆ",
-];
+const CATEGORIES_INCOME = ["ร้านอาหาร", "ตกปลา", "ผลไม้", "แมงพลัด" , "อื่นๆ"];
+const CATEGORIES_EXPENSE = ["วัตถุดิบ", "ค่าแรง", "ค่าอุปกรณ์ครัว", "ค่าซ่อมบำรุง", "แมงพลัด" , "อื่นๆ"];
 const SHOP_NAME = "ร้านโคกหนองนาฟิชชิ่งท่าเรือ";
 
 // รายการเมนูอาหาร + ราคา ของหมวด "ร้านอาหาร"
@@ -54,8 +47,9 @@ const MENU_ITEMS = [
   { name: "ตำตีนไก่", price: 60 },
   { name: "ตำป่า", price: 70 },
 
-  // ===== เมนูย่าง =====
-  { name: "คอหมูย่าง", price: 70 },
+  // ===== เมนูอบ =====
+  { name: "คอหมูอบ", price: 70 },
+  { name: "น่องไก่อบ", price: 60 },
 
   // ===== เมนูลาบ =====
   { name: "ลาบหมู", price: 60 },
@@ -279,6 +273,11 @@ const MENU_ITEMS = [
   { name: "ปลาทอดสามรส (ปลากะพง)", price: 100 },
   { name: "ปลาทอดสามรส (ปลาจิตรลดา)", price: 80 },
   { name: "ปลากระพงนึ่งมะนาว (ปลากะพง)", price: 100 },
+  { name: "เมี่ยงปลาทอด (ปลากะพง)", price: 120 },
+  { name: "เมี่ยงปลาทอด (ปลาจิตรลดา)", price: 100 },
+  { name: "ลาบปลาทอด (ปลากะพง)", price: 100 },
+  { name: "ลาบปลาทอด (ปลาจิตรลดา)", price: 80 },
+
 
   // ===== แมงพลัด/แมงพลับ (เมนูตามฤดูกาล) - จานละ 70 บาท =====
   { name: "แมงพลัดทอดกรอบ", price: 70 },
@@ -294,29 +293,14 @@ const MENU_ITEMS = [
 const STOCK_CATALOG = [
   {
     category: "🥤 เครื่องดื่ม",
-    items: [
-      "น้ำดื่มเล็ก",
-      "น้ำดื่มใหญ่",
-      "น้ำอัดลมเล็ก",
-      "น้ำอัดลมใหญ่",
-      "เบียร์สิงห์",
-      "เบียร์ลีโอ",
-      "น้ำแข็ง",
-    ],
+    items: ["น้ำดื่มเล็ก", "น้ำดื่มใหญ่", "น้ำอัดลมเล็ก", "น้ำอัดลมใหญ่", "เบียร์สิงห์", "เบียร์ลีโอ", "น้ำแข็ง"],
   },
   {
     category: "🍦 ไอศกรีม",
     items: [
-      "ไอซ์ สตรอเบอร์รี่ ซันเด",
-      "ไอซ์ ช็อกโกแลต คริสปี้",
-      "ไอซ์ บิงโกคุกกี้",
-      "ไอซ์ สตรอเบอร์รี่",
-      "ไอซ์ ฟรุซซี่ เกรป",
-      "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต",
-      "ไอซ์ โมจิ ช็อกโกแลต",
-      "ไอซ์ โมจิ วานิลลา",
-      "ไอซ์ ซามังก้า",
-      "ไอซ์ ช็อกโก มอลต์",
+      "ไอซ์ สตรอเบอร์รี่ ซันเด", "ไอซ์ ช็อกโกแลต คริสปี้", "ไอซ์ บิงโกคุกกี้",
+      "ไอซ์ สตรอเบอร์รี่", "ไอซ์ ฟรุซซี่ เกรป", "ไอซ์ ฟรุซซี่ บลูเบอร์รี่ โยเกิร์ต",
+      "ไอซ์ โมจิ ช็อกโกแลต", "ไอซ์ โมจิ วานิลลา", "ไอซ์ ซามังก้า", "ไอซ์ ช็อกโก มอลต์",
     ],
   },
   {
@@ -327,9 +311,9 @@ const STOCK_CATALOG = [
 
 // แก้ไข/เพิ่มรายชื่อพนักงานและรหัสได้ที่นี่
 const STAFF_PINS = {
-  1203: "กอล์ฟ",
-  121: "น้ำ",
-  313: "กิ๊บ",
+  "1203": "กอล์ฟ",
+  "121": "น้ำ",
+  "313": "กิ๊บ",
 };
 
 // โหลดฟอนต์ Sarabun จาก Google Fonts จริงๆ (ครั้งเดียว) เพื่อให้ภาพสรุปหน้าตาเหมือนกันทุกอุปกรณ์
@@ -339,11 +323,10 @@ let _fontLoadPromise = null;
 function ensureSarabunLoaded() {
   if (_fontLoadPromise) return _fontLoadPromise;
   _fontLoadPromise = (async () => {
-    if (!document.querySelector("link[data-sarabun-font]")) {
+    if (!document.querySelector('link[data-sarabun-font]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap";
+      link.href = "https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap";
       link.setAttribute("data-sarabun-font", "1");
       document.head.appendChild(link);
     }
@@ -362,10 +345,7 @@ function ensureSarabunLoaded() {
 }
 
 const formatMoney = (n) =>
-  Number(n).toLocaleString("th-TH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const todayStr = () => {
   const d = new Date();
@@ -401,18 +381,7 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 // วาดแถวข้อมูล: ข้อความฝั่งซ้าย + ตัวเลขฝั่งขวา พร้อมตัดข้อความที่ยาวเกินไป
-function drawRow(
-  ctx,
-  leftText,
-  rightText,
-  x1,
-  y,
-  x2,
-  leftColor,
-  rightColor,
-  font,
-  size = 13,
-) {
+function drawRow(ctx, leftText, rightText, x1, y, x2, leftColor, rightColor, font, size = 13) {
   const maxLeftWidth = x2 - x1 - 130;
   ctx.font = `400 ${size}px ${font}`;
   let txt = leftText;
@@ -433,85 +402,28 @@ function drawRow(
 
 function ConfirmModal({ msg, onConfirm, onCancel }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9998,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: "28px 24px",
-          maxWidth: 320,
-          width: "90%",
-          border: "1px solid #ef4444",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>
-          ⚠️
-        </div>
-        <div
-          style={{
-            textAlign: "center",
-            color: "#f1f5f9",
-            fontWeight: 700,
-            fontSize: 16,
-            marginBottom: 8,
-          }}
-        >
-          ยืนยันการลบ
-        </div>
-        <div
-          style={{
-            textAlign: "center",
-            color: "#94a3b8",
-            fontSize: 14,
-            marginBottom: 24,
-          }}
-        >
-          {msg}
-        </div>
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9998,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: "28px 24px",
+        maxWidth: 320, width: "90%", border: "1px solid #ef4444",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>⚠️</div>
+        <div style={{ textAlign: "center", color: "#f1f5f9", fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ยืนยันการลบ</div>
+        <div style={{ textAlign: "center", color: "#94a3b8", fontSize: 14, marginBottom: 24 }}>{msg}</div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg,#b91c1c,#ef4444)",
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ลบรายการ
-          </button>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ลบรายการ</button>
         </div>
       </div>
     </div>
@@ -533,114 +445,42 @@ function PinModal({ title, onSubmit, onCancel }) {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: "28px 24px",
-          maxWidth: 320,
-          width: "90%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>
-          🔐
-        </div>
-        <div
-          style={{
-            textAlign: "center",
-            color: "#f1f5f9",
-            fontWeight: 700,
-            fontSize: 16,
-            marginBottom: 16,
-          }}
-        >
-          {title}
-        </div>
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: "28px 24px",
+        maxWidth: 320, width: "90%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🔐</div>
+        <div style={{ textAlign: "center", color: "#f1f5f9", fontWeight: 700, fontSize: 16, marginBottom: 16 }}>{title}</div>
         <input
           type="password"
           inputMode="numeric"
           autoFocus
           placeholder="กรอกรหัสประจำตัว"
           value={pin}
-          onChange={(e) => {
-            setPin(e.target.value);
-            setErr("");
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleConfirm();
-          }}
+          onChange={(e) => { setPin(e.target.value); setErr(""); }}
+          onKeyDown={(e) => { if (e.key === "Enter") handleConfirm(); }}
           style={{
-            width: "100%",
-            background: "#0f172a",
-            border: `1px solid ${err ? "#ef4444" : "#334155"}`,
-            color: "#f1f5f9",
-            padding: "12px 14px",
-            borderRadius: 10,
-            fontSize: 18,
-            textAlign: "center",
-            letterSpacing: 4,
-            boxSizing: "border-box",
-            marginBottom: 8,
+            width: "100%", background: "#0f172a", border: `1px solid ${err ? "#ef4444" : "#334155"}`,
+            color: "#f1f5f9", padding: "12px 14px", borderRadius: 10, fontSize: 18,
+            textAlign: "center", letterSpacing: 4, boxSizing: "border-box", marginBottom: 8,
           }}
         />
-        {err && (
-          <div
-            style={{
-              color: "#ef4444",
-              fontSize: 12,
-              textAlign: "center",
-              marginBottom: 10,
-            }}
-          >
-            {err}
-          </div>
-        )}
+        {err && <div style={{ color: "#ef4444", fontSize: 12, textAlign: "center", marginBottom: 10 }}>{err}</div>}
         <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={handleConfirm}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg,#1d4ed8,#3b82f6)",
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยืนยัน
-          </button>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={handleConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยืนยัน</button>
         </div>
       </div>
     </div>
@@ -650,97 +490,39 @@ function PinModal({ title, onSubmit, onCancel }) {
 // โมดัลแสดงภาพสรุปที่สร้างแล้ว พร้อมปุ่มดาวน์โหลด
 function SummaryImageModal({ image, onClose }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.85)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: 18,
-          maxWidth: 420,
-          width: "100%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-          maxHeight: "92vh",
-          display: "flex",
-          flexDirection: "column",
-          gap: 14,
-        }}
-      >
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 15,
-            color: "#f1f5f9",
-            textAlign: "center",
-          }}
-        >
-          {image.label}
-        </div>
-        <div
-          style={{
-            overflowY: "auto",
-            overflowX: "hidden",
-            borderRadius: 10,
-            border: "1px solid #334155",
-          }}
-        >
-          <img
-            src={image.dataUrl}
-            alt={image.label}
-            style={{ width: "100%", maxWidth: "100%", display: "block" }}
-          />
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 18,
+        maxWidth: 420, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)", maxHeight: "92vh",
+        display: "flex", flexDirection: "column", gap: 14,
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", textAlign: "center" }}>{image.label}</div>
+        <div style={{ overflowY: "auto", overflowX: "hidden", borderRadius: 10, border: "1px solid #334155" }}>
+          <img src={image.dataUrl} alt={image.label} style={{ width: "100%", maxWidth: "100%", display: "block" }} />
         </div>
         <div style={{ fontSize: 11, color: "#64748b", textAlign: "center" }}>
           มือถือ: กดค้างที่ภาพเพื่อบันทึก หรือกดปุ่มดาวน์โหลดด้านล่าง
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ปิด
-          </button>
+          <button onClick={onClose} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ปิด</button>
           <a
             href={image.dataUrl}
             download={`${image.label.replace(/\s+/g, "_")}.png`}
             style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg,#15803d,#22c55e)",
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-              textAlign: "center",
-              textDecoration: "none",
-              display: "inline-block",
+              flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+              background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff",
+              fontWeight: 700, cursor: "pointer", fontSize: 15, textAlign: "center",
+              textDecoration: "none", display: "inline-block",
             }}
-          >
-            ⬇️ ดาวน์โหลด
-          </a>
+          >⬇️ ดาวน์โหลด</a>
         </div>
       </div>
     </div>
@@ -748,134 +530,42 @@ function SummaryImageModal({ image, onClose }) {
 }
 
 // โมดัลเลือกแบบสรุป (วันเดียว/ทั้งเดือน) ก่อนสร้างภาพ
-function SummaryPickerModal({
-  summaryMode,
-  setSummaryMode,
-  summaryDate,
-  setSummaryDate,
-  filterMonth,
-  onGenerate,
-  generating,
-  onClose,
-}) {
+function SummaryPickerModal({ summaryMode, setSummaryMode, summaryDate, setSummaryDate, filterMonth, onGenerate, generating, onClose }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: 20,
-          maxWidth: 340,
-          width: "100%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 16,
-            color: "#f1f5f9",
-            marginBottom: 16,
-            textAlign: "center",
-          }}
-        >
-          📷 สร้างภาพสรุป
-        </div>
-        <div
-          style={{
-            display: "flex",
-            borderRadius: 10,
-            overflow: "hidden",
-            marginBottom: 12,
-            border: "1px solid #334155",
-          }}
-        >
-          {[
-            { key: "day", label: "วันเดียว" },
-            { key: "month", label: `ทั้งเดือน (${filterMonth})` },
-          ].map((m) => (
-            <button
-              key={m.key}
-              onClick={() => setSummaryMode(m.key)}
-              style={{
-                flex: 1,
-                padding: "9px 0",
-                border: "none",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 700,
-                background: summaryMode === m.key ? "#0f4c2a" : "#0f172a",
-                color: summaryMode === m.key ? "#fff" : "#64748b",
-                transition: "all 0.2s",
-              }}
-            >
-              {m.label}
-            </button>
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 340, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>📷 สร้างภาพสรุป</div>
+        <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 12, border: "1px solid #334155" }}>
+          {[{ key: "day", label: "วันเดียว" }, { key: "month", label: `ทั้งเดือน (${filterMonth})` }].map((m) => (
+            <button key={m.key} onClick={() => setSummaryMode(m.key)} style={{
+              flex: 1, padding: "9px 0", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
+              background: summaryMode === m.key ? "#0f4c2a" : "#0f172a",
+              color: summaryMode === m.key ? "#fff" : "#64748b", transition: "all 0.2s",
+            }}>{m.label}</button>
           ))}
         </div>
         {summaryMode === "day" && (
-          <input
-            type="date"
-            value={summaryDate}
-            onChange={(e) => setSummaryDate(e.target.value)}
-            style={{
-              background: "#0f172a",
-              border: "1px solid #334155",
-              color: "#f1f5f9",
-              padding: "8px 12px",
-              borderRadius: 8,
-              fontSize: 14,
-              marginBottom: 12,
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          />
+          <input type="date" value={summaryDate} onChange={(e) => setSummaryDate(e.target.value)}
+            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "8px 12px", borderRadius: 8, fontSize: 14, marginBottom: 12, width: "100%", boxSizing: "border-box" }} />
         )}
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={onGenerate}
-            disabled={generating}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              cursor: generating ? "not-allowed" : "pointer",
-              background: "linear-gradient(135deg,#1d4ed8,#3b82f6)",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 14,
-              opacity: generating ? 0.7 : 1,
-            }}
-          >
+          <button onClick={onClose} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onGenerate} disabled={generating} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none", cursor: generating ? "not-allowed" : "pointer",
+            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff", fontWeight: 700, fontSize: 14,
+            opacity: generating ? 0.7 : 1,
+          }}>
             {generating ? "⏳ กำลังสร้าง..." : "🖼️ สร้างภาพ"}
           </button>
         </div>
@@ -885,101 +575,35 @@ function SummaryPickerModal({
 }
 
 // โมดัลเพิ่มสินค้าใหม่ในสต็อก
-function NewItemModal({
-  title,
-  name,
-  setName,
-  unit,
-  setUnit,
-  onConfirm,
-  onCancel,
-  confirmLabel,
-}) {
+function NewItemModal({ title, name, setName, unit, setUnit, onConfirm, onCancel, confirmLabel }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: 20,
-          maxWidth: 340,
-          width: "100%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 16,
-            color: "#f1f5f9",
-            marginBottom: 16,
-            textAlign: "center",
-          }}
-        >
-          {title || "📦 เพิ่มสินค้าในสต็อก"}
-        </div>
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 340, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 16, textAlign: "center" }}>{title || "📦 เพิ่มสินค้าในสต็อก"}</div>
         <label style={labelStyle}>ชื่อสินค้า</label>
-        <input
-          type="text"
-          autoFocus
-          placeholder="เช่น ไอติม, น้ำอัดลม"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ ...inputStyle, marginBottom: 12 }}
-        />
+        <input type="text" autoFocus placeholder="เช่น ไอติม, น้ำอัดลม" value={name}
+          onChange={(e) => setName(e.target.value)} style={{ ...inputStyle, marginBottom: 12 }} />
         <label style={labelStyle}>หน่วยนับ (ไม่บังคับ)</label>
-        <input
-          type="text"
-          placeholder="เช่น แท่ง, ขวด, ชิ้น, กิโลกรัม"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-          style={{ ...inputStyle, marginBottom: 16 }}
-        />
+        <input type="text" placeholder="เช่น แท่ง, ขวด, ชิ้น, กิโลกรัม" value={unit}
+          onChange={(e) => setUnit(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg,#15803d,#22c55e)",
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            {confirmLabel || "เพิ่มสินค้า"}
-          </button>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff",
+            fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>{confirmLabel || "เพิ่มสินค้า"}</button>
         </div>
       </div>
     </div>
@@ -987,15 +611,7 @@ function NewItemModal({
 }
 
 // โมดัลกรอกจำนวนตอนเพิ่ม/ลบ/แจกฟรีสต็อก
-function StockQtyModal({
-  request,
-  value,
-  setValue,
-  note,
-  setNote,
-  onConfirm,
-  onCancel,
-}) {
+function StockQtyModal({ request, value, setValue, note, setNote, onConfirm, onCancel }) {
   const isAdd = request.action === "add";
   const isFree = request.action === "free";
   const icon = isAdd ? "📥" : isFree ? "🎁" : "📤";
@@ -1003,72 +619,32 @@ function StockQtyModal({
   const btnColor = isAdd
     ? "linear-gradient(135deg,#15803d,#22c55e)"
     : isFree
-      ? "linear-gradient(135deg,#c2410c,#f97316)"
-      : "linear-gradient(135deg,#b91c1c,#ef4444)";
+    ? "linear-gradient(135deg,#c2410c,#f97316)"
+    : "linear-gradient(135deg,#b91c1c,#ef4444)";
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: 20,
-          maxWidth: 320,
-          width: "100%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>
-          {icon}
-        </div>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 16,
-            color: "#f1f5f9",
-            marginBottom: 4,
-            textAlign: "center",
-          }}
-        >
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 320, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>{icon}</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>
           {title}
         </div>
-        <div
-          style={{
-            fontSize: 13,
-            color: "#94a3b8",
-            marginBottom: 16,
-            textAlign: "center",
-          }}
-        >
-          {request.itemName}
-        </div>
+        <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 16, textAlign: "center" }}>{request.itemName}</div>
         <input
           type="number"
           autoFocus
           placeholder={`จำนวน (${request.unit})`}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !isFree) onConfirm();
-          }}
-          style={{
-            ...inputStyle,
-            fontSize: 20,
-            fontWeight: 700,
-            textAlign: "center",
-            marginBottom: isFree ? 10 : 16,
-          }}
+          onKeyDown={(e) => { if (e.key === "Enter" && !isFree) onConfirm(); }}
+          style={{ ...inputStyle, fontSize: 20, fontWeight: 700, textAlign: "center", marginBottom: isFree ? 10 : 16 }}
         />
         {isFree && (
           <input
@@ -1076,45 +652,20 @@ function StockQtyModal({
             placeholder="หมายเหตุ เช่น แจกในงานเปิดร้าน"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") onConfirm();
-            }}
+            onKeyDown={(e) => { if (e.key === "Enter") onConfirm(); }}
             style={{ ...inputStyle, marginBottom: 16 }}
           />
         )}
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: btnColor,
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยืนยัน
-          </button>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: btnColor,
+            color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยืนยัน</button>
         </div>
       </div>
     </div>
@@ -1127,11 +678,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    type: "income",
-    date: todayStr(),
-    amount: "",
-    category: CATEGORIES_INCOME[0],
-    note: "",
+    type: "income", date: todayStr(), amount: "", category: CATEGORIES_INCOME[0], note: "",
   });
   // รายการเมนูที่กำลังเพิ่มในออเดอร์ (ใช้เมื่อหมวด = ร้านอาหาร)
   // แต่ละแถว: { id, name, price, qty }
@@ -1139,7 +686,9 @@ function App() {
   // วิธีรับเงิน (บังคับเลือกตอนบันทึกรายรับหมวดร้านอาหาร): "" | "cash" | "transfer"
   const [paymentMethod, setPaymentMethod] = useState("");
   const [filterMonth, setFilterMonth] = useState(todayStr().slice(0, 7));
-  const [toast, setToast] = useState(null);
+  const [dashDateMode, setDashDateMode] = useState("month"); // "month" | "range"
+  const [dashRangeStart, setDashRangeStart] = useState(daysAgoStr(6));
+  const [dashRangeEnd, setDashRangeEnd] = useState(todayStr());  const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   // pinRequest: { purpose: "save" | "delete", payload }
   const [pinRequest, setPinRequest] = useState(null);
@@ -1158,9 +707,7 @@ function App() {
   const [stockMovements, setStockMovements] = useState([]);
   const [stockView, setStockView] = useState("list"); // "list" | "graph"
   const [selectedStockItemId, setSelectedStockItemId] = useState(null);
-  const [stockGraphMonth, setStockGraphMonth] = useState(
-    todayStr().slice(0, 7),
-  );
+  const [stockGraphMonth, setStockGraphMonth] = useState(todayStr().slice(0, 7));
   // ช่วงวันที่ที่ใช้แสดงในตารางสรุปยอดขายรายวัน (หน้ารายการสต็อก) — ตั้งต้นเป็น 7 วันล่าสุด
   const [stockRangeStart, setStockRangeStart] = useState(daysAgoStr(6));
   const [stockRangeEnd, setStockRangeEnd] = useState(todayStr());
@@ -1182,14 +729,9 @@ function App() {
   const [freshStockItems, setFreshStockItems] = useState([]);
   const [freshStockMovements, setFreshStockMovements] = useState([]);
   const [freshStockView, setFreshStockView] = useState("list"); // "list" | "graph"
-  const [selectedFreshStockItemId, setSelectedFreshStockItemId] =
-    useState(null);
-  const [freshStockGraphMonth, setFreshStockGraphMonth] = useState(
-    todayStr().slice(0, 7),
-  );
-  const [freshStockRangeStart, setFreshStockRangeStart] = useState(
-    daysAgoStr(6),
-  );
+  const [selectedFreshStockItemId, setSelectedFreshStockItemId] = useState(null);
+  const [freshStockGraphMonth, setFreshStockGraphMonth] = useState(todayStr().slice(0, 7));
+  const [freshStockRangeStart, setFreshStockRangeStart] = useState(daysAgoStr(6));
   const [freshStockRangeEnd, setFreshStockRangeEnd] = useState(todayStr());
   const [pendingFreshStockAction, setPendingFreshStockAction] = useState(null); // "add" | "remove" | "free"
   // การเพิ่มสินค้าของสดใหม่ ต้องกรอกรหัสประจำตัวก่อนถึงจะเพิ่มได้:
@@ -1237,13 +779,9 @@ function App() {
     // Real-time subscription
     const channel = supabase
       .channel("records-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "records" },
-        () => {
-          fetchRecords();
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "records" }, () => {
+        fetchRecords();
+      })
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
@@ -1254,20 +792,12 @@ function App() {
     fetchStockMovements();
     const channel = supabase
       .channel("stock-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "stock_items" },
-        () => {
-          fetchStockItems();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "stock_movements" },
-        () => {
-          fetchStockMovements();
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, () => {
+        fetchStockItems();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_movements" }, () => {
+        fetchStockMovements();
+      })
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
@@ -1278,20 +808,12 @@ function App() {
     fetchFreshStockMovements();
     const channel = supabase
       .channel("fresh-stock-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "fresh_stock_items" },
-        () => {
-          fetchFreshStockItems();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "fresh_stock_movements" },
-        () => {
-          fetchFreshStockMovements();
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "fresh_stock_items" }, () => {
+        fetchFreshStockItems();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "fresh_stock_movements" }, () => {
+        fetchFreshStockMovements();
+      })
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
@@ -1346,8 +868,7 @@ function App() {
     setForm((f) => {
       const updated = { ...f, [field]: value };
       if (field === "type") {
-        updated.category =
-          value === "income" ? CATEGORIES_INCOME[0] : CATEGORIES_EXPENSE[0];
+        updated.category = value === "income" ? CATEGORIES_INCOME[0] : CATEGORIES_EXPENSE[0];
       }
       if (field === "type" || field === "category") {
         setOrderItems([]); // ล้างรายการเมนูเมื่อเปลี่ยนประเภท/หมวดหมู่
@@ -1358,30 +879,22 @@ function App() {
   };
 
   const isFoodOrder = form.type === "income" && form.category === "ร้านอาหาร";
-  const orderTotal = orderItems.reduce(
-    (s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 0),
-    0,
-  );
+  const orderTotal = orderItems.reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 0), 0);
 
   // เพิ่มแถวเมนูใหม่ในออเดอร์
   const addOrderItem = () => {
-    setOrderItems((items) => [
-      ...items,
-      { id: genId(), name: "", price: "", qty: 1 },
-    ]);
+    setOrderItems((items) => [...items, { id: genId(), name: "", price: "", qty: 1 }]);
   };
   const updateOrderItem = (id, field, value) => {
-    setOrderItems((items) =>
-      items.map((it) => {
-        if (it.id !== id) return it;
-        const updated = { ...it, [field]: value };
-        if (field === "name") {
-          const match = MENU_ITEMS.find((m) => m.name === value);
-          if (match) updated.price = match.price;
-        }
-        return updated;
-      }),
-    );
+    setOrderItems((items) => items.map((it) => {
+      if (it.id !== id) return it;
+      const updated = { ...it, [field]: value };
+      if (field === "name") {
+        const match = MENU_ITEMS.find((m) => m.name === value);
+        if (match) updated.price = match.price;
+      }
+      return updated;
+    }));
   };
   const removeOrderItem = (id) => {
     setOrderItems((items) => items.filter((it) => it.id !== id));
@@ -1394,14 +907,7 @@ function App() {
         showToast("กรุณาเพิ่มเมนูอย่างน้อย 1 รายการ", "#ef4444");
         return;
       }
-      const invalid = orderItems.some(
-        (it) =>
-          !it.name.trim() ||
-          !it.price ||
-          Number(it.price) <= 0 ||
-          !it.qty ||
-          Number(it.qty) <= 0,
-      );
+      const invalid = orderItems.some((it) => !it.name.trim() || !it.price || Number(it.price) <= 0 || !it.qty || Number(it.qty) <= 0);
       if (invalid) {
         showToast("กรุณากรอกชื่อเมนู ราคา และจำนวนให้ครบทุกแถว", "#ef4444");
         return;
@@ -1411,11 +917,7 @@ function App() {
         return;
       }
     } else {
-      if (
-        !form.amount ||
-        isNaN(Number(form.amount)) ||
-        Number(form.amount) <= 0
-      ) {
+      if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) {
         showToast("กรุณากรอกจำนวนเงินที่ถูกต้อง", "#ef4444");
         return;
       }
@@ -1432,16 +934,8 @@ function App() {
     if (isFoodOrder) {
       amount = orderTotal;
       const paymentLabel = paymentMethod === "cash" ? "เงินสด" : "โอน";
-      note =
-        orderItems.map((it) => `${it.name.trim()} x${it.qty}`).join(" · ") +
-        ` (${paymentLabel})`;
-      items = JSON.stringify(
-        orderItems.map((it) => ({
-          name: it.name.trim(),
-          price: Number(it.price),
-          qty: Number(it.qty),
-        })),
-      );
+      note = orderItems.map((it) => `${it.name.trim()} x${it.qty}`).join(" · ") + ` (${paymentLabel})`;
+      items = JSON.stringify(orderItems.map((it) => ({ name: it.name.trim(), price: Number(it.price), qty: Number(it.qty) })));
       payment = paymentMethod;
     } else {
       amount = Number(form.amount);
@@ -1473,9 +967,7 @@ function App() {
       setForm((f) => ({ ...f, amount: "", note: "" }));
       setOrderItems([]);
       setPaymentMethod("");
-      showToast(
-        form.type === "income" ? "✓ บันทึกรายรับแล้ว" : "✓ บันทึกรายจ่ายแล้ว",
-      );
+      showToast(form.type === "income" ? "✓ บันทึกรายรับแล้ว" : "✓ บันทึกรายจ่ายแล้ว");
     }
   };
 
@@ -1496,11 +988,7 @@ function App() {
   const doDelete = async () => {
     const { error } = await supabase
       .from("records")
-      .update({
-        deleted: true,
-        deleted_by: confirmDelete.deletedBy,
-        deleted_at: Date.now(),
-      })
+      .update({ deleted: true, deleted_by: confirmDelete.deletedBy, deleted_at: Date.now() })
       .eq("id", confirmDelete.id);
     setConfirmDelete(null);
     if (!error) showToast("ลบรายการแล้ว", "#f59e0b");
@@ -1519,10 +1007,7 @@ function App() {
   const getStockCount = (itemId) => {
     return stockMovements
       .filter((m) => m.item_id === itemId)
-      .reduce(
-        (sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity),
-        0,
-      );
+      .reduce((sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity), 0);
   };
 
   // สร้างสินค้าใหม่ในสต็อก (ไม่ต้องกรอกรหัส แค่ตั้งชื่อ/หน่วย)
@@ -1552,12 +1037,7 @@ function App() {
   const askStockQty = (item, action) => {
     setStockQtyValue("");
     setStockNote("");
-    setStockQtyRequest({
-      itemId: item.id,
-      itemName: item.name,
-      unit: item.unit,
-      action,
-    });
+    setStockQtyRequest({ itemId: item.id, itemName: item.name, unit: item.unit, action });
   };
 
   // ขั้นที่สอง: กรอกจำนวนแล้ว -> ปิดหน้ากรอกจำนวน แล้วขอรหัสประจำตัว
@@ -1567,11 +1047,7 @@ function App() {
       showToast("กรุณากรอกจำนวนที่ถูกต้อง", "#ef4444");
       return;
     }
-    const payload = {
-      ...stockQtyRequest,
-      quantity: qty,
-      note: stockQtyRequest.action === "free" ? stockNote.trim() : "",
-    };
+    const payload = { ...stockQtyRequest, quantity: qty, note: stockQtyRequest.action === "free" ? stockNote.trim() : "" };
     setStockQtyRequest(null);
     setPinRequest({ purpose: "stock", payload });
   };
@@ -1597,15 +1073,8 @@ function App() {
     if (error) {
       showToast("บันทึกสต็อกไม่สำเร็จ", "#ef4444");
     } else {
-      const verb =
-        payload.action === "add"
-          ? "เพิ่ม"
-          : payload.action === "free"
-            ? "แจกฟรี"
-            : "ตัดสต็อก";
-      showToast(
-        `✓ ${verb} ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`,
-      );
+      const verb = payload.action === "add" ? "เพิ่ม" : payload.action === "free" ? "แจกฟรี" : "ตัดสต็อก";
+      showToast(`✓ ${verb} ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`);
     }
   };
 
@@ -1615,10 +1084,7 @@ function App() {
   const getFreshStockCount = (itemId) => {
     return freshStockMovements
       .filter((m) => m.item_id === itemId)
-      .reduce(
-        (sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity),
-        0,
-      );
+      .reduce((sum, m) => sum + (m.type === "add" ? m.quantity : -m.quantity), 0);
   };
 
   // ขั้นแรก: กดเพิ่มสินค้าของสด -> เปิดโมดัลกรอกชื่อ/หน่วย (ยังไม่บันทึก)
@@ -1634,10 +1100,7 @@ function App() {
       showToast("กรุณากรอกชื่อสินค้า", "#ef4444");
       return;
     }
-    const payload = {
-      name: newFreshItemName.trim(),
-      unit: newFreshItemUnit.trim() || "กก.",
-    };
+    const payload = { name: newFreshItemName.trim(), unit: newFreshItemUnit.trim() || "กก." };
     setShowNewFreshItemModal(false);
     setPinRequest({ purpose: "fresh-new-item", payload });
   };
@@ -1666,12 +1129,7 @@ function App() {
   const askFreshStockQty = (item, action) => {
     setFreshStockQtyValue("");
     setFreshStockDate(todayStr());
-    setFreshStockQtyRequest({
-      itemId: item.id,
-      itemName: item.name,
-      unit: item.unit,
-      action,
-    });
+    setFreshStockQtyRequest({ itemId: item.id, itemName: item.name, unit: item.unit, action });
   };
 
   const confirmFreshStockQty = () => {
@@ -1684,11 +1142,7 @@ function App() {
       showToast("กรุณาเลือกวันที่", "#ef4444");
       return;
     }
-    const payload = {
-      ...freshStockQtyRequest,
-      quantity: qty,
-      date: freshStockDate,
-    };
+    const payload = { ...freshStockQtyRequest, quantity: qty, date: freshStockDate };
     setFreshStockQtyRequest(null);
     setPinRequest({ purpose: "fresh-stock", payload });
   };
@@ -1708,16 +1162,12 @@ function App() {
       created_by: name,
       created_at: Date.now(),
     };
-    const { error } = await supabase
-      .from("fresh_stock_movements")
-      .insert([movement]);
+    const { error } = await supabase.from("fresh_stock_movements").insert([movement]);
     setSavingFreshStock(false);
     if (error) {
       showToast("บันทึกของสดไม่สำเร็จ", "#ef4444");
     } else {
-      showToast(
-        `✓ บันทึกซื้อ ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`,
-      );
+      showToast(`✓ บันทึกซื้อ ${payload.itemName} แล้ว ${payload.quantity} ${payload.unit}`);
     }
   };
 
@@ -1726,28 +1176,17 @@ function App() {
 
     // ชีต 1: รายการทั้งหมด (ไม่รวมรายการที่ถูกลบ)
     const allRows = [...activeRecords]
-      .sort(
-        (a, b) => a.date.localeCompare(b.date) || a.created_at - b.created_at,
-      )
+      .sort((a, b) => a.date.localeCompare(b.date) || a.created_at - b.created_at)
       .map((r) => ({
-        วันที่: r.date,
-        ประเภท: r.type === "income" ? "รายรับ" : "รายจ่าย",
-        หมวดหมู่: r.category,
-        จำนวนเงิน: r.amount,
-        วิธีรับเงิน:
-          r.payment_method === "cash"
-            ? "เงินสด"
-            : r.payment_method === "transfer"
-              ? "โอน"
-              : "",
-        หมายเหตุ: r.note || "",
-        บันทึกโดย: r.created_by || "",
+        "วันที่": r.date,
+        "ประเภท": r.type === "income" ? "รายรับ" : "รายจ่าย",
+        "หมวดหมู่": r.category,
+        "จำนวนเงิน": r.amount,
+        "วิธีรับเงิน": r.payment_method === "cash" ? "เงินสด" : r.payment_method === "transfer" ? "โอน" : "",
+        "หมายเหตุ": r.note || "",
+        "บันทึกโดย": r.created_by || "",
       }));
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(allRows),
-      "รายการทั้งหมด",
-    );
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allRows), "รายการทั้งหมด");
 
     // ชีต 2: สรุปรายวัน
     const dailyMap2 = {};
@@ -1758,49 +1197,30 @@ function App() {
     const dailyRows2 = Object.entries(dailyMap2)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([date, v]) => ({
-        วันที่: date,
-        รายรับ: v.income,
-        รายจ่าย: v.expense,
-        กำไรสุทธิ: v.income - v.expense,
+        "วันที่": date,
+        "รายรับ": v.income,
+        "รายจ่าย": v.expense,
+        "กำไรสุทธิ": v.income - v.expense,
       }));
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(dailyRows2),
-      "สรุปรายวัน",
-    );
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyRows2), "สรุปรายวัน");
 
     // ชีต 3: ยอดขายตามเมนู
     const menuMap = {};
     activeRecords
-      .filter(
-        (r) => r.type === "income" && r.category === "ร้านอาหาร" && r.items,
-      )
+      .filter((r) => r.type === "income" && r.category === "ร้านอาหาร" && r.items)
       .forEach((r) => {
         let parsed = [];
-        try {
-          parsed = JSON.parse(r.items);
-        } catch (e) {
-          parsed = [];
-        }
+        try { parsed = JSON.parse(r.items); } catch (e) { parsed = []; }
         parsed.forEach((it) => {
           if (!menuMap[it.name]) menuMap[it.name] = { qty: 0, total: 0 };
           menuMap[it.name].qty += Number(it.qty) || 0;
-          menuMap[it.name].total +=
-            (Number(it.qty) || 0) * (Number(it.price) || 0);
+          menuMap[it.name].total += (Number(it.qty) || 0) * (Number(it.price) || 0);
         });
       });
     const menuRows = Object.entries(menuMap)
-      .map(([name, v]) => ({
-        เมนู: name,
-        จำนวนที่ขาย: v.qty,
-        ยอดขายรวม: v.total,
-      }))
+      .map(([name, v]) => ({ "เมนู": name, "จำนวนที่ขาย": v.qty, "ยอดขายรวม": v.total }))
       .sort((a, b) => b["จำนวนที่ขาย"] - a["จำนวนที่ขาย"]);
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(menuRows),
-      "ยอดขายตามเมนู",
-    );
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(menuRows), "ยอดขายตามเมนู");
 
     // ชีต 4: สรุปตามหมวดหมู่
     const catMap = {};
@@ -1808,15 +1228,8 @@ function App() {
       const key = `${r.type === "income" ? "รายรับ" : "รายจ่าย"} - ${r.category}`;
       catMap[key] = (catMap[key] || 0) + r.amount;
     });
-    const catRows = Object.entries(catMap).map(([k, v]) => ({
-      "ประเภท-หมวดหมู่": k,
-      ยอดรวม: v,
-    }));
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(catRows),
-      "สรุปตามหมวดหมู่",
-    );
+    const catRows = Object.entries(catMap).map(([k, v]) => ({ "ประเภท-หมวดหมู่": k, "ยอดรวม": v }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "สรุปตามหมวดหมู่");
 
     // ชีต 5: สต็อกของสด (ประวัติการซื้อ)
     const freshRows = [...freshStockMovements]
@@ -1825,22 +1238,18 @@ function App() {
       .map((m) => {
         const item = freshStockItems.find((i) => i.id === m.item_id);
         return {
-          วันที่: m.date,
-          สินค้า: item ? item.name : m.item_id,
-          จำนวนที่ซื้อ: m.quantity,
-          หน่วย: item ? item.unit : "",
-          บันทึกโดย: m.created_by,
+          "วันที่": m.date,
+          "สินค้า": item ? item.name : m.item_id,
+          "จำนวนที่ซื้อ": m.quantity,
+          "หน่วย": item ? item.unit : "",
+          "บันทึกโดย": m.created_by,
         };
       });
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(freshRows),
-      "สต็อกของสด",
-    );
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(freshRows), "สต็อกของสด");
 
     XLSX.writeFile(wb, `สรุปข้อมูลร้าน_${todayStr()}.xlsx`);
   };
-
+  
   // สร้างภาพสรุป (เหมือนใบเสร็จ) ด้วย Canvas API ไม่ต้องพึ่งไลบรารีเสริม
   const generateSummaryImage = async () => {
     setGeneratingImage(true);
@@ -1848,15 +1257,10 @@ function App() {
       await ensureSarabunLoaded();
 
       const isDay = summaryMode === "day";
-      const items = (
-        isDay
-          ? activeRecords.filter((r) => r.date === summaryDate)
-          : activeRecords.filter((r) => r.date.startsWith(filterMonth))
-      ).sort((a, b) =>
-        a.date === b.date
-          ? a.created_at - b.created_at
-          : a.date.localeCompare(b.date),
-      );
+      const items = (isDay
+        ? activeRecords.filter((r) => r.date === summaryDate)
+        : activeRecords.filter((r) => r.date.startsWith(filterMonth))
+      ).sort((a, b) => (a.date === b.date ? a.created_at - b.created_at : a.date.localeCompare(b.date)));
 
       const label = isDay ? `วันที่ ${summaryDate}` : `เดือน ${filterMonth}`;
 
@@ -1868,9 +1272,7 @@ function App() {
 
       const byCat = (list) => {
         const m = {};
-        list.forEach((r) => {
-          m[r.category] = (m[r.category] || 0) + r.amount;
-        });
+        list.forEach((r) => { m[r.category] = (m[r.category] || 0) + r.amount; });
         return Object.entries(m).sort((a, b) => b[1] - a[1]);
       };
       const incomeCats = byCat(incomeItems);
@@ -1919,11 +1321,7 @@ function App() {
       y += 30;
       ctx.fillStyle = "#94a3b8";
       ctx.font = `600 14px ${FONT}`;
-      ctx.fillText(
-        `สรุปข้อมูล${isDay ? "ประจำวัน" : "ประจำเดือน"} — ${label}`,
-        PAD,
-        y + 14,
-      );
+      ctx.fillText(`สรุปข้อมูล${isDay ? "ประจำวัน" : "ประจำเดือน"} — ${label}`, PAD, y + 14);
       y += 36;
 
       // เส้นแบ่ง
@@ -1940,11 +1338,7 @@ function App() {
       const boxes = [
         { label: "รายรับ", value: sumIncome, color: "#22c55e" },
         { label: "รายจ่าย", value: sumExpense, color: "#ef4444" },
-        {
-          label: "กำไรสุทธิ",
-          value: net,
-          color: net >= 0 ? "#f97316" : "#ef4444",
-        },
+        { label: "กำไรสุทธิ", value: net, color: net >= 0 ? "#f97316" : "#ef4444" },
       ];
       boxes.forEach((b, i) => {
         const bx = PAD + i * (boxW + 8);
@@ -1977,17 +1371,7 @@ function App() {
           ctx.fillText("รายรับ", PAD, y + 12);
           y += 22;
           incomeCats.forEach(([cat, amt]) => {
-            drawRow(
-              ctx,
-              cat,
-              formatMoney(amt) + " ฿",
-              PAD,
-              y,
-              W - RIGHT_MARGIN,
-              "#cbd5e1",
-              "#22c55e",
-              FONT,
-            );
+            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - RIGHT_MARGIN, "#cbd5e1", "#22c55e", FONT);
             y += lineH;
           });
           y += 8;
@@ -1998,17 +1382,7 @@ function App() {
           ctx.fillText("รายจ่าย", PAD, y + 12);
           y += 22;
           expenseCats.forEach(([cat, amt]) => {
-            drawRow(
-              ctx,
-              cat,
-              formatMoney(amt) + " ฿",
-              PAD,
-              y,
-              W - RIGHT_MARGIN,
-              "#cbd5e1",
-              "#ef4444",
-              FONT,
-            );
+            drawRow(ctx, cat, formatMoney(amt) + " ฿", PAD, y, W - RIGHT_MARGIN, "#cbd5e1", "#ef4444", FONT);
             y += lineH;
           });
         }
@@ -2041,18 +1415,7 @@ function App() {
           const color = r.type === "income" ? "#22c55e" : "#ef4444";
           const dateTag = isDay ? "" : `${r.date.slice(5)} · `;
           const leftText = `${dateTag}${r.category}${r.note ? " · " + r.note : ""}`;
-          drawRow(
-            ctx,
-            leftText,
-            `${sign}${formatMoney(r.amount)} ฿`,
-            PAD,
-            y,
-            W - RIGHT_MARGIN,
-            "#cbd5e1",
-            color,
-            FONT,
-            12,
-          );
+          drawRow(ctx, leftText, `${sign}${formatMoney(r.amount)} ฿`, PAD, y, W - RIGHT_MARGIN, "#cbd5e1", color, FONT, 12);
           y += lineH;
         });
       }
@@ -2073,10 +1436,7 @@ function App() {
       ctx.fillText(`สร้างเมื่อ ${stamp}`, W / 2, y + 12);
 
       const dataUrl = canvas.toDataURL("image/png");
-      setSummaryImage({
-        dataUrl,
-        label: isDay ? `สรุปวันที่ ${summaryDate}` : `สรุปเดือน ${filterMonth}`,
-      });
+      setSummaryImage({ dataUrl, label: isDay ? `สรุปวันที่ ${summaryDate}` : `สรุปเดือน ${filterMonth}` });
       setShowSummaryPicker(false);
     } finally {
       setGeneratingImage(false);
@@ -2085,15 +1445,16 @@ function App() {
 
   // Stats: ไม่นับรายการที่ถูกลบแล้ว
   const activeRecords = records.filter((r) => !r.deleted);
-  const monthRecords = activeRecords.filter((r) =>
-    r.date.startsWith(filterMonth),
-  );
-  const totalIncome = monthRecords
-    .filter((r) => r.type === "income")
-    .reduce((s, r) => s + r.amount, 0);
-  const totalExpense = monthRecords
-    .filter((r) => r.type === "expense")
-    .reduce((s, r) => s + r.amount, 0);
+  const monthRecords = (() => {
+    if (dashDateMode === "month") {
+      return activeRecords.filter((r) => r.date.startsWith(filterMonth));
+    }
+    let s = dashRangeStart, e = dashRangeEnd;
+    if (s > e) { const t = s; s = e; e = t; }
+    return activeRecords.filter((r) => r.date >= s && r.date <= e);
+  })();
+  const totalIncome = monthRecords.filter((r) => r.type === "income").reduce((s, r) => s + r.amount, 0);
+  const totalExpense = monthRecords.filter((r) => r.type === "expense").reduce((s, r) => s + r.amount, 0);
   const profit = totalIncome - totalExpense;
 
   const dailyMap = {};
@@ -2103,48 +1464,29 @@ function App() {
   });
   const dailyRows = Object.entries(dailyMap)
     .sort((a, b) => b[0].localeCompare(a[0]))
-    .map(([date, v]) => ({
-      date,
-      income: v.income,
-      expense: v.expense,
-      profit: v.income - v.expense,
-    }));
+    .map(([date, v]) => ({ date, income: v.income, expense: v.expense, profit: v.income - v.expense }));
 
   const catIncome = {};
   const catExpense = {};
   monthRecords.forEach((r) => {
-    if (r.type === "income")
-      catIncome[r.category] = (catIncome[r.category] || 0) + r.amount;
+    if (r.type === "income") catIncome[r.category] = (catIncome[r.category] || 0) + r.amount;
     else catExpense[r.category] = (catExpense[r.category] || 0) + r.amount;
   });
-  const maxBar = Math.max(
-    ...dailyRows.map((d) => Math.max(d.income, d.expense, 1)),
-    1,
-  );
+  const maxBar = Math.max(...dailyRows.map((d) => Math.max(d.income, d.expense, 1)), 1);
 
   // สรุปยอดขายตามเมนู: รวบรวมจากออเดอร์ "ร้านอาหาร" ที่มีรายการ items บันทึกไว้
-  const menuStatsRecords = activeRecords.filter(
-    (r) =>
-      r.type === "income" &&
-      r.category === "ร้านอาหาร" &&
-      r.items &&
-      (menuStatsMode === "day"
-        ? r.date === menuStatsDate
-        : r.date.startsWith(menuStatsDate.slice(0, 7))),
+  const menuStatsRecords = activeRecords.filter((r) =>
+    r.type === "income" && r.category === "ร้านอาหาร" && r.items &&
+    (menuStatsMode === "day" ? r.date === menuStatsDate : r.date.startsWith(menuStatsDate.slice(0, 7)))
   );
   const menuStatsMap = {};
   menuStatsRecords.forEach((r) => {
     let parsed = [];
-    try {
-      parsed = JSON.parse(r.items);
-    } catch (e) {
-      parsed = [];
-    }
+    try { parsed = JSON.parse(r.items); } catch (e) { parsed = []; }
     parsed.forEach((it) => {
       if (!menuStatsMap[it.name]) menuStatsMap[it.name] = { qty: 0, total: 0 };
       menuStatsMap[it.name].qty += Number(it.qty) || 0;
-      menuStatsMap[it.name].total +=
-        (Number(it.qty) || 0) * (Number(it.price) || 0);
+      menuStatsMap[it.name].total += (Number(it.qty) || 0) * (Number(it.price) || 0);
     });
   });
   const menuStatsRows = Object.entries(menuStatsMap)
@@ -2153,17 +1495,7 @@ function App() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#0f172a",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: 16,
-        }}
-      >
+      <div style={{ minHeight: "100vh", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
         <div style={{ fontSize: 48 }}>🎣</div>
         <div style={{ color: "#94a3b8", fontSize: 16 }}>กำลังโหลดข้อมูล...</div>
       </div>
@@ -2171,14 +1503,7 @@ function App() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0f172a",
-        color: "#e2e8f0",
-        fontFamily: "'Sarabun','Noto Sans Thai',sans-serif",
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0", fontFamily: "'Sarabun','Noto Sans Thai',sans-serif" }}>
       {confirmDelete && (
         <ConfirmModal
           msg={`ต้องการลบ${confirmDelete.label} ใช่หรือไม่?`}
@@ -2201,10 +1526,7 @@ function App() {
       )}
 
       {summaryImage && (
-        <SummaryImageModal
-          image={summaryImage}
-          onClose={() => setSummaryImage(null)}
-        />
+        <SummaryImageModal image={summaryImage} onClose={() => setSummaryImage(null)} />
       )}
 
       {showNewItemModal && (
@@ -2214,11 +1536,7 @@ function App() {
           unit={newItemUnit}
           setUnit={setNewItemUnit}
           onConfirm={handleAddItem}
-          onCancel={() => {
-            setShowNewItemModal(false);
-            setNewItemName("");
-            setNewItemUnit("");
-          }}
+          onCancel={() => { setShowNewItemModal(false); setNewItemName(""); setNewItemUnit(""); }}
         />
       )}
 
@@ -2243,11 +1561,7 @@ function App() {
           unit={newFreshItemUnit}
           setUnit={setNewFreshItemUnit}
           onConfirm={confirmNewFreshItem}
-          onCancel={() => {
-            setShowNewFreshItemModal(false);
-            setNewFreshItemName("");
-            setNewFreshItemUnit("");
-          }}
+          onCancel={() => { setShowNewFreshItemModal(false); setNewFreshItemName(""); setNewFreshItemUnit(""); }}
         />
       )}
 
@@ -2268,15 +1582,11 @@ function App() {
       {pinRequest && (
         <PinModal
           title={
-            pinRequest.purpose === "save"
-              ? "กรอกรหัสประจำตัวเพื่อบันทึก"
-              : pinRequest.purpose === "delete"
-                ? "กรอกรหัสประจำตัวเพื่อลบรายการ"
-                : pinRequest.purpose === "fresh-new-item"
-                  ? "กรอกรหัสประจำตัวเพื่อเพิ่มสินค้าของสด"
-                  : pinRequest.purpose === "fresh-stock"
-                    ? "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อกของสด"
-                    : "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
+            pinRequest.purpose === "save" ? "กรอกรหัสประจำตัวเพื่อบันทึก" :
+            pinRequest.purpose === "delete" ? "กรอกรหัสประจำตัวเพื่อลบรายการ" :
+            pinRequest.purpose === "fresh-new-item" ? "กรอกรหัสประจำตัวเพื่อเพิ่มสินค้าของสด" :
+            pinRequest.purpose === "fresh-stock" ? "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อกของสด" :
+            "กรอกรหัสประจำตัวเพื่อแก้ไขสต็อก"
           }
           onSubmit={handlePinSubmit}
           onCancel={() => setPinRequest(null)}
@@ -2284,438 +1594,159 @@ function App() {
       )}
 
       {toast && (
-        <div
-          style={{
-            position: "fixed",
-            top: 20,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: toast.color,
-            color: "#fff",
-            padding: "10px 24px",
-            borderRadius: 30,
-            fontWeight: 700,
-            zIndex: 9999,
-            fontSize: 15,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {toast.msg}
-        </div>
+        <div style={{
+          position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)",
+          background: toast.color, color: "#fff", padding: "10px 24px",
+          borderRadius: 30, fontWeight: 700, zIndex: 9999, fontSize: 15,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)", whiteSpace: "nowrap",
+        }}>{toast.msg}</div>
       )}
 
       {/* Header */}
-      <div
-        style={{
-          background: "linear-gradient(135deg,#0f4c2a 0%,#1a3a5c 100%)",
-          borderBottom: "1px solid #334155",
-          padding: "14px 20px",
-        }}
-      >
+      <div style={{ background: "linear-gradient(135deg,#0f4c2a 0%,#1a3a5c 100%)", borderBottom: "1px solid #334155", padding: "14px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 28 }}>🎣</span>
           <div style={{ flex: 1 }}>
-            <div
-              style={{
-                fontWeight: 800,
-                fontSize: 16,
-                color: "#f8fafc",
-                lineHeight: 1.2,
-              }}
-            >
-              {SHOP_NAME}
-            </div>
-            <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
-              ระบบบันทึกการเงิน
-            </div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: "#f8fafc", lineHeight: 1.2 }}>{SHOP_NAME}</div>
+            <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>ระบบบันทึกการเงิน</div>
           </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: saving ? "#f59e0b" : "#22c55e",
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <div
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: saving ? "#f59e0b" : "#22c55e",
-              }}
-            />
+          <div style={{ fontSize: 11, color: saving ? "#f59e0b" : "#22c55e", display: "flex", alignItems: "center", gap: 4 }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: saving ? "#f59e0b" : "#22c55e" }} />
             {saving ? "กำลังบันทึก..." : "🌐 ออนไลน์"}
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <div
-        style={{
-          display: "flex",
-          borderBottom: "1px solid #1e293b",
-          background: "#0f172a",
-        }}
-      >
+      <div style={{ display: "flex", borderBottom: "1px solid #1e293b", background: "#0f172a" }}>
         {[
           { key: "dashboard", label: "📊 สรุป" },
           { key: "add", label: "➕ บันทึก" },
           { key: "stock", label: "📦 สต็อก" },
           { key: "history", label: "📋 ประวัติ" },
         ].map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            style={{
-              flex: 1,
-              padding: "13px 0",
-              border: "none",
-              cursor: "pointer",
-              background: tab === t.key ? "#1e293b" : "transparent",
-              color: tab === t.key ? "#f97316" : "#94a3b8",
-              fontWeight: tab === t.key ? 700 : 400,
-              fontSize: 14,
-              borderBottom:
-                tab === t.key ? "2px solid #f97316" : "2px solid transparent",
-              transition: "all 0.15s",
-            }}
-          >
-            {t.label}
-          </button>
+          <button key={t.key} onClick={() => setTab(t.key)} style={{
+            flex: 1, padding: "13px 0", border: "none", cursor: "pointer",
+            background: tab === t.key ? "#1e293b" : "transparent",
+            color: tab === t.key ? "#f97316" : "#94a3b8",
+            fontWeight: tab === t.key ? 700 : 400, fontSize: 14,
+            borderBottom: tab === t.key ? "2px solid #f97316" : "2px solid transparent",
+            transition: "all 0.15s",
+          }}>{t.label}</button>
         ))}
       </div>
 
-      <div
-        style={{ maxWidth: 680, margin: "0 auto", padding: "20px 16px 80px" }}
-      >
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "20px 16px 80px" }}>
+
         {/* DASHBOARD */}
         {tab === "dashboard" && (
           <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 18,
-              }}
-            >
-              <label style={{ color: "#94a3b8", fontSize: 13 }}>เดือน:</label>
-              <input
-                type="month"
-                value={filterMonth}
-                onChange={(e) => setFilterMonth(e.target.value)}
-                style={{
-                  background: "#1e293b",
-                  border: "1px solid #334155",
-                  color: "#f1f5f9",
-                  padding: "6px 12px",
-                  borderRadius: 8,
-                  fontSize: 14,
-                }}
-              />
-              <button
-                onClick={() => setShowSummaryPicker(true)}
-                title="สร้างภาพสรุป"
-                style={{
-                  width: 34,
-                  height: 34,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#1e293b",
-                  border: "1px solid #334155",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: 16,
-                  flexShrink: 0,
-                }}
-              >
-                📷
-              </button>
-              <button
-                onClick={exportExcel}
-                title="ส่งออก Excel"
-                style={{
-                  width: 34,
-                  height: 34,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#1e293b",
-                  border: "1px solid #334155",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: 16,
-                  flexShrink: 0,
-                }}
-              >
-                📊
-              </button>
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid #334155", flexShrink: 0 }}>
+                  {[{ key: "month", label: "รายเดือน" }, { key: "range", label: "ช่วงวันที่" }].map((m) => (
+                    <button key={m.key} onClick={() => setDashDateMode(m.key)} style={{
+                      padding: "7px 14px", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
+                      background: dashDateMode === m.key ? "#0f4c2a" : "#0f172a",
+                      color: dashDateMode === m.key ? "#fff" : "#64748b", transition: "all 0.2s",
+                    }}>{m.label}</button>
+                  ))}
+                </div>
+
+                {dashDateMode === "month" ? (
+                  <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
+                    style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 12px", borderRadius: 8, fontSize: 14 }} />
+                ) : (
+                  <>
+                    <input type="date" value={dashRangeStart} onChange={(e) => setDashRangeStart(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                    <input type="date" value={dashRangeEnd} onChange={(e) => setDashRangeEnd(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <button onClick={() => { setDashRangeStart(daysAgoStr(6)); setDashRangeEnd(todayStr()); }} style={{
+                      padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                      color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    }}>7 วันล่าสุด</button>
+                    <button onClick={() => { setDashRangeStart(daysAgoStr(29)); setDashRangeEnd(todayStr()); }} style={{
+                      padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                      color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    }}>30 วันล่าสุด</button>
+                  </>
+                )}
+              </div>
+
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setShowSummaryPicker(true)} title="สร้างภาพสรุป" style={{
+                  width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                  cursor: "pointer", fontSize: 16, flexShrink: 0,
+                }}>📷</button>
+                <button onClick={exportExcel} title="ส่งออก Excel" style={{
+                  width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "#1e293b", border: "1px solid #334155", borderRadius: 8,
+                  cursor: "pointer", fontSize: 16, flexShrink: 0,
+                }}>📊</button>
+              </div>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
               {[
-                {
-                  label: "รายรับ",
-                  value: totalIncome,
-                  color: "#22c55e",
-                  icon: "📈",
-                },
-                {
-                  label: "รายจ่าย",
-                  value: totalExpense,
-                  color: "#ef4444",
-                  icon: "📉",
-                },
-                {
-                  label: "กำไรสุทธิ",
-                  value: profit,
-                  color: profit >= 0 ? "#f97316" : "#ef4444",
-                  icon: "💰",
-                },
+                { label: "รายรับ", value: totalIncome, color: "#22c55e", icon: "📈" },
+                { label: "รายจ่าย", value: totalExpense, color: "#ef4444", icon: "📉" },
+                { label: "กำไรสุทธิ", value: profit, color: profit >= 0 ? "#f97316" : "#ef4444", icon: "💰" },
               ].map((k) => (
-                <div
-                  key={k.label}
-                  style={{
-                    background: "#1e293b",
-                    borderRadius: 12,
-                    padding: "14px 10px",
-                    textAlign: "center",
-                    border: "1px solid #334155",
-                  }}
-                >
+                <div key={k.label} style={{ background: "#1e293b", borderRadius: 12, padding: "14px 10px", textAlign: "center", border: "1px solid #334155" }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>{k.icon}</div>
-                  <div
-                    style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}
-                  >
-                    {k.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 800,
-                      color: k.color,
-                      wordBreak: "break-all",
-                    }}
-                  >
-                    {formatMoney(k.value)}
-                  </div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>{k.label}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: k.color, wordBreak: "break-all" }}>{formatMoney(k.value)}</div>
                 </div>
               ))}
             </div>
 
             {dailyRows.length > 0 && (
-              <div
-                style={{
-                  background: "#1e293b",
-                  borderRadius: 14,
-                  padding: 16,
-                  marginBottom: 18,
-                  border: "1px solid #334155",
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: 700,
-                    marginBottom: 14,
-                    fontSize: 14,
-                    color: "#f1f5f9",
-                  }}
-                >
-                  📅 กำไรรายวัน
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 4,
-                    alignItems: "flex-end",
-                    height: 100,
-                    overflowX: "auto",
-                  }}
-                >
+              <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 กำไรรายวัน</div>
+                <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
                   {[...dailyRows].reverse().map((d) => (
-                    <div
-                      key={d.date}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        minWidth: 28,
-                        flex: 1,
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 2,
-                          alignItems: "flex-end",
-                          height: 80,
-                          marginBottom: 4,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 10,
-                            background: "#22c55e",
-                            borderRadius: "3px 3px 0 0",
-                            height: `${Math.max(4, (d.income / maxBar) * 76)}px`,
-                          }}
-                        />
-                        <div
-                          style={{
-                            width: 10,
-                            background: "#ef4444",
-                            borderRadius: "3px 3px 0 0",
-                            height: `${Math.max(4, (d.expense / maxBar) * 76)}px`,
-                          }}
-                        />
+                    <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, flex: 1 }}>
+                      <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: 80, marginBottom: 4 }}>
+                        <div style={{ width: 10, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.income / maxBar) * 76)}px` }} />
+                        <div style={{ width: 10, background: "#ef4444", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.expense / maxBar) * 76)}px` }} />
                       </div>
-                      <div style={{ fontSize: 9, color: "#64748b" }}>
-                        {d.date.slice(8)}
-                      </div>
+                      <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
                     </div>
                   ))}
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 16,
-                    marginTop: 10,
-                    justifyContent: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                      fontSize: 11,
-                      color: "#94a3b8",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 10,
-                        height: 10,
-                        background: "#22c55e",
-                        borderRadius: 2,
-                      }}
-                    />{" "}
-                    รายรับ
+                <div style={{ display: "flex", gap: 16, marginTop: 10, justifyContent: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                    <div style={{ width: 10, height: 10, background: "#22c55e", borderRadius: 2 }} /> รายรับ
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                      fontSize: 11,
-                      color: "#94a3b8",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 10,
-                        height: 10,
-                        background: "#ef4444",
-                        borderRadius: 2,
-                      }}
-                    />{" "}
-                    รายจ่าย
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                    <div style={{ width: 10, height: 10, background: "#ef4444", borderRadius: 2 }} /> รายจ่าย
                   </div>
                 </div>
               </div>
             )}
 
             {dailyRows.length > 0 && (
-              <div
-                style={{
-                  background: "#1e293b",
-                  borderRadius: 14,
-                  padding: 16,
-                  marginBottom: 18,
-                  border: "1px solid #334155",
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: 700,
-                    marginBottom: 12,
-                    fontSize: 14,
-                    color: "#f1f5f9",
-                  }}
-                >
-                  📋 สรุปรายวัน
-                </div>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    fontSize: 13,
-                  }}
-                >
+              <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ color: "#64748b" }}>
-                      <th style={{ textAlign: "left", paddingBottom: 8 }}>
-                        วันที่
-                      </th>
-                      <th style={{ textAlign: "right", paddingBottom: 8 }}>
-                        รายรับ
-                      </th>
-                      <th style={{ textAlign: "right", paddingBottom: 8 }}>
-                        รายจ่าย
-                      </th>
-                      <th style={{ textAlign: "right", paddingBottom: 8 }}>
-                        กำไร
-                      </th>
+                      <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
+                      <th style={{ textAlign: "right", paddingBottom: 8 }}>รายรับ</th>
+                      <th style={{ textAlign: "right", paddingBottom: 8 }}>รายจ่าย</th>
+                      <th style={{ textAlign: "right", paddingBottom: 8 }}>กำไร</th>
                     </tr>
                   </thead>
                   <tbody>
                     {dailyRows.map((d) => (
-                      <tr
-                        key={d.date}
-                        style={{ borderTop: "1px solid #0f172a" }}
-                      >
-                        <td style={{ padding: "7px 0", color: "#cbd5e1" }}>
-                          {d.date}
-                        </td>
-                        <td
-                          style={{
-                            padding: "7px 0",
-                            textAlign: "right",
-                            color: "#22c55e",
-                          }}
-                        >
-                          {formatMoney(d.income)}
-                        </td>
-                        <td
-                          style={{
-                            padding: "7px 0",
-                            textAlign: "right",
-                            color: "#ef4444",
-                          }}
-                        >
-                          {formatMoney(d.expense)}
-                        </td>
-                        <td
-                          style={{
-                            padding: "7px 0",
-                            textAlign: "right",
-                            fontWeight: 700,
-                            color: d.profit >= 0 ? "#f97316" : "#ef4444",
-                          }}
-                        >
-                          {formatMoney(d.profit)}
-                        </td>
+                      <tr key={d.date} style={{ borderTop: "1px solid #0f172a" }}>
+                        <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
+                        <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>{formatMoney(d.income)}</td>
+                        <td style={{ padding: "7px 0", textAlign: "right", color: "#ef4444" }}>{formatMoney(d.expense)}</td>
+                        <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: d.profit >= 0 ? "#f97316" : "#ef4444" }}>{formatMoney(d.profit)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -2723,260 +1754,81 @@ function App() {
               </div>
             )}
 
-            {(Object.keys(catIncome).length > 0 ||
-              Object.keys(catExpense).length > 0) && (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
-              >
+            {(Object.keys(catIncome).length > 0 || Object.keys(catExpense).length > 0) && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
-                  {
-                    label: "รายรับตามประเภท",
-                    data: catIncome,
-                    color: "#22c55e",
-                  },
-                  {
-                    label: "รายจ่ายตามประเภท",
-                    data: catExpense,
-                    color: "#ef4444",
-                  },
+                  { label: "รายรับตามประเภท", data: catIncome, color: "#22c55e" },
+                  { label: "รายจ่ายตามประเภท", data: catExpense, color: "#ef4444" },
                 ].map((sec) => (
-                  <div
-                    key={sec.label}
-                    style={{
-                      background: "#1e293b",
-                      borderRadius: 14,
-                      padding: 14,
-                      border: "1px solid #334155",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontWeight: 700,
-                        marginBottom: 10,
-                        fontSize: 13,
-                        color: "#f1f5f9",
-                      }}
-                    >
-                      {sec.label}
-                    </div>
-                    {Object.entries(sec.data)
-                      .sort((a, b) => b[1] - a[1])
-                      .map(([cat, amt]) => (
-                        <div key={cat} style={{ marginBottom: 7 }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              fontSize: 12,
-                              marginBottom: 3,
-                            }}
-                          >
-                            <span style={{ color: "#cbd5e1" }}>{cat}</span>
-                            <span style={{ color: sec.color, fontWeight: 700 }}>
-                              {formatMoney(amt)}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              height: 4,
-                              background: "#0f172a",
-                              borderRadius: 2,
-                            }}
-                          >
-                            <div
-                              style={{
-                                height: 4,
-                                background: sec.color,
-                                borderRadius: 2,
-                                width: `${(amt / Math.max(...Object.values(sec.data))) * 100}%`,
-                                opacity: 0.8,
-                              }}
-                            />
-                          </div>
+                  <div key={sec.label} style={{ background: "#1e293b", borderRadius: 14, padding: 14, border: "1px solid #334155" }}>
+                    <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 13, color: "#f1f5f9" }}>{sec.label}</div>
+                    {Object.entries(sec.data).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
+                      <div key={cat} style={{ marginBottom: 7 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
+                          <span style={{ color: "#cbd5e1" }}>{cat}</span>
+                          <span style={{ color: sec.color, fontWeight: 700 }}>{formatMoney(amt)}</span>
                         </div>
-                      ))}
+                        <div style={{ height: 4, background: "#0f172a", borderRadius: 2 }}>
+                          <div style={{ height: 4, background: sec.color, borderRadius: 2, width: `${(amt / Math.max(...Object.values(sec.data))) * 100}%`, opacity: 0.8 }} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
             )}
 
             {monthRecords.length === 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "50px 0",
-                  color: "#475569",
-                }}
-              >
+              <div style={{ textAlign: "center", padding: "50px 0", color: "#475569" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-                <div>
-                  ยังไม่มีข้อมูลในเดือนนี้
-                  <br />
-                  กดแท็บ "บันทึก" เพื่อเพิ่มรายการ
-                </div>
+                <div>ยังไม่มีข้อมูลในเดือนนี้<br />กดแท็บ "บันทึก" เพื่อเพิ่มรายการ</div>
               </div>
             )}
 
             {/* เส้นแบ่ง + สรุปยอดขายตามเมนู */}
-            <div
-              style={{
-                borderTop: "1px solid #334155",
-                marginTop: 28,
-                paddingTop: 20,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 12,
-                  flexWrap: "wrap",
-                  gap: 10,
-                }}
-              >
-                <div
-                  style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}
-                >
-                  🍽️ ยอดขายตามเมนู
-                </div>
+            <div style={{ borderTop: "1px solid #334155", marginTop: 28, paddingTop: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>🍽️ ยอดขายตามเมนู</div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      borderRadius: 8,
-                      overflow: "hidden",
-                      border: "1px solid #334155",
-                    }}
-                  >
-                    {[
-                      { key: "day", label: "วันเดียว" },
-                      { key: "month", label: "ทั้งเดือน" },
-                    ].map((m) => (
-                      <button
-                        key={m.key}
-                        onClick={() => setMenuStatsMode(m.key)}
-                        style={{
-                          padding: "6px 12px",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          background:
-                            menuStatsMode === m.key ? "#0f4c2a" : "#0f172a",
-                          color: menuStatsMode === m.key ? "#fff" : "#64748b",
-                        }}
-                      >
-                        {m.label}
-                      </button>
+                  <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid #334155" }}>
+                    {[{ key: "day", label: "วันเดียว" }, { key: "month", label: "ทั้งเดือน" }].map((m) => (
+                      <button key={m.key} onClick={() => setMenuStatsMode(m.key)} style={{
+                        padding: "6px 12px", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
+                        background: menuStatsMode === m.key ? "#0f4c2a" : "#0f172a",
+                        color: menuStatsMode === m.key ? "#fff" : "#64748b",
+                      }}>{m.label}</button>
                     ))}
                   </div>
                   {menuStatsMode === "day" ? (
-                    <input
-                      type="date"
-                      value={menuStatsDate}
-                      onChange={(e) => setMenuStatsDate(e.target.value)}
-                      style={{
-                        background: "#1e293b",
-                        border: "1px solid #334155",
-                        color: "#f1f5f9",
-                        padding: "6px 10px",
-                        borderRadius: 8,
-                        fontSize: 13,
-                      }}
-                    />
+                    <input type="date" value={menuStatsDate} onChange={(e) => setMenuStatsDate(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
                   ) : (
-                    <input
-                      type="month"
-                      value={menuStatsDate.slice(0, 7)}
-                      onChange={(e) => setMenuStatsDate(e.target.value + "-01")}
-                      style={{
-                        background: "#1e293b",
-                        border: "1px solid #334155",
-                        color: "#f1f5f9",
-                        padding: "6px 10px",
-                        borderRadius: 8,
-                        fontSize: 13,
-                      }}
-                    />
+                    <input type="month" value={menuStatsDate.slice(0, 7)} onChange={(e) => setMenuStatsDate(e.target.value + "-01")}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
                   )}
                 </div>
               </div>
 
               {menuStatsRows.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "30px 0",
-                    color: "#475569",
-                    fontSize: 13,
-                  }}
-                >
-                  ไม่มีรายการขายเมนูอาหารใน
-                  {menuStatsMode === "day" ? "วันนี้" : "เดือนนี้"}
+                <div style={{ textAlign: "center", padding: "30px 0", color: "#475569", fontSize: 13 }}>
+                  ไม่มีรายการขายเมนูอาหารใน{menuStatsMode === "day" ? "วันนี้" : "เดือนนี้"}
                 </div>
               ) : (
-                <div
-                  style={{
-                    background: "#1e293b",
-                    borderRadius: 14,
-                    padding: 16,
-                    border: "1px solid #334155",
-                  }}
-                >
-                  <table
-                    style={{
-                      width: "100%",
-                      borderCollapse: "collapse",
-                      fontSize: 13,
-                    }}
-                  >
+                <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <thead>
                       <tr style={{ color: "#64748b" }}>
-                        <th style={{ textAlign: "left", paddingBottom: 8 }}>
-                          เมนู
-                        </th>
-                        <th style={{ textAlign: "right", paddingBottom: 8 }}>
-                          จำนวนสั่ง
-                        </th>
-                        <th style={{ textAlign: "right", paddingBottom: 8 }}>
-                          ยอดขาย
-                        </th>
+                        <th style={{ textAlign: "left", paddingBottom: 8 }}>เมนู</th>
+                        <th style={{ textAlign: "right", paddingBottom: 8 }}>จำนวนสั่ง</th>
+                        <th style={{ textAlign: "right", paddingBottom: 8 }}>ยอดขาย</th>
                       </tr>
                     </thead>
                     <tbody>
                       {menuStatsRows.map((m) => (
-                        <tr
-                          key={m.name}
-                          style={{ borderTop: "1px solid #0f172a" }}
-                        >
-                          <td style={{ padding: "8px 0", color: "#cbd5e1" }}>
-                            {m.name}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px 0",
-                              textAlign: "right",
-                              color: "#f1f5f9",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {m.qty}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px 0",
-                              textAlign: "right",
-                              color: "#22c55e",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {formatMoney(m.total)} ฿
-                          </td>
+                        <tr key={m.name} style={{ borderTop: "1px solid #0f172a" }}>
+                          <td style={{ padding: "8px 0", color: "#cbd5e1" }}>{m.name}</td>
+                          <td style={{ padding: "8px 0", textAlign: "right", color: "#f1f5f9", fontWeight: 700 }}>{m.qty}</td>
+                          <td style={{ padding: "8px 0", textAlign: "right", color: "#22c55e", fontWeight: 700 }}>{formatMoney(m.total)} ฿</td>
                         </tr>
                       ))}
                     </tbody>
@@ -2989,82 +1841,26 @@ function App() {
 
         {/* ADD */}
         {tab === "add" && (
-          <div
-            style={{
-              background: "#1e293b",
-              borderRadius: 16,
-              padding: 20,
-              border: "1px solid #334155",
-            }}
-          >
-            <div
-              style={{
-                fontWeight: 800,
-                fontSize: 16,
-                marginBottom: 20,
-                color: "#f1f5f9",
-              }}
-            >
-              ➕ บันทึกรายการ
-            </div>
-            <div
-              style={{
-                display: "flex",
-                borderRadius: 10,
-                overflow: "hidden",
-                marginBottom: 20,
-                border: "1px solid #334155",
-              }}
-            >
-              {[
-                { key: "income", label: "💚 รายรับ" },
-                { key: "expense", label: "❤️ รายจ่าย" },
-              ].map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => handleFormChange("type", t.key)}
-                  style={{
-                    flex: 1,
-                    padding: "12px 0",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    background:
-                      form.type === t.key
-                        ? t.key === "income"
-                          ? "#15803d"
-                          : "#b91c1c"
-                        : "#0f172a",
-                    color: form.type === t.key ? "#fff" : "#64748b",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {t.label}
-                </button>
+          <div style={{ background: "#1e293b", borderRadius: 16, padding: 20, border: "1px solid #334155" }}>
+            <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 20, color: "#f1f5f9" }}>➕ บันทึกรายการ</div>
+            <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 20, border: "1px solid #334155" }}>
+              {[{ key: "income", label: "💚 รายรับ" }, { key: "expense", label: "❤️ รายจ่าย" }].map((t) => (
+                <button key={t.key} onClick={() => handleFormChange("type", t.key)} style={{
+                  flex: 1, padding: "12px 0", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700,
+                  background: form.type === t.key ? (t.key === "income" ? "#15803d" : "#b91c1c") : "#0f172a",
+                  color: form.type === t.key ? "#fff" : "#64748b", transition: "all 0.2s",
+                }}>{t.label}</button>
               ))}
             </div>
             <div style={{ display: "grid", gap: 14 }}>
               <div>
                 <label style={labelStyle}>📅 วันที่</label>
-                <input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => handleFormChange("date", e.target.value)}
-                  style={inputStyle}
-                />
+                <input type="date" value={form.date} onChange={(e) => handleFormChange("date", e.target.value)} style={inputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>🏷️ ประเภท</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => handleFormChange("category", e.target.value)}
-                  style={inputStyle}
-                >
-                  {(form.type === "income"
-                    ? CATEGORIES_INCOME
-                    : CATEGORIES_EXPENSE
-                  ).map((c) => (
+                <select value={form.category} onChange={(e) => handleFormChange("category", e.target.value)} style={inputStyle}>
+                  {(form.type === "income" ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map((c) => (
                     <option key={c}>{c}</option>
                   ))}
                 </select>
@@ -3074,227 +1870,92 @@ function App() {
                 <div>
                   <label style={labelStyle}>🍽️ รายการเมนู</label>
                   <datalist id="menu-options">
-                    {MENU_ITEMS.map((m) => (
-                      <option key={m.name} value={m.name} />
-                    ))}
+                    {MENU_ITEMS.map((m) => <option key={m.name} value={m.name} />)}
                   </datalist>
                   {orderItems.map((it) => (
-                    <div
-                      key={it.id}
-                      style={{
-                        display: "flex",
-                        gap: 6,
-                        marginBottom: 8,
-                        alignItems: "center",
-                        background: "#0f172a",
-                        border: "1px solid #334155",
-                        borderRadius: 10,
-                        padding: 8,
-                      }}
-                    >
+                    <div key={it.id} style={{
+                      display: "flex", gap: 6, marginBottom: 8, alignItems: "center",
+                      background: "#0f172a", border: "1px solid #334155", borderRadius: 10, padding: 8,
+                    }}>
                       <input
                         type="text"
                         list="menu-options"
                         placeholder="พิมพ์หรือเลือกเมนู"
                         value={it.name}
-                        onChange={(e) =>
-                          updateOrderItem(it.id, "name", e.target.value)
-                        }
-                        style={{
-                          ...inputStyle,
-                          flex: 2,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                        }}
+                        onChange={(e) => updateOrderItem(it.id, "name", e.target.value)}
+                        style={{ ...inputStyle, flex: 2, padding: "8px 10px", fontSize: 13 }}
                       />
                       <input
                         type="number"
                         placeholder="ราคา"
                         value={it.price}
-                        onChange={(e) =>
-                          updateOrderItem(it.id, "price", e.target.value)
-                        }
-                        style={{
-                          ...inputStyle,
-                          flex: 1,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          minWidth: 0,
-                        }}
+                        onChange={(e) => updateOrderItem(it.id, "price", e.target.value)}
+                        style={{ ...inputStyle, flex: 1, padding: "8px 10px", fontSize: 13, minWidth: 0 }}
                       />
                       <input
                         type="number"
                         placeholder="จำนวน"
                         value={it.qty}
-                        onChange={(e) =>
-                          updateOrderItem(it.id, "qty", e.target.value)
-                        }
-                        style={{
-                          ...inputStyle,
-                          flex: 1,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          minWidth: 0,
-                        }}
+                        onChange={(e) => updateOrderItem(it.id, "qty", e.target.value)}
+                        style={{ ...inputStyle, flex: 1, padding: "8px 10px", fontSize: 13, minWidth: 0 }}
                       />
-                      <button
-                        onClick={() => removeOrderItem(it.id)}
-                        style={{
-                          background: "rgba(239,68,68,0.15)",
-                          border: "1px solid rgba(239,68,68,0.3)",
-                          color: "#ef4444",
-                          borderRadius: 8,
-                          padding: "8px 10px",
-                          cursor: "pointer",
-                          fontSize: 13,
-                          flexShrink: 0,
-                        }}
-                      >
-                        ✕
-                      </button>
+                      <button onClick={() => removeOrderItem(it.id)} style={{
+                        background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)",
+                        color: "#ef4444", borderRadius: 8, padding: "8px 10px", cursor: "pointer", fontSize: 13, flexShrink: 0,
+                      }}>✕</button>
                     </div>
                   ))}
-                  <button
-                    onClick={addOrderItem}
-                    style={{
-                      width: "100%",
-                      padding: "10px 0",
-                      borderRadius: 10,
-                      border: "1px dashed #3b82f6",
-                      background: "rgba(59,130,246,0.1)",
-                      color: "#60a5fa",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      fontSize: 14,
-                      marginBottom: 14,
-                    }}
-                  >
-                    ➕ เพิ่มเมนู
-                  </button>
+                  <button onClick={addOrderItem} style={{
+                    width: "100%", padding: "10px 0", borderRadius: 10, border: "1px dashed #3b82f6",
+                    background: "rgba(59,130,246,0.1)", color: "#60a5fa", fontWeight: 700, cursor: "pointer", fontSize: 14,
+                    marginBottom: 14,
+                  }}>➕ เพิ่มเมนู</button>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "12px 14px",
-                      background: "#0f172a",
-                      borderRadius: 10,
-                      border: "1px solid #334155",
-                      marginBottom: 14,
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "#94a3b8",
-                        fontSize: 14,
-                        fontWeight: 600,
-                      }}
-                    >
-                      ยอดรวม
-                    </span>
-                    <span
-                      style={{
-                        color: "#22c55e",
-                        fontSize: 20,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {formatMoney(orderTotal)} ฿
-                    </span>
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "12px 14px", background: "#0f172a", borderRadius: 10, border: "1px solid #334155",
+                    marginBottom: 14,
+                  }}>
+                    <span style={{ color: "#94a3b8", fontSize: 14, fontWeight: 600 }}>ยอดรวม</span>
+                    <span style={{ color: "#22c55e", fontSize: 20, fontWeight: 800 }}>{formatMoney(orderTotal)} ฿</span>
                   </div>
 
-                  <label style={labelStyle}>
-                    💳 วิธีรับเงิน <span style={{ color: "#ef4444" }}>*</span>
-                  </label>
+                  <label style={labelStyle}>💳 วิธีรับเงิน <span style={{ color: "#ef4444" }}>*</span></label>
                   <div style={{ display: "flex", gap: 8 }}>
-                    {[
-                      { key: "cash", label: "💵 เงินสด" },
-                      { key: "transfer", label: "🏦 โอน" },
-                    ].map((p) => (
-                      <button
-                        key={p.key}
-                        onClick={() => setPaymentMethod(p.key)}
-                        style={{
-                          flex: 1,
-                          padding: "12px 0",
-                          borderRadius: 10,
-                          cursor: "pointer",
-                          fontSize: 14,
-                          fontWeight: 700,
-                          border:
-                            paymentMethod === p.key
-                              ? "2px solid #3b82f6"
-                              : "1px solid #334155",
-                          background:
-                            paymentMethod === p.key
-                              ? "rgba(59,130,246,0.15)"
-                              : "#0f172a",
-                          color:
-                            paymentMethod === p.key ? "#60a5fa" : "#64748b",
-                        }}
-                      >
-                        {p.label}
-                      </button>
+                    {[{ key: "cash", label: "💵 เงินสด" }, { key: "transfer", label: "🏦 โอน" }].map((p) => (
+                      <button key={p.key} onClick={() => setPaymentMethod(p.key)} style={{
+                        flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer", fontSize: 14, fontWeight: 700,
+                        border: paymentMethod === p.key ? "2px solid #3b82f6" : "1px solid #334155",
+                        background: paymentMethod === p.key ? "rgba(59,130,246,0.15)" : "#0f172a",
+                        color: paymentMethod === p.key ? "#60a5fa" : "#64748b",
+                      }}>{p.label}</button>
                     ))}
                   </div>
                 </div>
               ) : (
                 <div>
                   <label style={labelStyle}>💵 จำนวนเงิน (บาท)</label>
-                  <input
-                    type="number"
-                    placeholder="0.00"
-                    value={form.amount}
+                  <input type="number" placeholder="0.00" value={form.amount}
                     onChange={(e) => handleFormChange("amount", e.target.value)}
-                    style={{
-                      ...inputStyle,
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: form.type === "income" ? "#22c55e" : "#ef4444",
-                    }}
-                  />
+                    style={{ ...inputStyle, fontSize: 20, fontWeight: 700, color: form.type === "income" ? "#22c55e" : "#ef4444" }} />
                 </div>
               )}
 
               {!isFoodOrder && (
                 <div>
                   <label style={labelStyle}>📝 หมายเหตุ (ไม่บังคับ)</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น ค่าหมู ค่าผัก..."
-                    value={form.note}
-                    onChange={(e) => handleFormChange("note", e.target.value)}
-                    style={inputStyle}
-                  />
+                  <input type="text" placeholder="เช่น ค่าหมู ค่าผัก..." value={form.note}
+                    onChange={(e) => handleFormChange("note", e.target.value)} style={inputStyle} />
                 </div>
               )}
 
-              <button
-                onClick={handleSubmit}
-                disabled={saving}
-                style={{
-                  marginTop: 6,
-                  padding: "14px 0",
-                  borderRadius: 12,
-                  border: "none",
-                  cursor: saving ? "not-allowed" : "pointer",
-                  background:
-                    form.type === "income"
-                      ? "linear-gradient(135deg,#15803d,#22c55e)"
-                      : "linear-gradient(135deg,#b91c1c,#ef4444)",
-                  color: "#fff",
-                  fontWeight: 800,
-                  fontSize: 16,
-                  opacity: saving ? 0.7 : 1,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-                }}
-              >
-                {saving
-                  ? "⏳ กำลังบันทึก..."
-                  : form.type === "income"
-                    ? "💚 บันทึกรายรับ"
-                    : "❤️ บันทึกรายจ่าย"}
+              <button onClick={handleSubmit} disabled={saving} style={{
+                marginTop: 6, padding: "14px 0", borderRadius: 12, border: "none", cursor: saving ? "not-allowed" : "pointer",
+                background: form.type === "income" ? "linear-gradient(135deg,#15803d,#22c55e)" : "linear-gradient(135deg,#b91c1c,#ef4444)",
+                color: "#fff", fontWeight: 800, fontSize: 16, opacity: saving ? 0.7 : 1,
+                boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+              }}>
+                {saving ? "⏳ กำลังบันทึก..." : (form.type === "income" ? "💚 บันทึกรายรับ" : "❤️ บันทึกรายจ่าย")}
               </button>
             </div>
           </div>
@@ -3304,1911 +1965,600 @@ function App() {
         {tab === "stock" && (
           <div>
             {/* สลับระหว่างสต็อกทั่วไป กับ สต็อกของสด */}
-            <div
-              style={{
-                display: "flex",
-                borderRadius: 10,
-                overflow: "hidden",
-                marginBottom: 16,
-                border: "1px solid #334155",
-              }}
-            >
-              {[
-                { key: "general", label: "📦 ของทั่วไป" },
-                { key: "fresh", label: "🥬 ของสด" },
-              ].map((k) => (
-                <button
-                  key={k.key}
-                  onClick={() => setStockKind(k.key)}
-                  style={{
-                    flex: 1,
-                    padding: "11px 0",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 14,
-                    fontWeight: 700,
-                    background: stockKind === k.key ? "#0f4c2a" : "#0f172a",
-                    color: stockKind === k.key ? "#fff" : "#64748b",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {k.label}
-                </button>
+            <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", marginBottom: 16, border: "1px solid #334155" }}>
+              {[{ key: "general", label: "📦 ของทั่วไป" }, { key: "fresh", label: "🥬 ของสด" }].map((k) => (
+                <button key={k.key} onClick={() => setStockKind(k.key)} style={{
+                  flex: 1, padding: "11px 0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700,
+                  background: stockKind === k.key ? "#0f4c2a" : "#0f172a",
+                  color: stockKind === k.key ? "#fff" : "#64748b", transition: "all 0.2s",
+                }}>{k.label}</button>
               ))}
             </div>
 
             {stockKind === "general" && (
-              <div>
-                {/* Item picker modal — เปิดตอนกดปุ่ม เพิ่ม/ขาย/ฟรี ด้านล่างตาราง */}
-                {pendingStockAction && (
-                  <div
-                    style={{
-                      position: "fixed",
-                      inset: 0,
-                      background: "rgba(0,0,0,0.75)",
-                      display: "flex",
-                      alignItems: "flex-end",
-                      justifyContent: "center",
-                      zIndex: 9998,
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#1e293b",
-                        borderRadius: "16px 16px 0 0",
-                        padding: "20px 16px 32px",
-                        width: "100%",
-                        maxWidth: 480,
-                        maxHeight: "70vh",
-                        overflowY: "auto",
-                        border: "1px solid #334155",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 15,
-                          color: "#f1f5f9",
-                          marginBottom: 14,
-                          textAlign: "center",
-                        }}
-                      >
-                        {pendingStockAction === "add"
-                          ? "📥 เลือกสินค้าที่จะเพิ่ม"
-                          : pendingStockAction === "remove"
-                            ? "📤 เลือกสินค้าที่ขายแล้ว"
-                            : "🎁 เลือกสินค้าที่แจกฟรี"}
-                      </div>
-                      {STOCK_CATALOG.map((cat) => (
-                        <div key={cat.category} style={{ marginBottom: 16 }}>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: "#64748b",
-                              fontWeight: 700,
-                              marginBottom: 6,
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {cat.category}
-                          </div>
-                          {cat.items.map((name) => {
-                            const item = stockItems.find(
-                              (s) => s.name === name,
-                            );
-                            if (!item) return null;
-                            const count = getStockCount(item.id);
-                            return (
-                              <button
-                                key={name}
-                                onClick={() => {
-                                  setPendingStockAction(null);
-                                  askStockQty(item, pendingStockAction);
-                                }}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  width: "100%",
-                                  padding: "10px 12px",
-                                  marginBottom: 6,
-                                  borderRadius: 10,
-                                  border: "1px solid #334155",
-                                  background: "#0f172a",
-                                  cursor: "pointer",
-                                  textAlign: "left",
-                                }}
-                              >
-                                <span
-                                  style={{ color: "#f1f5f9", fontSize: 14 }}
-                                >
-                                  {name}
-                                </span>
-                                <span
-                                  style={{
-                                    color: count > 0 ? "#22c55e" : "#ef4444",
-                                    fontWeight: 700,
-                                    fontSize: 14,
-                                  }}
-                                >
-                                  {count} {item.unit}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ))}
-                      <button
-                        onClick={() => setPendingStockAction(null)}
-                        style={{
-                          width: "100%",
-                          padding: "11px 0",
-                          borderRadius: 10,
-                          border: "1px solid #334155",
-                          background: "#0f172a",
-                          color: "#94a3b8",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          fontSize: 15,
-                          marginTop: 8,
-                        }}
-                      >
-                        ยกเลิก
-                      </button>
+            <div>
+            {/* Item picker modal — เปิดตอนกดปุ่ม เพิ่ม/ขาย/ฟรี ด้านล่างตาราง */}
+            {pendingStockAction && (
+              <div style={{
+                position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+                display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9998,
+              }}>
+                <div style={{
+                  background: "#1e293b", borderRadius: "16px 16px 0 0", padding: "20px 16px 32px",
+                  width: "100%", maxWidth: 480, maxHeight: "70vh", overflowY: "auto",
+                  border: "1px solid #334155",
+                }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", marginBottom: 14, textAlign: "center" }}>
+                    {pendingStockAction === "add" ? "📥 เลือกสินค้าที่จะเพิ่ม" : pendingStockAction === "remove" ? "📤 เลือกสินค้าที่ขายแล้ว" : "🎁 เลือกสินค้าที่แจกฟรี"}
+                  </div>
+                  {STOCK_CATALOG.map((cat) => (
+                    <div key={cat.category} style={{ marginBottom: 16 }}>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>{cat.category}</div>
+                      {cat.items.map((name) => {
+                        const item = stockItems.find((s) => s.name === name);
+                        if (!item) return null;
+                        const count = getStockCount(item.id);
+                        return (
+                          <button key={name} onClick={() => { setPendingStockAction(null); askStockQty(item, pendingStockAction); }} style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            width: "100%", padding: "10px 12px", marginBottom: 6, borderRadius: 10,
+                            border: "1px solid #334155", background: "#0f172a", cursor: "pointer", textAlign: "left",
+                          }}>
+                            <span style={{ color: "#f1f5f9", fontSize: 14 }}>{name}</span>
+                            <span style={{ color: count > 0 ? "#22c55e" : "#ef4444", fontWeight: 700, fontSize: 14 }}>{count} {item.unit}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                  <button onClick={() => setPendingStockAction(null)} style={{
+                    width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+                    background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15, marginTop: 8,
+                  }}>ยกเลิก</button>
+                </div>
+              </div>
+            )}
+
+            {stockView === "list" && (() => {
+              // สร้างช่วงวันที่ตามที่ผู้ใช้เลือก (stockRangeStart -> stockRangeEnd)
+              // ถ้าผู้ใช้เผลอเลือกวันเริ่มหลังวันสิ้นสุด ให้สลับให้อัตโนมัติ
+              let rangeStart = stockRangeStart;
+              let rangeEnd = stockRangeEnd;
+              if (rangeStart > rangeEnd) { const tmp = rangeStart; rangeStart = rangeEnd; rangeEnd = tmp; }
+
+              const dayDates = [];
+              {
+                const cursor = new Date(rangeStart + "T00:00:00");
+                const endD = new Date(rangeEnd + "T00:00:00");
+                // จำกัดสูงสุด 62 วัน กันตารางกว้างเกินไปโดยไม่ตั้งใจ
+                let guard = 0;
+                while (cursor <= endD && guard < 62) {
+                  const yyyy = cursor.getFullYear();
+                  const mm = String(cursor.getMonth() + 1).padStart(2, "0");
+                  const dd = String(cursor.getDate()).padStart(2, "0");
+                  dayDates.push(`${yyyy}-${mm}-${dd}`);
+                  cursor.setDate(cursor.getDate() + 1);
+                  guard++;
+                }
+              }
+              const days = dayDates.map((d) => d.slice(5)); // mm-dd สำหรับหัวตาราง
+
+              // คำนวณยอดขาย (remove+free) ต่อวัน ต่อ item
+              const getSoldOnDay = (itemId, date) =>
+                stockMovements
+                  .filter((m) => m.item_id === itemId && m.date === date && (m.type === "remove" || m.type === "free"))
+                  .reduce((s, m) => s + m.quantity, 0);
+
+              return (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>📦 สต็อกสินค้า</div>
+                    <button onClick={() => setShowNewItemModal(true)} style={{
+                      padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+                      fontWeight: 700, fontSize: 12,
+                    }}>➕ เพิ่มสินค้า</button>
+                  </div>
+
+                  {/* ตัวเลือกช่วงวันที่สำหรับตารางยอดขายรายวัน */}
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+                    background: "#1e293b", border: "1px solid #334155", borderRadius: 10,
+                    padding: "10px 12px", marginBottom: 16,
+                  }}>
+                    <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>ช่วงวันที่:</span>
+                    <input type="date" value={stockRangeStart} onChange={(e) => setStockRangeStart(e.target.value)}
+                      style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                    <input type="date" value={stockRangeEnd} onChange={(e) => setStockRangeEnd(e.target.value)}
+                      style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                    <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+                      <button onClick={() => { setStockRangeStart(daysAgoStr(6)); setStockRangeEnd(todayStr()); }} style={{
+                        padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                        color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                      }}>7 วันล่าสุด</button>
+                      <button onClick={() => { setStockRangeStart(daysAgoStr(29)); setStockRangeEnd(todayStr()); }} style={{
+                        padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                        color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                      }}>30 วันล่าสุด</button>
                     </div>
                   </div>
-                )}
 
-                {stockView === "list" &&
-                  (() => {
-                    // สร้างช่วงวันที่ตามที่ผู้ใช้เลือก (stockRangeStart -> stockRangeEnd)
-                    // ถ้าผู้ใช้เผลอเลือกวันเริ่มหลังวันสิ้นสุด ให้สลับให้อัตโนมัติ
-                    let rangeStart = stockRangeStart;
-                    let rangeEnd = stockRangeEnd;
-                    if (rangeStart > rangeEnd) {
-                      const tmp = rangeStart;
-                      rangeStart = rangeEnd;
-                      rangeEnd = tmp;
-                    }
+                  {STOCK_CATALOG.map((cat) => {
+                    const catItems = cat.items
+                      .map((name) => stockItems.find((s) => s.name === name))
+                      .filter(Boolean);
+                    if (catItems.length === 0) return null;
+
+                    return (
+                      <div key={cat.category} style={{ marginBottom: 20 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>{cat.category}</div>
+                        <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #334155" }}>
+                          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 460 }}>
+                            <thead>
+                              <tr style={{ background: "#0f172a" }}>
+                                <th style={{ textAlign: "left", padding: "8px 10px", color: "#64748b", fontWeight: 700, minWidth: 110 }}>สินค้า</th>
+                                <th style={{ textAlign: "center", padding: "8px 6px", color: "#22c55e", fontWeight: 700, minWidth: 52 }}>คงเหลือ</th>
+                                {days.map((d) => (
+                                  <th key={d} style={{ textAlign: "center", padding: "8px 4px", color: "#64748b", fontWeight: 600, minWidth: 36 }}>{d}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {catItems.map((item, idx) => {
+                                const count = getStockCount(item.id);
+                                return (
+                                  <tr key={item.id} style={{ borderTop: "1px solid #1e293b", background: idx % 2 === 0 ? "#1e293b" : "#172033" }}>
+                                    <td style={{ padding: "9px 10px" }}>
+                                      <button onClick={() => { setSelectedStockItemId(item.id); setStockView("graph"); }}
+                                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                                        <span style={{ color: "#e2e8f0", fontSize: 12 }}>{item.name}</span>
+                                        <span style={{ display: "block", fontSize: 10, color: "#3b82f6" }}>📈 ดูกราฟ</span>
+                                      </button>
+                                    </td>
+                                    <td style={{ textAlign: "center", padding: "9px 6px", fontWeight: 800, fontSize: 14, color: count > 0 ? "#22c55e" : "#ef4444" }}>
+                                      {count}
+                                    </td>
+                                    {dayDates.map((date) => {
+                                      const sold = getSoldOnDay(item.id, date);
+                                      return (
+                                        <td key={date} style={{ textAlign: "center", padding: "9px 4px", color: sold > 0 ? "#ef4444" : "#334155", fontWeight: sold > 0 ? 700 : 400 }}>
+                                          {sold > 0 ? sold : "—"}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {stockItems.length === 0 && (
+                    <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                      <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+                      <div>ยังไม่มีสินค้าในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น</div>
+                    </div>
+                  )}
+
+                  {/* ปุ่มลงรายการ ด้านล่างสุดของตาราง */}
+                  <div style={{ display: "flex", gap: 8, marginTop: 10, position: "sticky", bottom: 16 }}>
+                    <button onClick={() => setPendingStockAction("add")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>📥 เพิ่มสต็อก</button>
+                    <button onClick={() => setPendingStockAction("remove")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#b91c1c,#ef4444)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>📤 ขายแล้ว</button>
+                    <button onClick={() => setPendingStockAction("free")} style={{
+                      flex: 1, padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      background: "linear-gradient(135deg,#c2410c,#f97316)", color: "#fff", fontWeight: 800, fontSize: 14,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                    }}>🎁 ฟรี</button>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {stockView === "graph" && (() => {
+              const item = stockItems.find((i) => i.id === selectedStockItemId);
+              if (!item) {
+                return (
+                  <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                    <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                    <div style={{ marginBottom: 14 }}>ไม่พบสินค้านี้</div>
+                    <button onClick={() => setStockView("list")} style={{
+                      padding: "9px 18px", borderRadius: 8, border: "1px solid #334155",
+                      background: "#1e293b", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 13,
+                    }}>← กลับไปหน้าสต็อก</button>
+                  </div>
+                );
+              }
+              const itemMovements = stockMovements
+                .filter((m) => m.item_id === item.id && m.date.startsWith(stockGraphMonth))
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+              const dayMap = {};
+              itemMovements.forEach((m) => {
+                if (!dayMap[m.date]) dayMap[m.date] = { add: 0, remove: 0, free: 0 };
+                dayMap[m.date][m.type] += m.quantity;
+              });
+              const dayRows = Object.entries(dayMap).map(([date, v]) => ({ date, add: v.add, remove: v.remove, free: v.free }));
+              const maxQty = Math.max(...dayRows.map((d) => Math.max(d.add, d.remove, d.free, 1)), 1);
+              const currentCount = getStockCount(item.id);
+              const freeNotes = itemMovements.filter((m) => m.type === "free");
+
+              return (
+                <div>
+                  <button onClick={() => setStockView("list")} style={{
+                    background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
+                    fontSize: 13, marginBottom: 14, padding: 0,
+                  }}>← กลับไปหน้าสต็อก</button>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 17, color: "#f1f5f9" }}>{item.name}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>สต็อกล่าสุด: <span style={{ color: currentCount > 0 ? "#22c55e" : "#ef4444", fontWeight: 700 }}>{currentCount} {item.unit}</span></div>
+                    </div>
+                    <input type="month" value={stockGraphMonth} onChange={(e) => setStockGraphMonth(e.target.value)}
+                      style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                  </div>
+
+                  {dayRows.length > 0 ? (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 การเคลื่อนไหวรายวัน</div>
+                      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
+                        {dayRows.map((d) => (
+                          <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 36, flex: 1 }}>
+                            <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: 80, marginBottom: 4 }}>
+                              <div style={{ width: 8, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.add / maxQty) * 76)}px` }} />
+                              <div style={{ width: 8, background: "#ef4444", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.remove / maxQty) * 76)}px` }} />
+                              <div style={{ width: 8, background: "#f97316", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.free / maxQty) * 76)}px` }} />
+                            </div>
+                            <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: "flex", gap: 16, marginTop: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#22c55e", borderRadius: 2 }} /> เพิ่มเข้า
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#ef4444", borderRadius: 2 }} /> ตัดออก (ขาย)
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#94a3b8" }}>
+                          <div style={{ width: 10, height: 10, background: "#f97316", borderRadius: 2 }} /> แจกฟรี
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                      <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                      <div>ไม่มีการเคลื่อนไหวในเดือนนี้</div>
+                    </div>
+                  )}
+
+                  {dayRows.length > 0 && (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                        <thead>
+                          <tr style={{ color: "#64748b" }}>
+                            <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>เพิ่ม</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>ขาย</th>
+                            <th style={{ textAlign: "right", paddingBottom: 8 }}>ฟรี</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...dayRows].reverse().map((d) => (
+                            <tr key={d.date} style={{ borderTop: "1px solid #0f172a" }}>
+                              <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>+{d.add}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#ef4444" }}>-{d.remove}</td>
+                              <td style={{ padding: "7px 0", textAlign: "right", color: "#f97316" }}>{d.free > 0 ? `-${d.free}` : "-"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {freeNotes.length > 0 && (
+                    <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                      <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>🎁 รายการแจกฟรี</div>
+                      {[...freeNotes].sort((a, b) => b.created_at - a.created_at).map((m) => (
+                        <div key={m.id} style={{ padding: "8px 0", borderTop: "1px solid #0f172a", fontSize: 13 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span style={{ color: "#f97316", fontWeight: 700 }}>-{m.quantity} {item.unit}</span>
+                            <span style={{ color: "#64748b", fontSize: 11 }}>{m.date} · {m.created_by}</span>
+                          </div>
+                          {m.note && <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>{m.note}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+            </div>
+            )}
+
+            {stockKind === "fresh" && (() => {
+            const sortedFreshStockItems = [...freshStockItems].sort((a, b) => a.name.localeCompare(b.name, "th"));
+              // Item picker modal ของสด — เปิดตอนกดปุ่ม "บันทึกซื้อของเพิ่ม" ด้านล่างตาราง
+              return (
+                <div>
+                  {pendingFreshStockAction && (
+                    <div style={{
+                      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+                      display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9998,
+                    }}>
+                      <div style={{
+                        background: "#1e293b", borderRadius: "16px 16px 0 0", padding: "20px 16px 32px",
+                        width: "100%", maxWidth: 480, maxHeight: "70vh", overflowY: "auto",
+                        border: "1px solid #334155",
+                      }}>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", marginBottom: 14, textAlign: "center" }}>
+                          📥 เลือกของที่จะซื้อเพิ่ม
+                        </div>
+                        {freshStockItems.length === 0 && (
+                          <div style={{ textAlign: "center", padding: "20px 0", color: "#64748b", fontSize: 13 }}>ยังไม่มีสินค้าของสด กด "เพิ่มสินค้า" ก่อน</div>
+                        )}
+                        {sortedFreshStockItems.map((item) => {
+                          const total = getFreshStockCount(item.id);
+                          return (
+                            <button key={item.id} onClick={() => { setPendingFreshStockAction(null); askFreshStockQty(item, "add"); }} style={{
+                              display: "flex", justifyContent: "space-between", alignItems: "center",
+                              width: "100%", padding: "10px 12px", marginBottom: 6, borderRadius: 10,
+                              border: "1px solid #334155", background: "#0f172a", cursor: "pointer", textAlign: "left",
+                            }}>
+                              <span style={{ color: "#f1f5f9", fontSize: 14 }}>{item.name}</span>
+                              <span style={{ color: "#64748b", fontWeight: 700, fontSize: 13 }}>ซื้อสะสม {total} {item.unit}</span>
+                            </button>
+                          );
+                        })}
+                        <button onClick={() => setPendingFreshStockAction(null)} style={{
+                          width: "100%", padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+                          background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15, marginTop: 8,
+                        }}>ยกเลิก</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {freshStockView === "list" && (() => {
+                    let rangeStart = freshStockRangeStart;
+                    let rangeEnd = freshStockRangeEnd;
+                    if (rangeStart > rangeEnd) { const tmp = rangeStart; rangeStart = rangeEnd; rangeEnd = tmp; }
 
                     const dayDates = [];
                     {
                       const cursor = new Date(rangeStart + "T00:00:00");
                       const endD = new Date(rangeEnd + "T00:00:00");
-                      // จำกัดสูงสุด 62 วัน กันตารางกว้างเกินไปโดยไม่ตั้งใจ
                       let guard = 0;
                       while (cursor <= endD && guard < 62) {
                         const yyyy = cursor.getFullYear();
-                        const mm = String(cursor.getMonth() + 1).padStart(
-                          2,
-                          "0",
-                        );
+                        const mm = String(cursor.getMonth() + 1).padStart(2, "0");
                         const dd = String(cursor.getDate()).padStart(2, "0");
                         dayDates.push(`${yyyy}-${mm}-${dd}`);
                         cursor.setDate(cursor.getDate() + 1);
                         guard++;
                       }
                     }
-                    const days = dayDates.map((d) => d.slice(5)); // mm-dd สำหรับหัวตาราง
+                    const days = dayDates.map((d) => d.slice(5));
 
-                    // คำนวณยอดขาย (remove+free) ต่อวัน ต่อ item
-                    const getSoldOnDay = (itemId, date) =>
-                      stockMovements
-                        .filter(
-                          (m) =>
-                            m.item_id === itemId &&
-                            m.date === date &&
-                            (m.type === "remove" || m.type === "free"),
-                        )
+                    // จำนวนที่ซื้อเข้าเฉพาะวันนั้น (คอลัมรายวัน)
+                    const getPurchasedOnDay = (itemId, date) =>
+                      freshStockMovements
+                        .filter((m) => m.item_id === itemId && m.date === date && m.type === "add")
+                        .reduce((s, m) => s + m.quantity, 0);
+
+                    // ผลรวมที่ซื้อเข้าทั้งหมด เฉพาะภายในช่วงวันที่ที่เลือกอยู่ (คอลัม "ทั้งหมด")
+                    const getPurchasedInRange = (itemId) =>
+                      freshStockMovements
+                        .filter((m) => m.item_id === itemId && m.type === "add" && dayDates.includes(m.date))
                         .reduce((s, m) => s + m.quantity, 0);
 
                     return (
                       <div>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 14,
-                            flexWrap: "wrap",
-                            gap: 10,
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 15,
-                              color: "#f1f5f9",
-                            }}
-                          >
-                            📦 สต็อกสินค้า
-                          </div>
-                          <button
-                            onClick={() => setShowNewItemModal(true)}
-                            style={{
-                              padding: "7px 12px",
-                              borderRadius: 8,
-                              border: "none",
-                              cursor: "pointer",
-                              background:
-                                "linear-gradient(135deg,#1d4ed8,#3b82f6)",
-                              color: "#fff",
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
-                          >
-                            ➕ เพิ่มสินค้า
-                          </button>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                          <div style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9" }}>🥬 สต็อกของสด (บันทึกการซื้อ)</div>
+                          <button onClick={askNewFreshItem} style={{
+                            padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer",
+                            background: "linear-gradient(135deg,#1d4ed8,#3b82f6)", color: "#fff",
+                            fontWeight: 700, fontSize: 12,
+                          }}>➕ เพิ่มสินค้า</button>
                         </div>
 
-                        {/* ตัวเลือกช่วงวันที่สำหรับตารางยอดขายรายวัน */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                            flexWrap: "wrap",
-                            background: "#1e293b",
-                            border: "1px solid #334155",
-                            borderRadius: 10,
-                            padding: "10px 12px",
-                            marginBottom: 16,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 12,
-                              color: "#94a3b8",
-                              fontWeight: 600,
-                            }}
-                          >
-                            ช่วงวันที่:
-                          </span>
-                          <input
-                            type="date"
-                            value={stockRangeStart}
-                            onChange={(e) => setStockRangeStart(e.target.value)}
-                            style={{
-                              background: "#0f172a",
-                              border: "1px solid #334155",
-                              color: "#f1f5f9",
-                              padding: "6px 10px",
-                              borderRadius: 8,
-                              fontSize: 13,
-                            }}
-                          />
-                          <span style={{ fontSize: 12, color: "#64748b" }}>
-                            ถึง
-                          </span>
-                          <input
-                            type="date"
-                            value={stockRangeEnd}
-                            onChange={(e) => setStockRangeEnd(e.target.value)}
-                            style={{
-                              background: "#0f172a",
-                              border: "1px solid #334155",
-                              color: "#f1f5f9",
-                              padding: "6px 10px",
-                              borderRadius: 8,
-                              fontSize: 13,
-                            }}
-                          />
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 6,
-                              marginLeft: "auto",
-                            }}
-                          >
-                            <button
-                              onClick={() => {
-                                setStockRangeStart(daysAgoStr(6));
-                                setStockRangeEnd(todayStr());
-                              }}
-                              style={{
-                                padding: "6px 10px",
-                                borderRadius: 8,
-                                border: "1px solid #334155",
-                                background: "#0f172a",
-                                color: "#94a3b8",
-                                fontSize: 11,
-                                fontWeight: 700,
-                                cursor: "pointer",
-                              }}
-                            >
-                              7 วันล่าสุด
-                            </button>
-                            <button
-                              onClick={() => {
-                                setStockRangeStart(daysAgoStr(29));
-                                setStockRangeEnd(todayStr());
-                              }}
-                              style={{
-                                padding: "6px 10px",
-                                borderRadius: 8,
-                                border: "1px solid #334155",
-                                background: "#0f172a",
-                                color: "#94a3b8",
-                                fontSize: 11,
-                                fontWeight: 700,
-                                cursor: "pointer",
-                              }}
-                            >
-                              30 วันล่าสุด
-                            </button>
+                        <div style={{
+                          display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+                          background: "#1e293b", border: "1px solid #334155", borderRadius: 10,
+                          padding: "10px 12px", marginBottom: 16,
+                        }}>
+                          <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>ช่วงวันที่:</span>
+                          <input type="date" value={freshStockRangeStart} onChange={(e) => setFreshStockRangeStart(e.target.value)}
+                            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                          <span style={{ fontSize: 12, color: "#64748b" }}>ถึง</span>
+                          <input type="date" value={freshStockRangeEnd} onChange={(e) => setFreshStockRangeEnd(e.target.value)}
+                            style={{ background: "#0f172a", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
+                          <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+                            <button onClick={() => { setFreshStockRangeStart(daysAgoStr(6)); setFreshStockRangeEnd(todayStr()); }} style={{
+                              padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                              color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                            }}>7 วันล่าสุด</button>
+                            <button onClick={() => { setFreshStockRangeStart(daysAgoStr(29)); setFreshStockRangeEnd(todayStr()); }} style={{
+                              padding: "6px 10px", borderRadius: 8, border: "1px solid #334155", background: "#0f172a",
+                              color: "#94a3b8", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                            }}>30 วันล่าสุด</button>
                           </div>
                         </div>
 
-                        {STOCK_CATALOG.map((cat) => {
-                          const catItems = cat.items
-                            .map((name) =>
-                              stockItems.find((s) => s.name === name),
-                            )
-                            .filter(Boolean);
-                          if (catItems.length === 0) return null;
-
-                          return (
-                            <div
-                              key={cat.category}
-                              style={{ marginBottom: 20 }}
-                            >
-                              <div
-                                style={{
-                                  fontSize: 13,
-                                  fontWeight: 700,
-                                  color: "#94a3b8",
-                                  marginBottom: 8,
-                                }}
-                              >
-                                {cat.category}
-                              </div>
-                              <div
-                                style={{
-                                  overflowX: "auto",
-                                  borderRadius: 12,
-                                  border: "1px solid #334155",
-                                }}
-                              >
-                                <table
-                                  style={{
-                                    width: "100%",
-                                    borderCollapse: "collapse",
-                                    fontSize: 12,
-                                    minWidth: 460,
-                                  }}
-                                >
-                                  <thead>
-                                    <tr style={{ background: "#0f172a" }}>
-                                      <th
-                                        style={{
-                                          textAlign: "left",
-                                          padding: "8px 10px",
-                                          color: "#64748b",
-                                          fontWeight: 700,
-                                          minWidth: 110,
-                                        }}
-                                      >
-                                        สินค้า
-                                      </th>
-                                      <th
-                                        style={{
-                                          textAlign: "center",
-                                          padding: "8px 6px",
-                                          color: "#22c55e",
-                                          fontWeight: 700,
-                                          minWidth: 52,
-                                        }}
-                                      >
-                                        คงเหลือ
-                                      </th>
-                                      {days.map((d) => (
-                                        <th
-                                          key={d}
-                                          style={{
-                                            textAlign: "center",
-                                            padding: "8px 4px",
-                                            color: "#64748b",
-                                            fontWeight: 600,
-                                            minWidth: 36,
-                                          }}
-                                        >
-                                          {d}
-                                        </th>
-                                      ))}
+                        {freshStockItems.length > 0 ? (
+                          <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #334155", marginBottom: 16 }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 460 }}>
+                              <thead>
+                                <tr style={{ background: "#0f172a" }}>
+                                  <th style={{ textAlign: "left", padding: "8px 10px", color: "#64748b", fontWeight: 700, minWidth: 110 }}>สินค้า</th>
+                                  <th style={{ textAlign: "center", padding: "8px 6px", color: "#22c55e", fontWeight: 700, minWidth: 52 }}>ทั้งหมด</th>
+                                  {days.map((d) => (
+                                    <th key={d} style={{ textAlign: "center", padding: "8px 4px", color: "#64748b", fontWeight: 600, minWidth: 36 }}>{d}</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {sortedFreshStockItems.map((item, idx) => {
+                                  const total = getPurchasedInRange(item.id);
+                                  return (
+                                    <tr key={item.id} style={{ borderTop: "1px solid #1e293b", background: idx % 2 === 0 ? "#1e293b" : "#172033" }}>
+                                      <td style={{ padding: "9px 10px" }}>
+                                        <button onClick={() => { setSelectedFreshStockItemId(item.id); setFreshStockView("graph"); }}
+                                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                                          <span style={{ color: "#e2e8f0", fontSize: 12 }}>{item.name}</span>
+                                          <span style={{ display: "block", fontSize: 10, color: "#3b82f6" }}>📈 ดูกราฟ</span>
+                                        </button>
+                                      </td>
+                                      <td style={{ textAlign: "center", padding: "9px 6px", fontWeight: 800, fontSize: 14, color: total > 0 ? "#22c55e" : "#64748b" }}>
+                                        {total}
+                                      </td>
+                                      {dayDates.map((date) => {
+                                        const bought = getPurchasedOnDay(item.id, date);
+                                        return (
+                                          <td key={date} style={{ textAlign: "center", padding: "9px 4px", color: bought > 0 ? "#22c55e" : "#334155", fontWeight: bought > 0 ? 700 : 400 }}>
+                                            {bought > 0 ? bought : "—"}
+                                          </td>
+                                        );
+                                      })}
                                     </tr>
-                                  </thead>
-                                  <tbody>
-                                    {catItems.map((item, idx) => {
-                                      const count = getStockCount(item.id);
-                                      return (
-                                        <tr
-                                          key={item.id}
-                                          style={{
-                                            borderTop: "1px solid #1e293b",
-                                            background:
-                                              idx % 2 === 0
-                                                ? "#1e293b"
-                                                : "#172033",
-                                          }}
-                                        >
-                                          <td style={{ padding: "9px 10px" }}>
-                                            <button
-                                              onClick={() => {
-                                                setSelectedStockItemId(item.id);
-                                                setStockView("graph");
-                                              }}
-                                              style={{
-                                                background: "none",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                padding: 0,
-                                                textAlign: "left",
-                                              }}
-                                            >
-                                              <span
-                                                style={{
-                                                  color: "#e2e8f0",
-                                                  fontSize: 12,
-                                                }}
-                                              >
-                                                {item.name}
-                                              </span>
-                                              <span
-                                                style={{
-                                                  display: "block",
-                                                  fontSize: 10,
-                                                  color: "#3b82f6",
-                                                }}
-                                              >
-                                                📈 ดูกราฟ
-                                              </span>
-                                            </button>
-                                          </td>
-                                          <td
-                                            style={{
-                                              textAlign: "center",
-                                              padding: "9px 6px",
-                                              fontWeight: 800,
-                                              fontSize: 14,
-                                              color:
-                                                count > 0
-                                                  ? "#22c55e"
-                                                  : "#ef4444",
-                                            }}
-                                          >
-                                            {count}
-                                          </td>
-                                          {dayDates.map((date) => {
-                                            const sold = getSoldOnDay(
-                                              item.id,
-                                              date,
-                                            );
-                                            return (
-                                              <td
-                                                key={date}
-                                                style={{
-                                                  textAlign: "center",
-                                                  padding: "9px 4px",
-                                                  color:
-                                                    sold > 0
-                                                      ? "#ef4444"
-                                                      : "#334155",
-                                                  fontWeight:
-                                                    sold > 0 ? 700 : 400,
-                                                }}
-                                              >
-                                                {sold > 0 ? sold : "—"}
-                                              </td>
-                                            );
-                                          })}
-                                        </tr>
-                                      );
-                                    })}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          );
-                        })}
-
-                        {stockItems.length === 0 && (
-                          <div
-                            style={{
-                              textAlign: "center",
-                              padding: "40px 0",
-                              color: "#475569",
-                            }}
-                          >
-                            <div style={{ fontSize: 40, marginBottom: 12 }}>
-                              📭
-                            </div>
-                            <div>
-                              ยังไม่มีสินค้าในสต็อก
-                              <br />
-                              กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น
-                            </div>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                            <div style={{ fontSize: 40, marginBottom: 12 }}>🥬</div>
+                            <div>ยังไม่มีสินค้าของสดในสต็อก<br />กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น (ต้องกรอกรหัสประจำตัว)</div>
                           </div>
                         )}
 
-                        {/* ปุ่มลงรายการ ด้านล่างสุดของตาราง */}
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 8,
-                            marginTop: 10,
-                            position: "sticky",
-                            bottom: 16,
-                          }}
-                        >
-                          <button
-                            onClick={() => setPendingStockAction("add")}
-                            style={{
-                              flex: 1,
-                              padding: "13px 0",
-                              borderRadius: 12,
-                              border: "none",
-                              cursor: "pointer",
-                              background:
-                                "linear-gradient(135deg,#15803d,#22c55e)",
-                              color: "#fff",
-                              fontWeight: 800,
-                              fontSize: 14,
-                              boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                            }}
-                          >
-                            📥 เพิ่มสต็อก
-                          </button>
-                          <button
-                            onClick={() => setPendingStockAction("remove")}
-                            style={{
-                              flex: 1,
-                              padding: "13px 0",
-                              borderRadius: 12,
-                              border: "none",
-                              cursor: "pointer",
-                              background:
-                                "linear-gradient(135deg,#b91c1c,#ef4444)",
-                              color: "#fff",
-                              fontWeight: 800,
-                              fontSize: 14,
-                              boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                            }}
-                          >
-                            📤 ขายแล้ว
-                          </button>
-                          <button
-                            onClick={() => setPendingStockAction("free")}
-                            style={{
-                              flex: 1,
-                              padding: "13px 0",
-                              borderRadius: 12,
-                              border: "none",
-                              cursor: "pointer",
-                              background:
-                                "linear-gradient(135deg,#c2410c,#f97316)",
-                              color: "#fff",
-                              fontWeight: 800,
-                              fontSize: 14,
-                              boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                            }}
-                          >
-                            🎁 ฟรี
-                          </button>
+                        {/* เหลือปุ่มเดียว: บันทึกการซื้อของเพิ่ม */}
+                        <div style={{ marginTop: 10, position: "sticky", bottom: 16 }}>
+                          <button onClick={() => setPendingFreshStockAction("add")} style={{
+                            width: "100%", padding: "13px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                            background: "linear-gradient(135deg,#15803d,#22c55e)", color: "#fff", fontWeight: 800, fontSize: 14,
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                          }}>📥 บันทึกซื้อของเพิ่ม</button>
                         </div>
                       </div>
                     );
                   })()}
 
-                {stockView === "graph" &&
-                  (() => {
-                    const item = stockItems.find(
-                      (i) => i.id === selectedStockItemId,
-                    );
+                  {freshStockView === "graph" && (() => {
+                    const item = freshStockItems.find((i) => i.id === selectedFreshStockItemId);
                     if (!item) {
                       return (
-                        <div
-                          style={{
-                            textAlign: "center",
-                            padding: "40px 0",
-                            color: "#475569",
-                          }}
-                        >
-                          <div style={{ fontSize: 36, marginBottom: 10 }}>
-                            📭
-                          </div>
+                        <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                          <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
                           <div style={{ marginBottom: 14 }}>ไม่พบสินค้านี้</div>
-                          <button
-                            onClick={() => setStockView("list")}
-                            style={{
-                              padding: "9px 18px",
-                              borderRadius: 8,
-                              border: "1px solid #334155",
-                              background: "#1e293b",
-                              color: "#94a3b8",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              fontSize: 13,
-                            }}
-                          >
-                            ← กลับไปหน้าสต็อก
-                          </button>
+                          <button onClick={() => setFreshStockView("list")} style={{
+                            padding: "9px 18px", borderRadius: 8, border: "1px solid #334155",
+                            background: "#1e293b", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 13,
+                          }}>← กลับไปหน้าสต็อกของสด</button>
                         </div>
                       );
                     }
-                    const itemMovements = stockMovements
-                      .filter(
-                        (m) =>
-                          m.item_id === item.id &&
-                          m.date.startsWith(stockGraphMonth),
-                      )
+                    const itemMovements = freshStockMovements
+                      .filter((m) => m.item_id === item.id && m.type === "add" && m.date.startsWith(freshStockGraphMonth))
                       .sort((a, b) => a.date.localeCompare(b.date));
 
                     const dayMap = {};
                     itemMovements.forEach((m) => {
-                      if (!dayMap[m.date])
-                        dayMap[m.date] = { add: 0, remove: 0, free: 0 };
-                      dayMap[m.date][m.type] += m.quantity;
+                      if (!dayMap[m.date]) dayMap[m.date] = 0;
+                      dayMap[m.date] += m.quantity;
                     });
-                    const dayRows = Object.entries(dayMap).map(([date, v]) => ({
-                      date,
-                      add: v.add,
-                      remove: v.remove,
-                      free: v.free,
-                    }));
-                    const maxQty = Math.max(
-                      ...dayRows.map((d) =>
-                        Math.max(d.add, d.remove, d.free, 1),
-                      ),
-                      1,
-                    );
-                    const currentCount = getStockCount(item.id);
-                    const freeNotes = itemMovements.filter(
-                      (m) => m.type === "free",
-                    );
+                    const dayRows = Object.entries(dayMap).map(([date, qty]) => ({ date, qty }));
+                    const maxQty = Math.max(...dayRows.map((d) => d.qty), 1);
+                    const totalThisMonth = dayRows.reduce((s, d) => s + d.qty, 0);
 
                     return (
                       <div>
-                        <button
-                          onClick={() => setStockView("list")}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: "#94a3b8",
-                            cursor: "pointer",
-                            fontSize: 13,
-                            marginBottom: 14,
-                            padding: 0,
-                          }}
-                        >
-                          ← กลับไปหน้าสต็อก
-                        </button>
+                        <button onClick={() => setFreshStockView("list")} style={{
+                          background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
+                          fontSize: 13, marginBottom: 14, padding: 0,
+                        }}>← กลับไปหน้าสต็อกของสด</button>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 14,
-                          }}
-                        >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                           <div>
-                            <div
-                              style={{
-                                fontWeight: 800,
-                                fontSize: 17,
-                                color: "#f1f5f9",
-                              }}
-                            >
-                              {item.name}
-                            </div>
-                            <div style={{ fontSize: 12, color: "#64748b" }}>
-                              สต็อกล่าสุด:{" "}
-                              <span
-                                style={{
-                                  color:
-                                    currentCount > 0 ? "#22c55e" : "#ef4444",
-                                  fontWeight: 700,
-                                }}
-                              >
-                                {currentCount} {item.unit}
-                              </span>
-                            </div>
+                            <div style={{ fontWeight: 800, fontSize: 17, color: "#f1f5f9" }}>{item.name}</div>
+                            <div style={{ fontSize: 12, color: "#64748b" }}>ซื้อเข้าเดือนนี้: <span style={{ color: "#22c55e", fontWeight: 700 }}>{totalThisMonth} {item.unit}</span></div>
                           </div>
-                          <input
-                            type="month"
-                            value={stockGraphMonth}
-                            onChange={(e) => setStockGraphMonth(e.target.value)}
-                            style={{
-                              background: "#1e293b",
-                              border: "1px solid #334155",
-                              color: "#f1f5f9",
-                              padding: "6px 10px",
-                              borderRadius: 8,
-                              fontSize: 13,
-                            }}
-                          />
+                          <input type="month" value={freshStockGraphMonth} onChange={(e) => setFreshStockGraphMonth(e.target.value)}
+                            style={{ background: "#1e293b", border: "1px solid #334155", color: "#f1f5f9", padding: "6px 10px", borderRadius: 8, fontSize: 13 }} />
                         </div>
 
                         {dayRows.length > 0 ? (
-                          <div
-                            style={{
-                              background: "#1e293b",
-                              borderRadius: 14,
-                              padding: 16,
-                              marginBottom: 18,
-                              border: "1px solid #334155",
-                            }}
-                          >
-                            <div
-                              style={{
-                                fontWeight: 700,
-                                marginBottom: 14,
-                                fontSize: 14,
-                                color: "#f1f5f9",
-                              }}
-                            >
-                              📅 การเคลื่อนไหวรายวัน
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: 4,
-                                alignItems: "flex-end",
-                                height: 100,
-                                overflowX: "auto",
-                              }}
-                            >
+                          <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, marginBottom: 18, border: "1px solid #334155" }}>
+                            <div style={{ fontWeight: 700, marginBottom: 14, fontSize: 14, color: "#f1f5f9" }}>📅 ยอดซื้อรายวัน</div>
+                            <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 100, overflowX: "auto" }}>
                               {dayRows.map((d) => (
-                                <div
-                                  key={d.date}
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    minWidth: 36,
-                                    flex: 1,
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      gap: 2,
-                                      alignItems: "flex-end",
-                                      height: 80,
-                                      marginBottom: 4,
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        width: 8,
-                                        background: "#22c55e",
-                                        borderRadius: "3px 3px 0 0",
-                                        height: `${Math.max(4, (d.add / maxQty) * 76)}px`,
-                                      }}
-                                    />
-                                    <div
-                                      style={{
-                                        width: 8,
-                                        background: "#ef4444",
-                                        borderRadius: "3px 3px 0 0",
-                                        height: `${Math.max(4, (d.remove / maxQty) * 76)}px`,
-                                      }}
-                                    />
-                                    <div
-                                      style={{
-                                        width: 8,
-                                        background: "#f97316",
-                                        borderRadius: "3px 3px 0 0",
-                                        height: `${Math.max(4, (d.free / maxQty) * 76)}px`,
-                                      }}
-                                    />
+                                <div key={d.date} style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, flex: 1 }}>
+                                  <div style={{ height: 80, display: "flex", alignItems: "flex-end", marginBottom: 4 }}>
+                                    <div style={{ width: 14, background: "#22c55e", borderRadius: "3px 3px 0 0", height: `${Math.max(4, (d.qty / maxQty) * 76)}px` }} />
                                   </div>
-                                  <div
-                                    style={{ fontSize: 9, color: "#64748b" }}
-                                  >
-                                    {d.date.slice(8)}
-                                  </div>
+                                  <div style={{ fontSize: 9, color: "#64748b" }}>{d.date.slice(8)}</div>
                                 </div>
                               ))}
                             </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: 16,
-                                marginTop: 10,
-                                justifyContent: "center",
-                                flexWrap: "wrap",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 5,
-                                  fontSize: 11,
-                                  color: "#94a3b8",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: 10,
-                                    height: 10,
-                                    background: "#22c55e",
-                                    borderRadius: 2,
-                                  }}
-                                />{" "}
-                                เพิ่มเข้า
-                              </div>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 5,
-                                  fontSize: 11,
-                                  color: "#94a3b8",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: 10,
-                                    height: 10,
-                                    background: "#ef4444",
-                                    borderRadius: 2,
-                                  }}
-                                />{" "}
-                                ตัดออ  � (ขาย)
-                              </div>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 5,
-                                  fontSize: 11,
-                                  color: "#94a3b8",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: 10,
-                                    height: 10,
-                                    background: "#f97316",
-                                    borderRadius: 2,
-                                  }}
-                                />{" "}
-                                แจกฟรี
-                              </div>
-                            </div>
                           </div>
                         ) : (
-                          <div
-                            style={{
-                              textAlign: "center",
-                              padding: "40px 0",
-                              color: "#475569",
-                            }}
-                          >
-                            <div style={{ fontSize: 36, marginBottom: 10 }}>
-                              📭
-                            </div>
-                            <div>ไม่มีการเคลื่อนไหวในเดือนนี้</div>
+                          <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                            <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
+                            <div>ไม่มีการซื้อเข้าในเดือนนี้</div>
                           </div>
                         )}
 
                         {dayRows.length > 0 && (
-                          <div
-                            style={{
-                              background: "#1e293b",
-                              borderRadius: 14,
-                              padding: 16,
-                              marginBottom: 18,
-                              border: "1px solid #334155",
-                            }}
-                          >
-                            <div
-                              style={{
-                                fontWeight: 700,
-                                marginBottom: 12,
-                                fontSize: 14,
-                                color: "#f1f5f9",
-                              }}
-                            >
-                              📋 สรุปรายวัน
-                            </div>
-                            <table
-                              style={{
-                                width: "100%",
-                                borderCollapse: "collapse",
-                                fontSize: 13,
-                              }}
-                            >
+                          <div style={{ background: "#1e293b", borderRadius: 14, padding: 16, border: "1px solid #334155" }}>
+                            <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 14, color: "#f1f5f9" }}>📋 สรุปรายวัน</div>
+                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                               <thead>
                                 <tr style={{ color: "#64748b" }}>
-                                  <th
-                                    style={{
-                                      textAlign: "left",
-                                      paddingBottom: 8,
-                                    }}
-                                  >
-                                    วันที่
-                                  </th>
-                                  <th
-                                    style={{
-                                      textAlign: "right",
-                                      paddingBottom: 8,
-                                    }}
-                                  >
-                                    เพิ่ม
-                                  </th>
-                                  <th
-                                    style={{
-                                      textAlign: "right",
-                                      paddingBottom: 8,
-                                    }}
-                                  >
-                                    ขาย
-                                  </th>
-                                  <th
-                                    style={{
-                                      textAlign: "right",
-                                      paddingBottom: 8,
-                                    }}
-                                  >
-                                    ฟรี
-                                  </th>
+                                  <th style={{ textAlign: "left", paddingBottom: 8 }}>วันที่</th>
+                                  <th style={{ textAlign: "right", paddingBottom: 8 }}>ซื้อเข้า</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {[...dayRows].reverse().map((d) => (
-                                  <tr
-                                    key={d.date}
-                                    style={{ borderTop: "1px solid #0f172a" }}
-                                  >
-                                    <td
-                                      style={{
-                                        padding: "7px 0",
-                                        color: "#cbd5e1",
-                                      }}
-                                    >
-                                      {d.date}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "7px 0",
-                                        textAlign: "right",
-                                        color: "#22c55e",
-                                      }}
-                                    >
-                                      +{d.add}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "7px 0",
-                                        textAlign: "right",
-                                        color: "#ef4444",
-                                      }}
-                                    >
-                                      -{d.remove}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "7px 0",
-                                        textAlign: "right",
-                                        color: "#f97316",
-                                      }}
-                                    >
-                                      {d.free > 0 ? `-${d.free}` : "-"}
-                                    </td>
+                                  <tr key={d.date} style={{ borderTop: "1px solid #0f172a" }}>
+                                    <td style={{ padding: "7px 0", color: "#cbd5e1" }}>{d.date}</td>
+                                    <td style={{ padding: "7px 0", textAlign: "right", color: "#22c55e" }}>+{d.qty}</td>
                                   </tr>
                                 ))}
                               </tbody>
                             </table>
                           </div>
                         )}
-
-                        {freeNotes.length > 0 && (
-                          <div
-                            style={{
-                              background: "#1e293b",
-                              borderRadius: 14,
-                              padding: 16,
-                              border: "1px solid #334155",
-                            }}
-                          >
-                            <div
-                              style={{
-                                fontWeight: 700,
-                                marginBottom: 12,
-                                fontSize: 14,
-                                color: "#f1f5f9",
-                              }}
-                            >
-                              🎁 รายการแจกฟรี
-                            </div>
-                            {[...freeNotes]
-                              .sort((a, b) => b.created_at - a.created_at)
-                              .map((m) => (
-                                <div
-                                  key={m.id}
-                                  style={{
-                                    padding: "8px 0",
-                                    borderTop: "1px solid #0f172a",
-                                    fontSize: 13,
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        color: "#f97316",
-                                        fontWeight: 700,
-                                      }}
-                                    >
-                                      -{m.quantity} {item.unit}
-                                    </span>
-                                    <span
-                                      style={{ color: "#64748b", fontSize: 11 }}
-                                    >
-                                      {m.date} · {m.created_by}
-                                    </span>
-                                  </div>
-                                  {m.note && (
-                                    <div
-                                      style={{
-                                        color: "#94a3b8",
-                                        fontSize: 12,
-                                        marginTop: 2,
-                                      }}
-                                    >
-                                      {m.note}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                          </div>
-                        )}
                       </div>
                     );
                   })()}
-              </div>
-            )}
-
-            {stockKind === "fresh" &&
-              (() => {
-                const sortedFreshStockItems = [...freshStockItems].sort(
-                  (a, b) => a.name.localeCompare(b.name, "th"),
-                );
-                // Item picker modal ของสด — เปิดตอนกดปุ่ม "บันทึกซื้อของเพิ่ม" ด้านล่างตาราง
-                return (
-                  <div>
-                    {pendingFreshStockAction && (
-                      <div
-                        style={{
-                          position: "fixed",
-                          inset: 0,
-                          background: "rgba(0,0,0,0.75)",
-                          display: "flex",
-                          alignItems: "flex-end",
-                          justifyContent: "center",
-                          zIndex: 9998,
-                        }}
-                      >
-                        <div
-                          style={{
-                            background: "#1e293b",
-                            borderRadius: "16px 16px 0 0",
-                            padding: "20px 16px 32px",
-                            width: "100%",
-                            maxWidth: 480,
-                            maxHeight: "70vh",
-                            overflowY: "auto",
-                            border: "1px solid #334155",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontWeight: 700,
-                              fontSize: 15,
-                              color: "#f1f5f9",
-                              marginBottom: 14,
-                              textAlign: "center",
-                            }}
-                          >
-                            📥 เลือกของที่จะซื้อเพิ่ม
-                          </div>
-                          {freshStockItems.length === 0 && (
-                            <div
-                              style={{
-                                textAlign: "center",
-                                padding: "20px 0",
-                                color: "#64748b",
-                                fontSize: 13,
-                              }}
-                            >
-                              ยังไม่มีสินค้าของสด กด "เพิ่มสินค้า" ก่อน
-                            </div>
-                          )}
-                          {sortedFreshStockItems.map((item) => {
-                            const total = getFreshStockCount(item.id);
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => {
-                                  setPendingFreshStockAction(null);
-                                  askFreshStockQty(item, "add");
-                                }}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  width: "100%",
-                                  padding: "10px 12px",
-                                  marginBottom: 6,
-                                  borderRadius: 10,
-                                  border: "1px solid #334155",
-                                  background: "#0f172a",
-                                  cursor: "pointer",
-                                  textAlign: "left",
-                                }}
-                              >
-                                <span
-                                  style={{ color: "#f1f5f9", fontSize: 14 }}
-                                >
-                                  {item.name}
-                                </span>
-                                <span
-                                  style={{
-                                    color: "#64748b",
-                                    fontWeight: 700,
-                                    fontSize: 13,
-                                  }}
-                                >
-                                  ซื้อสะสม {total} {item.unit}
-                                </span>
-                              </button>
-                            );
-                          })}
-                          <button
-                            onClick={() => setPendingFreshStockAction(null)}
-                            style={{
-                              width: "100%",
-                              padding: "11px 0",
-                              borderRadius: 10,
-                              border: "1px solid #334155",
-                              background: "#0f172a",
-                              color: "#94a3b8",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              fontSize: 15,
-                              marginTop: 8,
-                            }}
-                          >
-                            ยกเลิก
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {freshStockView === "list" &&
-                      (() => {
-                        let rangeStart = freshStockRangeStart;
-                        let rangeEnd = freshStockRangeEnd;
-                        if (rangeStart > rangeEnd) {
-                          const tmp = rangeStart;
-                          rangeStart = rangeEnd;
-                          rangeEnd = tmp;
-                        }
-
-                        const dayDates = [];
-                        {
-                          const cursor = new Date(rangeStart + "T00:00:00");
-                          const endD = new Date(rangeEnd + "T00:00:00");
-                          let guard = 0;
-                          while (cursor <= endD && guard < 62) {
-                            const yyyy = cursor.getFullYear();
-                            const mm = String(cursor.getMonth() + 1).padStart(
-                              2,
-                              "0",
-                            );
-                            const dd = String(cursor.getDate()).padStart(
-                              2,
-                              "0",
-                            );
-                            dayDates.push(`${yyyy}-${mm}-${dd}`);
-                            cursor.setDate(cursor.getDate() + 1);
-                            guard++;
-                          }
-                        }
-                        const days = dayDates.map((d) => d.slice(5));
-
-                        // จำนวนที่ซื้อเข้าเฉพาะวันนั้น (คอลัมรายวัน)
-                        const getPurchasedOnDay = (itemId, date) =>
-                          freshStockMovements
-                            .filter(
-                              (m) =>
-                                m.item_id === itemId &&
-                                m.date === date &&
-                                m.type === "add",
-                            )
-                            .reduce((s, m) => s + m.quantity, 0);
-
-                        // ผลรวมที่ซื้อเข้าทั้งหมด เฉพาะภายในช่วงวันที่ที่เลือกอยู่ (คอลัม "ทั้งหมด")
-                        const getPurchasedInRange = (itemId) =>
-                          freshStockMovements
-                            .filter(
-                              (m) =>
-                                m.item_id === itemId &&
-                                m.type === "add" &&
-                                dayDates.includes(m.date),
-                            )
-                            .reduce((s, m) => s + m.quantity, 0);
-
-                        return (
-                          <div>
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                marginBottom: 14,
-                                flexWrap: "wrap",
-                                gap: 10,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  fontWeight: 700,
-                                  fontSize: 15,
-                                  color: "#f1f5f9",
-                                }}
-                              >
-                                🥬 สต็อกของสด (บันทึกการซื้อ)
-                              </div>
-                              <button
-                                onClick={askNewFreshItem}
-                                style={{
-                                  padding: "7px 12px",
-                                  borderRadius: 8,
-                                  border: "none",
-                                  cursor: "pointer",
-                                  background:
-                                    "linear-gradient(135deg,#1d4ed8,#3b82f6)",
-                                  color: "#fff",
-                                  fontWeight: 700,
-                                  fontSize: 12,
-                                }}
-                              >
-                                ➕ เพิ่มสินค้า
-                              </button>
-                            </div>
-
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                                flexWrap: "wrap",
-                                background: "#1e293b",
-                                border: "1px solid #334155",
-                                borderRadius: 10,
-                                padding: "10px 12px",
-                                marginBottom: 16,
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: 12,
-                                  color: "#94a3b8",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                ช่วงวันที่:
-                              </span>
-                              <input
-                                type="date"
-                                value={freshStockRangeStart}
-                                onChange={(e) =>
-                                  setFreshStockRangeStart(e.target.value)
-                                }
-                                style={{
-                                  background: "#0f172a",
-                                  border: "1px solid #334155",
-                                  color: "#f1f5f9",
-                                  padding: "6px 10px",
-                                  borderRadius: 8,
-                                  fontSize: 13,
-                                }}
-                              />
-                              <span style={{ fontSize: 12, color: "#64748b" }}>
-                                ถึง
-                              </span>
-                              <input
-                                type="date"
-                                value={freshStockRangeEnd}
-                                onChange={(e) =>
-                                  setFreshStockRangeEnd(e.target.value)
-                                }
-                                style={{
-                                  background: "#0f172a",
-                                  border: "1px solid #334155",
-                                  color: "#f1f5f9",
-                                  padding: "6px 10px",
-                                  borderRadius: 8,
-                                  fontSize: 13,
-                                }}
-                              />
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: 6,
-                                  marginLeft: "auto",
-                                }}
-                              >
-                                <button
-                                  onClick={() => {
-                                    setFreshStockRangeStart(daysAgoStr(6));
-                                    setFreshStockRangeEnd(todayStr());
-                                  }}
-                                  style={{
-                                    padding: "6px 10px",
-                                    borderRadius: 8,
-                                    border: "1px solid #334155",
-                                    background: "#0f172a",
-                                    color: "#94a3b8",
-                                    fontSize: 11,
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  7 วันล่าสุด
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setFreshStockRangeStart(daysAgoStr(29));
-                                    setFreshStockRangeEnd(todayStr());
-                                  }}
-                                  style={{
-                                    padding: "6px 10px",
-                                    borderRadius: 8,
-                                    border: "1px solid #334155",
-                                    background: "#0f172a",
-                                    color: "#94a3b8",
-                                    fontSize: 11,
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  30 วันล่าสุด
-                                </button>
-                              </div>
-                            </div>
-
-                            {freshStockItems.length > 0 ? (
-                              <div
-                                style={{
-                                  overflowX: "auto",
-                                  borderRadius: 12,
-                                  border: "1px solid #334155",
-                                  marginBottom: 16,
-                                }}
-                              >
-                                <table
-                                  style={{
-                                    width: "100%",
-                                    borderCollapse: "collapse",
-                                    fontSize: 12,
-                                    minWidth: 460,
-                                  }}
-                                >
-                                  <thead>
-                                    <tr style={{ background: "#0f172a" }}>
-                                      <th
-                                        style={{
-                                          textAlign: "left",
-                                          padding: "8px 10px",
-                                          color: "#64748b",
-                                          fontWeight: 700,
-                                          minWidth: 110,
-                                        }}
-                                      >
-                                        สินค้า
-                                      </th>
-                                      <th
-                                        style={{
-                                          textAlign: "center",
-                                          padding: "8px 6px",
-                                          color: "#22c55e",
-                                          fontWeight: 700,
-                                          minWidth: 52,
-                                        }}
-                                      >
-                                        ทั้งหมด
-                                      </th>
-                                      {days.map((d) => (
-                                        <th
-                                          key={d}
-                                          style={{
-                                            textAlign: "center",
-                                            padding: "8px 4px",
-                                            color: "#64748b",
-                                            fontWeight: 600,
-                                            minWidth: 36,
-                                          }}
-                                        >
-                                          {d}
-                                        </th>
-                                      ))}
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {sortedFreshStockItems.map((item, idx) => {
-                                      const total = getPurchasedInRange(
-                                        item.id,
-                                      );
-                                      return (
-                                        <tr
-                                          key={item.id}
-                                          style={{
-                                            borderTop: "1px solid #1e293b",
-                                            background:
-                                              idx % 2 === 0
-                                                ? "#1e293b"
-                                                : "#172033",
-                                          }}
-                                        >
-                                          <td style={{ padding: "9px 10px" }}>
-                                            <button
-                                              onClick={() => {
-                                                setSelectedFreshStockItemId(
-                                                  item.id,
-                                                );
-                                                setFreshStockView("graph");
-                                              }}
-                                              style={{
-                                                background: "none",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                padding: 0,
-                                                textAlign: "left",
-                                              }}
-                                            >
-                                              <span
-                                                style={{
-                                                  color: "#e2e8f0",
-                                                  fontSize: 12,
-                                                }}
-                                              >
-                                                {item.name}
-                                              </span>
-                                              <span
-                                                style={{
-                                                  display: "block",
-                                                  fontSize: 10,
-                                                  color: "#3b82f6",
-                                                }}
-                                              >
-                                                📈 ดูกราฟ
-                                              </span>
-                                            </button>
-                                          </td>
-                                          <td
-                                            style={{
-                                              textAlign: "center",
-                                              padding: "9px 6px",
-                                              fontWeight: 800,
-                                              fontSize: 14,
-                                              color:
-                                                total > 0
-                                                  ? "#22c55e"
-                                                  : "#64748b",
-                                            }}
-                                          >
-                                            {total}
-                                          </td>
-                                          {dayDates.map((date) => {
-                                            const bought = getPurchasedOnDay(
-                                              item.id,
-                                              date,
-                                            );
-                                            return (
-                                              <td
-                                                key={date}
-                                                style={{
-                                                  textAlign: "center",
-                                                  padding: "9px 4px",
-                                                  color:
-                                                    bought > 0
-                                                      ? "#22c55e"
-                                                      : "#334155",
-                                                  fontWeight:
-                                                    bought > 0 ? 700 : 400,
-                                                }}
-                                              >
-                                                {bought > 0 ? bought : "—"}
-                                              </td>
-                                            );
-                                          })}
-                                        </tr>
-                                      );
-                                    })}
-                                  </tbody>
-                                </table>
-                              </div>
-                            ) : (
-                              <div
-                                style={{
-                                  textAlign: "center",
-                                  padding: "40px 0",
-                                  color: "#475569",
-                                }}
-                              >
-                                <div style={{ fontSize: 40, marginBottom: 12 }}>
-                                  🥬
-                                </div>
-                                <div>
-                                  ยังไม่มีสินค้าของสดในสต็อก
-                                  <br />
-                                  กดปุ่ม "เพิ่มสินค้า" เพื่อเริ่มต้น
-                                  (ต้องกรอกรหัสประจำตัว)
-                                </div>
-                              </div>
-                            )}
-
-                            {/* เหลือปุ่มเดียว: บันทึกการซื้อของเพิ่ม */}
-                            <div
-                              style={{
-                                marginTop: 10,
-                                position: "sticky",
-                                bottom: 16,
-                              }}
-                            >
-                              <button
-                                onClick={() =>
-                                  setPendingFreshStockAction("add")
-                                }
-                                style={{
-                                  width: "100%",
-                                  padding: "13px 0",
-                                  borderRadius: 12,
-                                  border: "none",
-                                  cursor: "pointer",
-                                  background:
-                                    "linear-gradient(135deg,#15803d,#22c55e)",
-                                  color: "#fff",
-                                  fontWeight: 800,
-                                  fontSize: 14,
-                                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                                }}
-                              >
-                                📥 บันทึกซื้อของเพิ่ม
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                    {freshStockView === "graph" &&
-                      (() => {
-                        const item = freshStockItems.find(
-                          (i) => i.id === selectedFreshStockItemId,
-                        );
-                        if (!item) {
-                          return (
-                            <div
-                              style={{
-                                textAlign: "center",
-                                padding: "40px 0",
-                                color: "#475569",
-                              }}
-                            >
-                              <div style={{ fontSize: 36, marginBottom: 10 }}>
-                                📭
-                              </div>
-                              <div style={{ marginBottom: 14 }}>
-                                ไม่พบสินค้านี้
-                              </div>
-                              <button
-                                onClick={() => setFreshStockView("list")}
-                                style={{
-                                  padding: "9px 18px",
-                                  borderRadius: 8,
-                                  border: "1px solid #334155",
-                                  background: "#1e293b",
-                                  color: "#94a3b8",
-                                  fontWeight: 700,
-                                  cursor: "pointer",
-                                  fontSize: 13,
-                                }}
-                              >
-                                ← กลับไปหน้าสต็อกของสด
-                              </button>
-                            </div>
-                          );
-                        }
-                        const itemMovements = freshStockMovements
-                          .filter(
-                            (m) =>
-                              m.item_id === item.id &&
-                              m.type === "add" &&
-                              m.date.startsWith(freshStockGraphMonth),
-                          )
-                          .sort((a, b) => a.date.localeCompare(b.date));
-
-                        const dayMap = {};
-                        itemMovements.forEach((m) => {
-                          if (!dayMap[m.date]) dayMap[m.date] = 0;
-                          dayMap[m.date] += m.quantity;
-                        });
-                        const dayRows = Object.entries(dayMap).map(
-                          ([date, qty]) => ({ date, qty }),
-                        );
-                        const maxQty = Math.max(
-                          ...dayRows.map((d) => d.qty),
-                          1,
-                        );
-                        const totalThisMonth = dayRows.reduce(
-                          (s, d) => s + d.qty,
-                          0,
-                        );
-
-                        return (
-                          <div>
-                            <button
-                              onClick={() => setFreshStockView("list")}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                color: "#94a3b8",
-                                cursor: "pointer",
-                                fontSize: 13,
-                                marginBottom: 14,
-                                padding: 0,
-                              }}
-                            >
-                              ← กลับไปหน้าสต็อกของสด
-                            </button>
-
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                marginBottom: 14,
-                              }}
-                            >
-                              <div>
-                                <div
-                                  style={{
-                                    fontWeight: 800,
-                                    fontSize: 17,
-                                    color: "#f1f5f9",
-                                  }}
-                                >
-                                  {item.name}
-                                </div>
-                                <div style={{ fontSize: 12, color: "#64748b" }}>
-                                  ซื้อเข้าเดือนนี้:{" "}
-                                  <span
-                                    style={{
-                                      color: "#22c55e",
-                                      fontWeight: 700,
-                                    }}
-                                  >
-                                    {totalThisMonth} {item.unit}
-                                  </span>
-                                </div>
-                              </div>
-                              <input
-                                type="month"
-                                value={freshStockGraphMonth}
-                                onChange={(e) =>
-                                  setFreshStockGraphMonth(e.target.value)
-                                }
-                                style={{
-                                  background: "#1e293b",
-                                  border: "1px solid #334155",
-                                  color: "#f1f5f9",
-                                  padding: "6px 10px",
-                                  borderRadius: 8,
-                                  fontSize: 13,
-                                }}
-                              />
-                            </div>
-
-                            {dayRows.length > 0 ? (
-                              <div
-                                style={{
-                                  background: "#1e293b",
-                                  borderRadius: 14,
-                                  padding: 16,
-                                  marginBottom: 18,
-                                  border: "1px solid #334155",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    fontWeight: 700,
-                                    marginBottom: 14,
-                                    fontSize: 14,
-                                    color: "#f1f5f9",
-                                  }}
-                                >
-                                  📅 ยอดซื้อรายวัน
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    gap: 4,
-                                    alignItems: "flex-end",
-                                    height: 100,
-                                    overflowX: "auto",
-                                  }}
-                                >
-                                  {dayRows.map((d) => (
-                                    <div
-                                      key={d.date}
-                                      style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        minWidth: 28,
-                                        flex: 1,
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          height: 80,
-                                          display: "flex",
-                                          alignItems: "flex-end",
-                                          marginBottom: 4,
-                                        }}
-                                      >
-                                        <div
-                                          style={{
-                                            width: 14,
-                                            background: "#22c55e",
-                                            borderRadius: "3px 3px 0 0",
-                                            height: `${Math.max(4, (d.qty / maxQty) * 76)}px`,
-                                          }}
-                                        />
-                                      </div>
-                                      <div
-                                        style={{
-                                          fontSize: 9,
-                                          color: "#64748b",
-                                        }}
-                                      >
-                                        {d.date.slice(8)}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                style={{
-                                  textAlign: "center",
-                                  padding: "40px 0",
-                                  color: "#475569",
-                                }}
-                              >
-                                <div style={{ fontSize: 36, marginBottom: 10 }}>
-                                  📭
-                                </div>
-                                <div>ไม่มีการซื้อเข้าในเดือนนี้</div>
-                              </div>
-                            )}
-
-                            {dayRows.length > 0 && (
-                              <div
-                                style={{
-                                  background: "#1e293b",
-                                  borderRadius: 14,
-                                  padding: 16,
-                                  border: "1px solid #334155",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    fontWeight: 700,
-                                    marginBottom: 12,
-                                    fontSize: 14,
-                                    color: "#f1f5f9",
-                                  }}
-                                >
-                                  📋 สรุปรายวัน
-                                </div>
-                                <table
-                                  style={{
-                                    width: "100%",
-                                    borderCollapse: "collapse",
-                                    fontSize: 13,
-                                  }}
-                                >
-                                  <thead>
-                                    <tr style={{ color: "#64748b" }}>
-                                      <th
-                                        style={{
-                                          textAlign: "left",
-                                          paddingBottom: 8,
-                                        }}
-                                      >
-                                        วันที่
-                                      </th>
-                                      <th
-                                        style={{
-                                          textAlign: "right",
-                                          paddingBottom: 8,
-                                        }}
-                                      >
-                                        ซื้อเข้า
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {[...dayRows].reverse().map((d) => (
-                                      <tr
-                                        key={d.date}
-                                        style={{
-                                          borderTop: "1px solid #0f172a",
-                                        }}
-                                      >
-                                        <td
-                                          style={{
-                                            padding: "7px 0",
-                                            color: "#cbd5e1",
-                                          }}
-                                        >
-                                          {d.date}
-                                        </td>
-                                        <td
-                                          style={{
-                                            padding: "7px 0",
-                                            textAlign: "right",
-                                            color: "#22c55e",
-                                          }}
-                                        >
-                                          +{d.qty}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-                  </div>
-                );
-              })()}
+                </div>
+              );
+            })()}
           </div>
         )}
 
         {/* HISTORY */}
         {tab === "history" && (
           <div>
-            <div
-              style={{
-                fontWeight: 700,
-                fontSize: 15,
-                marginBottom: 14,
-                color: "#f1f5f9",
-              }}
-            >
-              📋 ประวัติทั้งหมด ({records.length} รายการ)
-            </div>
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14, color: "#f1f5f9" }}>📋 ประวัติทั้งหมด ({records.length} รายการ)</div>
             {records.length === 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "50px 0",
-                  color: "#475569",
-                }}
-              >
+              <div style={{ textAlign: "center", padding: "50px 0", color: "#475569" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
                 <div>ยังไม่มีรายการ</div>
               </div>
@@ -5216,81 +2566,38 @@ function App() {
             {records.map((r) => {
               const isDeleted = !!r.deleted;
               return (
-                <div
-                  key={r.id}
-                  style={{
-                    background: "#1e293b",
-                    borderRadius: 12,
-                    padding: "13px 14px",
-                    marginBottom: 8,
-                    border: `1px solid ${isDeleted ? "#334155" : r.type === "income" ? "#166534" : "#7f1d1d"}`,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    opacity: isDeleted ? 0.6 : 1,
-                  }}
-                >
-                  <div style={{ fontSize: 22 }}>
-                    {isDeleted ? "🗑️" : r.type === "income" ? "💚" : "❤️"}
-                  </div>
+                <div key={r.id} style={{
+                  background: "#1e293b", borderRadius: 12, padding: "13px 14px", marginBottom: 8,
+                  border: `1px solid ${isDeleted ? "#334155" : (r.type === "income" ? "#166534" : "#7f1d1d")}`,
+                  display: "flex", alignItems: "center", gap: 12,
+                  opacity: isDeleted ? 0.6 : 1,
+                }}>
+                  <div style={{ fontSize: 22 }}>{isDeleted ? "🗑️" : (r.type === "income" ? "💚" : "❤️")}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 16,
-                          color: isDeleted
-                            ? "#64748b"
-                            : r.type === "income"
-                              ? "#22c55e"
-                              : "#ef4444",
-                          textDecoration: isDeleted ? "line-through" : "none",
-                        }}
-                      >
-                        {r.type === "income" ? "+" : "-"}
-                        {formatMoney(r.amount)} ฿
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{
+                        fontWeight: 700, fontSize: 16,
+                        color: isDeleted ? "#64748b" : (r.type === "income" ? "#22c55e" : "#ef4444"),
+                        textDecoration: isDeleted ? "line-through" : "none",
+                      }}>
+                        {r.type === "income" ? "+" : "-"}{formatMoney(r.amount)} ฿
                       </span>
-                      <span style={{ fontSize: 11, color: "#64748b" }}>
-                        {r.date}
-                      </span>
+                      <span style={{ fontSize: 11, color: "#64748b" }}>{r.date}</span>
                     </div>
-                    <div
-                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}
-                    >
-                      {r.category}
-                      {r.note ? ` · ${r.note}` : ""}
+                    <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+                      {r.category}{r.note ? ` · ${r.note}` : ""}
                     </div>
-                    <div
-                      style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}
-                    >
+                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}>
                       {r.created_by ? `บันทึกโดย ${r.created_by}` : ""}
-                      {isDeleted
-                        ? ` · ลบไปแล้ว${r.deleted_by ? ` โดย ${r.deleted_by}` : ""}`
-                        : ""}
+                      {isDeleted ? ` · ลบไปแล้ว${r.deleted_by ? ` โดย ${r.deleted_by}` : ""}` : ""}
                     </div>
                   </div>
                   {!isDeleted && (
-                    <button
-                      onClick={() => askDelete(r)}
-                      style={{
-                        background: "rgba(239,68,68,0.1)",
-                        border: "1px solid rgba(239,68,68,0.3)",
-                        cursor: "pointer",
-                        color: "#ef4444",
-                        fontSize: 16,
-                        padding: "6px 10px",
-                        borderRadius: 8,
-                      }}
-                      title="ลบรายการ"
-                    >
-                      🗑️
-                    </button>
+                    <button onClick={() => askDelete(r)} style={{
+                      background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
+                      cursor: "pointer", color: "#ef4444", fontSize: 16,
+                      padding: "6px 10px", borderRadius: 8,
+                    }} title="ลบรายการ">🗑️</button>
                   )}
                 </div>
               );
@@ -5303,149 +2610,53 @@ function App() {
 }
 
 const inputStyle = {
-  width: "100%",
-  background: "#0f172a",
-  border: "1px solid #334155",
-  color: "#f1f5f9",
-  padding: "11px 14px",
-  borderRadius: 10,
-  fontSize: 15,
+  width: "100%", background: "#0f172a", border: "1px solid #334155",
+  color: "#f1f5f9", padding: "11px 14px", borderRadius: 10, fontSize: 15,
   boxSizing: "border-box",
 };
 const labelStyle = {
-  display: "block",
-  marginBottom: 6,
-  fontSize: 13,
-  color: "#94a3b8",
-  fontWeight: 600,
+  display: "block", marginBottom: 6, fontSize: 13, color: "#94a3b8", fontWeight: 600,
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 
-function FreshPurchaseModal({
-  itemName,
-  unit,
-  value,
-  setValue,
-  date,
-  setDate,
-  onConfirm,
-  onCancel,
-}) {
+function FreshPurchaseModal({ itemName, unit, value, setValue, date, setDate, onConfirm, onCancel }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 16,
-          padding: 20,
-          maxWidth: 320,
-          width: "100%",
-          border: "1px solid #334155",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-        }}
-      >
-        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>
-          📥
-        </div>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 16,
-            color: "#f1f5f9",
-            marginBottom: 4,
-            textAlign: "center",
-          }}
-        >
-          บันทึกซื้อของเพิ่ม
-        </div>
-        <div
-          style={{
-            fontSize: 13,
-            color: "#94a3b8",
-            marginBottom: 16,
-            textAlign: "center",
-          }}
-        >
-          {itemName}
-        </div>
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
+      padding: 16,
+    }}>
+      <div style={{
+        background: "#1e293b", borderRadius: 16, padding: 20,
+        maxWidth: 320, width: "100%", border: "1px solid #334155",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+      }}>
+        <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>📥</div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#f1f5f9", marginBottom: 4, textAlign: "center" }}>บันทึกซื้อของเพิ่ม</div>
+        <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 16, textAlign: "center" }}>{itemName}</div>
         <input
           type="number"
           autoFocus
           placeholder={`จำนวน (${unit})`}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          style={{
-            ...inputStyle,
-            fontSize: 20,
-            fontWeight: 700,
-            textAlign: "center",
-            marginBottom: 10,
-          }}
+          style={{ ...inputStyle, fontSize: 20, fontWeight: 700, textAlign: "center", marginBottom: 10 }}
         />
         <div style={{ marginBottom: 16 }}>
-          <label
-            style={{
-              display: "block",
-              marginBottom: 6,
-              fontSize: 12,
-              color: "#94a3b8",
-              fontWeight: 600,
-            }}
-          >
-            📅 วันที่ซื้อ
-          </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={inputStyle}
-          />
+          <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>📅 วันที่ซื้อ</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#94a3b8",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              flex: 1,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "linear-gradient(135deg,#15803d,#22c55e)",
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              fontSize: 15,
-            }}
-          >
-            ยืนยัน
-          </button>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "1px solid #334155",
+            background: "#0f172a", color: "#94a3b8", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยกเลิก</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "11px 0", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#15803d,#22c55e)",
+            color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 15,
+          }}>ยืนยัน</button>
         </div>
       </div>
     </div>
